@@ -1,7 +1,7 @@
 from typing import Optional
 import logging
 from oemof.solph import Bus, Flow, Investment
-from oemof.solph.components import Source
+from oemof.solph.components import Source, Sink
 from mtress.carriers import GasCarrier
 from mtress.physics import Gas
 from mtress._abstract_component import AbstractSolphRepresentation
@@ -73,6 +73,23 @@ class GasGridConnection(AbstractSolphRepresentation):
                     b_grid_import: Flow(
                         variable_costs=self.working_rate,
                         investment=demand_rate,
+                    )
+                },
+            )
+
+        if self.revenue is not None:
+            b_grid_export = self.create_solph_node(
+                label=f"grid_export_{pressure_level:.0f}",
+                node_type=Bus,
+                inputs={gas_carrier.inputs[self.gas_type][pressure_level]: Flow()},
+            )
+
+            self.create_solph_node(
+                label="grid_export",
+                node_type=Sink,
+                inputs={
+                    b_grid_export: Flow(
+                        variable_costs=-self.revenue,
                     )
                 },
             )
