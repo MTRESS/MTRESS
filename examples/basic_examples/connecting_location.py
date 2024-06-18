@@ -3,8 +3,8 @@ Basic working 'electricity' example.
 """
 
 import os
-import pandas as pd
 
+import pandas as pd
 from oemof.solph.processing import results
 
 from mtress import Location, MetaModel, SolphModel, carriers, demands, technologies
@@ -45,10 +45,15 @@ house_1.add(
 )
 
 house_1.add(
-    technologies.Electrolyser(name="Ely", nominal_power=1000, template=PEM_ELECTROLYSER)
+    technologies.Electrolyser(
+        name="Ely",
+        nominal_power=1000,
+        template=PEM_ELECTROLYSER,
+        hydrogen_output_pressure=60,
+    )
 )
 
-house_1.add(carriers.GasCarrier(gases={HYDROGEN: [30]}))
+house_1.add(carriers.GasCarrier(gases={HYDROGEN: [60, 30]}))
 house_1.add(carriers.Heat(temperature_levels=[50], reference_temperature=10))
 house_1.add(demands.HeatSink(name="Heat-Sink", temperature_levels=30))
 house_1.add(
@@ -82,10 +87,10 @@ house_1.connect(connection=technologies.ElectricityGridConnection, destination=h
 solph_representation.build_solph_model()
 
 plot = solph_representation.graph(detail=True)
-plot.render(outfile="second_location_pv_detail.png")
+plot.render(outfile="conn_pv_detail.png")
 
 plot = solph_representation.graph(detail=False)
-plot.render(outfile="second_location_pv_simple.png")
+plot.render(outfile="conn_pv_simple.png")
 
 
 solved_model = solph_representation.solve(solve_kwargs={"tee": True})
