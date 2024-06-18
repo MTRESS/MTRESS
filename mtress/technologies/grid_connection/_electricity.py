@@ -6,9 +6,11 @@ from typing import Optional
 
 from oemof.solph import Bus, Flow, Investment
 from oemof.solph.components import Sink, Source
+
+from mtress._abstract_component import AbstractSolphRepresentation
 from mtress._data_handler import TimeseriesSpecifier, TimeseriesType
 from mtress.carriers import Electricity
-from mtress._abstract_component import AbstractSolphRepresentation
+
 from ._abstract_grid_connection import AbstractGridConnection
 
 
@@ -36,12 +38,13 @@ class ElectricityGridConnection(AbstractGridConnection, AbstractSolphRepresentat
     def build_core(self):
         electricity_carrier = self.location.get_carrier(Electricity)
 
+        self.grid_export = b_grid_export = self.create_solph_node(
+            label="grid_export",
+            node_type=Bus,
+            inputs={electricity_carrier.feed_in: Flow()},
+        )
+
         if self.revenue is not None:
-            self.grid_export = b_grid_export = self.create_solph_node(
-                label="grid_export",
-                node_type=Bus,
-                inputs={electricity_carrier.feed_in: Flow()},
-            )
             self.create_solph_node(
                 label="sink_export",
                 node_type=Sink,
@@ -83,4 +86,5 @@ class ElectricityGridConnection(AbstractGridConnection, AbstractSolphRepresentat
         self,
         other: ElectricityGridConnection,
     ):
+        # TODO create the actual flows between the location in establish interconnections
         self.grid_export.outputs[other.grid_import] = Flow()
