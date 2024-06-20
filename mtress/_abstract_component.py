@@ -23,6 +23,21 @@ SOLPH_SHAPES = {
     GenericStorage: "cylinder",
 }
 
+EDGE_COLORS = {
+    "HeatCarrier": "red",
+    "HeatSource": "red",
+    "HeatSink": "red",
+    "HeatExchanger": "red",
+    "HeatPump": "red",
+    "FixedTemperatureHeating": "red",
+    "FixedTemperatureCooling": "red",
+
+    "Electricity": "yellow",
+    "ElectricityGridConnection": "yellow",
+
+    "GasCarrier": "blue"
+}
+
 
 class AbstractComponent(NamedElement):
     """Abstract MTRESS component."""
@@ -157,6 +172,7 @@ class AbstractSolphRepresentation(AbstractComponent):
                                     str(origin.label),
                                     str(solph_node.label),
                                     label=f"{flow}",
+                                    color=EDGE_COLORS.get(self.__class__.__name__, "black")
                                 )
                             else:
                                 graph.edge(
@@ -181,7 +197,7 @@ class AbstractSolphRepresentation(AbstractComponent):
                                         str(origin.label),
                                         str(solph_node.label),
                                         f"{flow}",
-                                        "black",
+                                        EDGE_COLORS.get(self.__class__.__name__, "black"),
                                     )
                                 )
                             else:

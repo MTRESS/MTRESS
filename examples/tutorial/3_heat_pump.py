@@ -76,11 +76,11 @@ solph_representation = SolphModel(
 
 solph_representation.build_solph_model()
 
-plot = solph_representation.graph(detail=True)
+""" plot = solph_representation.graph(detail=True)
 plot.render(outfile="heat_pump_cooling_detail.png")
 
 plot = solph_representation.graph(detail=False)
-plot.render(outfile="heat_pump_cooling_simple.png")
+plot.render(outfile="heat_pump_cooling_simple.png") """
 
 solved_model = solph_representation.solve(solve_kwargs={"tee": True})
 myresults = results(solved_model)
