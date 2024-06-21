@@ -104,7 +104,7 @@ class Location(NamedElement):
         for component in self._components:
             yield component
 
-    def graph(self, detail: bool = True, flow_results = None) -> Tuple[Digraph, set]:
+    def graph(self, detail: bool = True, flow_results = None, flow_color:dict = None) -> Tuple[Digraph, set]:
         """
         Generate graphviz visualization of the MTRESS location.
 
@@ -116,7 +116,7 @@ class Location(NamedElement):
         external_edges = set()
 
         for component in self.components:
-            subgraph, edges = component.graph(detail, flow_results)
+            subgraph, edges = component.graph(detail, flow_results, flow_color)
 
             external_edges.update(edges)
             graph.subgraph(subgraph)

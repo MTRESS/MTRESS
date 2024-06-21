@@ -14,6 +14,7 @@ energy_system.add_location(house_1)
 
 # Add carrier
 house_1.add(carriers.Electricity())
+print(house_1.get_carrier(carriers.Electricity).identifier)
 house_1.add(technologies.ElectricityGridConnection(working_rate=35))
 
 house_1.add(
@@ -86,5 +87,11 @@ solved_model = solph_representation.solve(solve_kwargs={"tee": True})
 myresults = results(solved_model)
 flows = get_flows(myresults)
 
-plot = solph_representation.graph(detail=True, flow_results=flows)
+flow_color = {
+    "Heat": "darkslateblue",
+    "Electricity": "olivedrab",
+    "Gas": 'darkorange'
+}
+
+plot = solph_representation.graph(detail=True, flow_results=flows, flow_color=flow_color)
 plot.render(outfile="heat_pump_cooling_results.png")
