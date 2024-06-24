@@ -33,21 +33,30 @@ MTRESS_TO_TYPE = {
     "FixedTemperatureHeating": ["Heat"],
     "FixedTemperatureCooling": ["Heat"],
     "Electrolyser": ["Heat", "Electricity", "Gas"],
-    "ResistiveHeater": ["Heat"],
+    "ResistiveHeater": ["Heat", "Electricity"],
+    "CHP": ["Heat", "Electricity", "Gas"],
 
     "Electricity": ["Electricity"],
     "ElectricityGridConnection": ["Electricity"],
     "Photovoltaics": ["Electricity"],
 
     "GasCarrier": ["Gas"],
+    "GasGridConnection": ["Gas"],
     "GasDemand": ["Gas"],
+    "FuelCell": ["Gas", "Electricity", "Heat"],
+    "H2Storage": ["Gas"],
+    "GasCompressor": ["Gas", "Electricity"],
 }
 
 # solph node to type matching for internal deviation from mtress component type
 SOLPH_TO_TYPE = {
-    # Heat pump
+    # HeatPump
     "HeatPump_cop": ["Heat", "Electricity"],
     "HeatPump_electricity": ["Electricity"],
+
+    # GasCompressor
+    "GasCompressor_electrical": ["Electricity"],
+    "GasCompressor_compress" : ["Gas", "Electricity"],
 }
 
 TYPE_COLOR = {
@@ -150,7 +159,7 @@ class AbstractSolphRepresentation(AbstractComponent):
         # TODO: 
         # better default values
         # infinite heat source and sink red arrows
-        print('###', self)
+        print('##################################################################################')
         """
         Generate graphviz visualization of the MTRESS component.
 
@@ -228,7 +237,7 @@ class AbstractSolphRepresentation(AbstractComponent):
                                     color="grey",
                                 )
                         else:
-                            graph.edge(str(origin.label), str(solph_node.label), color=edge_color)
+                            graph.edge(str(origin.label), str(solph_node.label))
                 else:
                     print("--------- EXTERNAL")
                     # This is an external edge
@@ -262,7 +271,7 @@ class AbstractSolphRepresentation(AbstractComponent):
                                 )
                         else:
                             external_edges.add(
-                                (str(origin.label), str(solph_node.label), "", edge_color)
+                                (str(origin.label), str(solph_node.label), "", "black")
                             )
                     else:
                         # Add edge from MTRESS component to MTRESS component

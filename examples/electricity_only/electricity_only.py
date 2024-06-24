@@ -63,3 +63,6 @@ print(flows[
     ('house_1', 'electricity demand', 'input'),
     ('house_1', 'electricity demand', 'sink')
 ])
+
+plot = solph_representation.graph(detail=True, flow_results=flows, flow_color=None)
+plot.render(outfile="electricity_only_results.png")

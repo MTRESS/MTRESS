@@ -5,6 +5,7 @@ import os
 from oemof.solph.processing import results
 
 from mtress import Location, MetaModel, SolphModel, carriers, demands, technologies
+from mtress._helpers import get_flows
 from mtress.physics import HYDROGEN
 from mtress.technologies import ALKALINE_ELECTROLYSER
 
@@ -146,6 +147,10 @@ plot.render(outfile="hydrogen_production_simple.png")
 solved_model = solph_representation.solve(solve_kwargs={"tee": True})
 
 myresults = results(solved_model)
+flows = get_flows(myresults)
+
+plot = solph_representation.graph(detail=True, flow_results=flows, flow_color=None)
+plot.render(outfile="hydrogen_production_results.png")
 
 solved_model.write(
     "hydrogen_production.lp", io_options={"symbolic_solver_labels": True}

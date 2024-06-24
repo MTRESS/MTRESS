@@ -53,16 +53,16 @@ solph_representation = SolphModel(
 solph_representation.build_solph_model()
 
 """ plot = solph_representation.graph(detail=True)
-plot.render(outfile="electrolyser_detail.png")
+plot.render(outfile="heat_detail.png")
 
 plot = solph_representation.graph(detail=False)
-plot.render(outfile="electrolyser_simple.png") """
+plot.render(outfile="heat_simple.png") """
 
 solved_model = solph_representation.solve(solve_kwargs={"tee": True})
 myresults = results(solved_model)
 flows = get_flows(myresults)
 
 plot = solph_representation.graph(detail=True, flow_results=flows)
-plot.render(outfile="electrolyser_results.png")
+plot.render(outfile="heat_results.png")
 
-solved_model.write("electrolyser.lp", io_options={"symbolic_solver_labels": True})
+solved_model.write("heat.lp", io_options={"symbolic_solver_labels": True})
