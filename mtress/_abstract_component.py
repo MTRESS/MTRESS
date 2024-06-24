@@ -38,13 +38,20 @@ MTRESS_TO_TYPE = {
     "ElectricityGridConnection": ["Electricity"],
 
     "GasCarrier": ["Gas"],
-    "GasDemand": ["Gas"]
+    "GasDemand": ["Gas"],
+}
+
+# solph node to type matching for internal deviation from mtress component type
+SOLPH_TO_TYPE = {
+    # Heat pump
+    "HeatPump_cop": ["Heat", "Electricity"],
+    "HeatPump_electricity": ["Electricity"],
 }
 
 TYPE_COLOR = {
     "Heat": "maroon",
     "Electricity": "orange",
-    "Gas": 'steelblue'
+    "Gas": 'steelblue',
 }
 
 
@@ -167,6 +174,8 @@ class AbstractSolphRepresentation(AbstractComponent):
 
         for solph_node in self.solph_nodes:
             print('self--', solph_node.mtress_component.__class__.__name__)
+            print(solph_node.mtress_component)
+            print(solph_node.label)
             node_flow = 0
             if detail:
                 graph.node(
@@ -192,7 +201,18 @@ class AbstractSolphRepresentation(AbstractComponent):
                                 if (set(["excess_heat", "missing_heat"]) & set([solph_node.label.solph_node, origin.label.solph_node])):
                                     edge_color = "red"
                                 else:
-                                    edge_color = flow_color[MTRESS_TO_TYPE.get(solph_node.mtress_component.__class__.__name__, "black")[0]]
+                                    # get energy type of technology
+                                    energy_type = MTRESS_TO_TYPE.get(solph_node.mtress_component.__class__.__name__, "black")[0]
+                                    print("energy_type: ", energy_type)
+                                    # check for exception in internal color scheme and set color accordingly
+                                    tech_name = solph_node.mtress_component.__class__.__name__
+                                    print("tech_name: ", tech_name)
+                                    node1, node2 = tech_name + "_" + solph_node.label.solph_node.split("_")[0], tech_name + "_" + origin.label.solph_node.split("_")[0]
+                                    print("nodes: ", node1, node2)
+                                    # get true energy type
+                                    (energy_type,) = list(set(SOLPH_TO_TYPE.get(node1, [energy_type])) & set(SOLPH_TO_TYPE.get(node2, [energy_type])))
+                                    print("true energy_type", energy_type)
+                                    edge_color = flow_color[energy_type]
                                 graph.edge(
                                     str(origin.label),
                                     str(solph_node.label),
