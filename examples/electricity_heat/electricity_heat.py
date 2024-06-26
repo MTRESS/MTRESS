@@ -22,8 +22,10 @@ created and the solver output is written to an .lp file.
 """
 
 import os
+from oemof.solph.processing import results
 
 from mtress import Location, MetaModel, SolphModel, carriers, demands, technologies
+from mtress._helpers import get_flows
 
 os.chdir(os.path.dirname(__file__))
 
@@ -97,5 +99,10 @@ plot = solph_representation.graph(detail=False)
 plot.render(outfile="electricity_heat_simple.png")
 
 solved_model = solph_representation.solve(solve_kwargs={"tee": True})
+myresults = results(solved_model)
+flows = get_flows(myresults)
+
+plot = solph_representation.graph(detail=True, flow_results=flows, flow_color=None)
+plot.render(outfile="electricity_heat_results.png")
 
 solved_model.write("electricity_heat.lp", io_options={"symbolic_solver_labels": True})
