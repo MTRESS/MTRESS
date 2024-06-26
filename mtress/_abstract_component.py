@@ -26,6 +26,7 @@ SOLPH_SHAPES = {
 # mtress componment to type mapping for color coding
 MTRESS_TO_TYPE = {
     "HeatCarrier": ["Heat"],
+    "HeatGridConnection": ["Heat"],
     "HeatSource": ["Heat"],
     "HeatSink": ["Heat"],
     "HeatExchanger": ["Heat"],
@@ -39,6 +40,7 @@ MTRESS_TO_TYPE = {
     "Electricity": ["Electricity"],
     "ElectricityGridConnection": ["Electricity"],
     "Photovoltaics": ["Electricity"],
+    "BatteryStorage": ["Electricity"],
 
     "GasCarrier": ["Gas"],
     "GasGridConnection": ["Gas"],
@@ -156,9 +158,7 @@ class AbstractSolphRepresentation(AbstractComponent):
         """Add constraints to the model."""
 
     def graph(self, detail: bool = False, flow_results=None, flow_color:dict=None) -> Tuple[Digraph, set]:
-        # TODO: 
-        # better default values
-        # infinite heat source and sink red arrows
+        # TODO: delete print statements
         print('##################################################################################')
         """
         Generate graphviz visualization of the MTRESS component.
