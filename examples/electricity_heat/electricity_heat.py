@@ -22,9 +22,9 @@ created and the solver output is written to an .lp file.
 """
 
 import os
-from oemof.solph.processing import results
 
 from mtress import Location, MetaModel, SolphModel, carriers, demands, technologies
+from oemof.solph.processing import results
 from mtress._helpers import get_flows
 
 os.chdir(os.path.dirname(__file__))
@@ -34,7 +34,7 @@ energy_system = MetaModel()
 house_1 = Location(name="house_1")
 energy_system.add_location(house_1)
 
-house_1.add(carriers.Electricity())
+house_1.add(carriers.ElectricityCarrier())
 house_1.add(technologies.ElectricityGridConnection(working_rate=0.035))
 
 house_1.add(
@@ -63,7 +63,7 @@ house_1.add(
     technologies.HeatPump(
         name="HeatPump",
         thermal_power_limit=None,
-        max_temp_primary=18,
+        max_temp_primary=20,
         min_temp_primary=10,
         max_temp_secondary=40,
         min_temp_secondary=30,
@@ -104,5 +104,11 @@ flows = get_flows(myresults)
 
 plot = solph_representation.graph(detail=True, flow_results=flows, flow_color=None)
 plot.render(outfile="electricity_heat_results.png")
+
+myresults = results(solved_model)
+flows = get_flows(myresults)
+
+plot = solph_representation.graph(detail=True, flow_results=flows)
+plot.render(outfile="air_heat_exchanger_results.png")
 
 solved_model.write("electricity_heat.lp", io_options={"symbolic_solver_labels": True})
