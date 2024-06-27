@@ -5,8 +5,9 @@ from dataclasses import dataclass
 from typing import Optional
 
 import numpy as np
+from oemof import solph
 from oemof.solph import Flow
-from oemof.solph.components import Converter
+from oemof.solph.components import Converter, OffsetConverter
 
 from .._abstract_component import AbstractSolphRepresentation
 from .._helpers._util import enable_templating
@@ -43,8 +44,11 @@ class ElectrolyserTemplate:
 
     """
 
-    hydrogen_efficiency: float
-    thermal_efficiency: float
+    max_load_hydrogen_efficiency: float
+    min_load_hydrogen_efficiency: float
+    max_load_thermal_efficiency: float
+    min_load_thermal_efficiency: float
+    minimum_load: float
     maximum_temperature: float
     minimum_temperature: float
     hydrogen_output_pressure: float
@@ -56,24 +60,33 @@ class ElectrolyserTemplate:
 #  as it gets older.
 
 PEM_ELECTROLYSER = ElectrolyserTemplate(
-    hydrogen_efficiency=0.63,
-    thermal_efficiency=0.25,
+    max_load_hydrogen_efficiency=0.63,
+    min_load_hydrogen_efficiency=0.70,
+    max_load_thermal_efficiency=0.25,
+    min_load_thermal_efficiency=0.20,
+    minimum_load=0.15,
     maximum_temperature=57,
     minimum_temperature=20,
     hydrogen_output_pressure=30,
 )
 
 ALKALINE_ELECTROLYSER = ElectrolyserTemplate(
-    hydrogen_efficiency=0.66,
-    thermal_efficiency=0.20,
+    max_load_hydrogen_efficiency=0.66,
+    min_load_hydrogen_efficiency=0.71,
+    max_load_thermal_efficiency=0.20,
+    min_load_thermal_efficiency=0.15,
+    minimum_load=0.25,
     maximum_temperature=65,
     minimum_temperature=20,
     hydrogen_output_pressure=30,
 )
 
 AEM_ELECTROLYSER = ElectrolyserTemplate(
-    hydrogen_efficiency=0.625,
-    thermal_efficiency=0.29,
+    max_load_hydrogen_efficiency=0.625,
+    min_load_hydrogen_efficiency=0.71,
+    max_load_thermal_efficiency=0.29,
+    min_load_thermal_efficiency=0.20,
+    minimum_load=0.30,
     maximum_temperature=50,
     minimum_temperature=20,
     hydrogen_output_pressure=35,
@@ -102,11 +115,16 @@ class Electrolyser(AbstractTechnology, AbstractSolphRepresentation):
         self,
         name: str,
         nominal_power: float,
-        hydrogen_efficiency: float,
-        thermal_efficiency: float,
+        max_load_hydrogen_efficiency: float,
+        max_load_thermal_efficiency: float,
         maximum_temperature: float,
         minimum_temperature: float,
         hydrogen_output_pressure: float,
+        min_load_hydrogen_efficiency: Optional[float] = None,
+        min_load_thermal_efficiency: Optional[float] = None,
+        minimum_load: Optional[float] = None,
+        maximum_load: float = 1,
+        offset: bool = False,
     ):
         """
         Initialize Electrolyser
@@ -124,11 +142,16 @@ class Electrolyser(AbstractTechnology, AbstractSolphRepresentation):
         super().__init__(name=name)
 
         self.nominal_power = nominal_power
-        self.hydrogen_efficiency = hydrogen_efficiency
-        self.thermal_efficiency = thermal_efficiency
+        self.max_load_hydrogen_efficiency = max_load_hydrogen_efficiency
+        self.max_load_thermal_efficiency = max_load_thermal_efficiency
         self.maximum_temperature = maximum_temperature
         self.minimum_temperature = minimum_temperature
         self.hydrogen_output_pressure = hydrogen_output_pressure
+        self.min_load_hydrogen_efficiency = min_load_hydrogen_efficiency
+        self.min_load_thermal_efficiency = min_load_thermal_efficiency
+        self.minimum_load = minimum_load
+        self.maximum_load = maximum_load
+        self.offset = offset
 
     def build_core(self):
         """Build core structure of oemof.solph representation."""
@@ -145,8 +168,11 @@ class Electrolyser(AbstractTechnology, AbstractSolphRepresentation):
 
         h2_bus = gas_carrier.inputs[HYDROGEN][pressure]
 
-        # H2 output in kg
-        h2_output = self.hydrogen_efficiency / HYDROGEN.LHV
+        # H2 output in kg at max load
+        max_load_h2_output = self.max_load_hydrogen_efficiency / HYDROGEN.LHV
+
+        # H2 output in kg at min load
+        min_load_h2_output = self.min_load_hydrogen_efficiency / HYDROGEN.LHV
 
         # Heat connection
         heat_carrier = self.location.get_carrier(HeatCarrier)
@@ -155,22 +181,62 @@ class Electrolyser(AbstractTechnology, AbstractSolphRepresentation):
             self.minimum_temperature,
         )
 
-        # TODO: Minimal power implementieren
-        self.create_solph_node(
-            label="converter",
-            node_type=Converter,
-            inputs={
-                electrical_bus: Flow(nominal_value=self.nominal_power),
-                heat_bus_cold: Flow(),
-            },
-            outputs={
-                h2_bus: Flow(),
-                heat_bus_warm: Flow(),
-            },
-            conversion_factors={
-                electrical_bus: 1,
-                heat_bus_cold: self.thermal_efficiency * ratio / (1 - ratio),
-                h2_bus: h2_output,
-                heat_bus_warm: self.thermal_efficiency / (1 - ratio),
-            },
-        )
+        # If offset is not desired
+        if self.offset is False:
+            self.create_solph_node(
+                label="converter",
+                node_type=Converter,
+                inputs={
+                    electrical_bus: Flow(nominal_value=self.nominal_power),
+                    heat_bus_cold: Flow(),
+                },
+                outputs={
+                    h2_bus: Flow(),
+                    heat_bus_warm: Flow(),
+                },
+                conversion_factors={
+                    electrical_bus: 1,
+                    heat_bus_cold: self.max_load_thermal_efficiency
+                    * ratio
+                    / (1 - ratio),
+                    h2_bus: max_load_h2_output,
+                    heat_bus_warm: self.max_load_thermal_efficiency / (1 - ratio),
+                },
+            )
+        else:
+            slope_h2, offset_h2 = solph.components.slope_offset_from_nonconvex_input(
+                self.maximum_load,
+                self.minimum_load,
+                max_load_h2_output,
+                min_load_h2_output,
+            )
+
+            slope_th, offset_th = solph.components.slope_offset_from_nonconvex_input(
+                self.maximum_load,
+                self.minimum_load,
+                self.max_load_thermal_efficiency,
+                self.min_load_thermal_efficiency,
+            )
+
+            self.create_solph_node(
+                label="Offset_conv",
+                node_type=OffsetConverter,
+                inputs={
+                    electrical_bus: Flow(
+                        nominal_value=self.nominal_power,
+                        max=self.maximum_load,
+                        min=self.minimum_load,
+                        nonconvex=solph.NonConvex(),
+                    ),
+                },
+                outputs={h2_bus: Flow(), heat_bus_warm: Flow()},
+                conversion_factors={
+                    h2_bus: slope_h2,
+                    heat_bus_warm: slope_th,
+                    heat_bus_cold: slope_th,
+                },
+                normed_offsets={
+                    h2_bus: offset_h2,
+                    heat_bus_warm: offset_th,
+                },
+            )
