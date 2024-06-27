@@ -233,7 +233,6 @@ class Electrolyser(AbstractTechnology, AbstractSolphRepresentation):
                 conversion_factors={
                     h2_bus: slope_h2,
                     heat_bus_warm: slope_th,
-                    heat_bus_cold: slope_th,
                 },
                 normed_offsets={
                     h2_bus: offset_h2,
