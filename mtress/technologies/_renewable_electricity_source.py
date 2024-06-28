@@ -16,7 +16,7 @@ from oemof.solph.components import Source
 
 from .._abstract_component import AbstractSolphRepresentation
 from .._data_handler import TimeseriesSpecifier, TimeseriesType
-from ..carriers import Electricity
+from ..carriers import ElectricityCarrier
 from ._abstract_technology import AbstractTechnology
 
 
@@ -26,7 +26,7 @@ class RenewableElectricitySource(AbstractTechnology, AbstractSolphRepresentation
     def __init__(
         self,
         name: str,
-        nominal_power: float, 
+        nominal_power: float,
         specific_generation: TimeseriesSpecifier,
         fixed: bool = True,
     ):
@@ -47,14 +47,22 @@ class RenewableElectricitySource(AbstractTechnology, AbstractSolphRepresentation
 
     def build_core(self):
         """Build oemof solph core structure."""
-        electricity_carrier = self.location.get_carrier(Electricity)
+        electricity_carrier = self.location.get_carrier(ElectricityCarrier)
 
         if self.fixed:
-            flow = Flow(nominal_value=self.nominal_power, fix=self._solph_model.data.get_timeseries(
-                self.specific_generation, kind=TimeseriesType.INTERVAL))
+            flow = Flow(
+                nominal_value=self.nominal_power,
+                fix=self._solph_model.data.get_timeseries(
+                    self.specific_generation, kind=TimeseriesType.INTERVAL
+                ),
+            )
         else:
-            flow = Flow(nominal_value=self.nominal_power, max=self._solph_model.data.get_timeseries(
-                self.specific_generation, kind=TimeseriesType.INTERVAL))
+            flow = Flow(
+                nominal_value=self.nominal_power,
+                max=self._solph_model.data.get_timeseries(
+                    self.specific_generation, kind=TimeseriesType.INTERVAL
+                ),
+            )
 
         local_bus = self.create_solph_node(
             label="connection",
