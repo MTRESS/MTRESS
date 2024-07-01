@@ -37,7 +37,7 @@ MTRESS_TO_TYPE = {
     "ResistiveHeater": ["Heat", "Electricity"],
     "CHP": ["Heat", "Electricity", "Gas"],
 
-    "Electricity": ["Electricity"],
+    "ElectricityCarrier": ["Electricity"],
     "ElectricityGridConnection": ["Electricity"],
     "Photovoltaics": ["Electricity"],
     "BatteryStorage": ["Electricity"],
@@ -66,6 +66,8 @@ TYPE_COLOR = {
     "Electricity": "orange",
     "Gas": 'steelblue',
 }
+
+test_dict = {}
 
 
 class AbstractComponent(NamedElement):
@@ -157,9 +159,45 @@ class AbstractSolphRepresentation(AbstractComponent):
     def add_constraints(self) -> None:
         """Add constraints to the model."""
 
+    def flow_color(self) -> dict:
+        print('flow color function --- START')
+        print('identifier: ', self.identifier)
+        if frozenset(self.identifier) not in test_dict:
+            print('IN IF')
+            # create (most likely a carrier)
+            test_dict[frozenset(self.identifier)] = {'color': next(self._solph_model.color_counter)}
+
+        # collect all in- and outputs
+        ext_connections = []
+        for solph_node in self.solph_nodes:
+            print('---', tuple(solph_node.label))
+            print('--- IN')
+            for origin in solph_node.inputs:
+                print('---------', tuple(origin.label))
+                if origin not in self._solph_nodes:
+                    test_dict.setdefault(frozenset(origin.mtress_component.identifier), {})
+                    ext_connections.append(origin.label)
+            print('--- OUT')
+            for target in solph_node.outputs:
+                print('---------', tuple(target.label))
+                if target not in self._solph_nodes:
+                    test_dict.setdefault(frozenset(target.mtress_component.identifier), {})
+                    ext_connections.append(target.label)
+        connectedness = set.intersection(*map(set, ext_connections))
+        print(connectedness)
+        if (frozenset(connectedness)) in test_dict:
+            # component only connects to a carrier -> same color as carrier (color on mtress_component level)
+            test_dict[frozenset(self.identifier)]['color'] = test_dict[frozenset(connectedness)]['color']
+        else:
+            # component connects to multiple carriers -> determine on solph_node level
+            pass
+        print(test_dict)
+        print('flow color function --- END')
+
     def graph(self, detail: bool = False, flow_results=None, flow_color:dict=None) -> Tuple[Digraph, set]:
         # TODO: delete print statements
         print('##################################################################################')
+        self.flow_color()
         """
         Generate graphviz visualization of the MTRESS component.
 
@@ -184,9 +222,9 @@ class AbstractSolphRepresentation(AbstractComponent):
             graph.node(str(self.identifier), label=self.name)
 
         for solph_node in self.solph_nodes:
-            print('self--', solph_node.mtress_component.__class__.__name__)
-            print(solph_node.mtress_component)
-            print(solph_node.label)
+            # print('self--', solph_node.mtress_component.__class__.__name__)
+            # print(solph_node.mtress_component)
+            # print(solph_node.label)
             node_flow = 0
             if detail:
                 graph.node(
@@ -196,9 +234,9 @@ class AbstractSolphRepresentation(AbstractComponent):
                 )
 
             for origin in solph_node.inputs:
-                print('origin---', origin.mtress_component.__class__.__name__)
+                # print('origin---', origin.mtress_component.__class__.__name__)
                 if origin in self._solph_nodes:
-                    print("--------- INTERNAL")
+                    # print("--------- INTERNAL")
                     # This is an internal edge and thus only added if detail is True
                     if detail:
                         flow = 0
@@ -208,15 +246,15 @@ class AbstractSolphRepresentation(AbstractComponent):
                         else:
                             # get energy type of technology
                             energy_type = MTRESS_TO_TYPE.get(solph_node.mtress_component.__class__.__name__, "black")[0]
-                            print("energy_type: ", energy_type)
+                            # print("energy_type: ", energy_type)
                             # check for exception in internal color scheme and set color accordingly
                             tech_name = solph_node.mtress_component.__class__.__name__
-                            print("tech_name: ", tech_name)
+                            # print("tech_name: ", tech_name)
                             node1, node2 = tech_name + "_" + solph_node.label.solph_node.split("_")[0], tech_name + "_" + origin.label.solph_node.split("_")[0]
-                            print("nodes: ", node1, node2)
+                            # print("nodes: ", node1, node2)
                             # get true energy type
                             (energy_type,) = list(set(SOLPH_TO_TYPE.get(node1, [energy_type])) & set(SOLPH_TO_TYPE.get(node2, [energy_type])))
-                            print("true energy_type", energy_type)
+                            # print("true energy_type", energy_type)
                             edge_color = flow_color[energy_type]
                         if flow_results is not None:
                             flow = (
@@ -239,7 +277,7 @@ class AbstractSolphRepresentation(AbstractComponent):
                         else:
                             graph.edge(str(origin.label), str(solph_node.label))
                 else:
-                    print("--------- EXTERNAL")
+                    # print("--------- EXTERNAL")
                     # This is an external edge
                     if detail:
                         flow = 0

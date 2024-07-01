@@ -39,6 +39,7 @@ class SolphModel:
         :param timeindex:  time index definition for the soph model
         :param locations: configuration dictionary for locations
         """
+        self.color_counter = iter(range(100))
         self._meta_model = meta_model
         self._solph_representations: Dict[
             Tuple[AbstractSolphRepresentation, str], object
