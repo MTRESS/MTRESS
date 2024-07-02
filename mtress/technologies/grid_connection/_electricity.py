@@ -38,13 +38,18 @@ class ElectricityGridConnection(AbstractGridConnection, AbstractSolphRepresentat
     def build_core(self):
         electricity_carrier = self.location.get_carrier(ElectricityCarrier)
 
-        self.grid_export = b_grid_export = self.create_solph_node(
-            label="grid_export",
+        self.grid_import = b_grid_import = self.create_solph_node(
+            label="grid_import",
             node_type=Bus,
-            inputs={electricity_carrier.feed_in: Flow()},
+            outputs={electricity_carrier.distribution: Flow()},
         )
 
         if self.revenue is not None:
+            self.grid_export = b_grid_export = self.create_solph_node(
+                label="grid_export",
+                node_type=Bus,
+                inputs={electricity_carrier.feed_in: Flow()},
+            )
             self.create_solph_node(
                 label="sink_export",
                 node_type=Sink,
@@ -62,12 +67,6 @@ class ElectricityGridConnection(AbstractGridConnection, AbstractSolphRepresentat
                 demand_rate = Investment(ep_costs=self.demand_rate)
             else:
                 demand_rate = None
-
-            self.grid_import = b_grid_import = self.create_solph_node(
-                label="grid_import",
-                node_type=Bus,
-                outputs={electricity_carrier.distribution: Flow()},
-            )
 
             self.create_solph_node(
                 label="source_import",
