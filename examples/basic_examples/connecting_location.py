@@ -19,7 +19,7 @@ energy_system = MetaModel()
 house_1 = Location(name="house_1")
 energy_system.add_location(house_1)
 
-house_1.add(carriers.Electricity())
+house_1.add(carriers.ElectricityCarrier())
 house_1.add(technologies.ElectricityGridConnection(working_rate=None, revenue=0.0001))
 
 weather = {
@@ -54,8 +54,12 @@ house_1.add(
 )
 
 house_1.add(carriers.GasCarrier(gases={HYDROGEN: [60, 30]}))
-house_1.add(carriers.Heat(temperature_levels=[50], reference_temperature=10))
-house_1.add(demands.HeatSink(name="Heat-Sink", temperature_levels=30))
+house_1.add(
+    carriers.HeatCarrier(
+        temperature_levels=[20, 50],
+        reference_temperature=10,
+    )
+)
 house_1.add(
     technologies.GasGridConnection(
         name="H2-Grid",
@@ -65,9 +69,17 @@ house_1.add(
         revenue=7.8,
     )
 )
+house_1.add(
+    demands.FixedTemperatureHeating(
+        name="heating",
+        time_series=100,
+        min_flow_temperature=50,
+        return_temperature=20,
+    )
+)
 house_2 = Location(name="house_2")
 energy_system.add_location(house_2)
-house_2.add(carriers.Electricity())
+house_2.add(carriers.ElectricityCarrier())
 house_2.add(technologies.ElectricityGridConnection(working_rate=0.25, revenue=None))
 house_2.add(demands.Electricity(name="demand0", time_series=500))
 
