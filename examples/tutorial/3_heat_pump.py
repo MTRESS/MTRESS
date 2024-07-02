@@ -92,5 +92,5 @@ flow_color = {
     "Gas": 'darkorange'
 }
 
-plot = solph_representation.graph(detail=True, flow_results=flows, flow_color=flow_color)
+plot = solph_representation.graph(detail=True, flow_results=flows)
 plot.render(outfile="heat_pump_cooling_results.png")

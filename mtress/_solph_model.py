@@ -39,7 +39,6 @@ class SolphModel:
         :param timeindex:  time index definition for the soph model
         :param locations: configuration dictionary for locations
         """
-        self.color_counter = iter(range(100))
         self._meta_model = meta_model
         self._solph_representations: Dict[
             Tuple[AbstractSolphRepresentation, str], object
@@ -91,7 +90,12 @@ class SolphModel:
     def graph(self, detail: bool = False, flow_results=None, flow_color:dict=None) -> Digraph:
         """Generate a graph representation of the energy system."""
         graph = Digraph(name="MTRESS model")
+        graph.attr('edge', colorscheme="accent8")
         external_edges = set()
+
+        print("#-_-# in SOLPH_MODEL")
+        # TODO: Allow to pass precalculated flow_color dict
+        flow_color = {}
 
         for location in self._meta_model.locations:
             subgraph, external_edges = location.graph(detail, flow_results, flow_color)

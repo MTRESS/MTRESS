@@ -50,6 +50,48 @@ house_1.add(
     )
 )
 
+
+house_2 = Location(name="house_2")
+energy_system.add_location(house_2)
+
+# Add carriers
+house_2.add(
+    carriers.HeatCarrier(
+        temperature_levels=[5, 10, 20, 30, 40],
+        reference_temperature=0,
+    )
+)
+
+# Add technologies
+house_2.add(
+    technologies.HeatSink(
+        name="air_HE",
+        reservoir_temperature=15,
+        maximum_working_temperature=40,
+        minimum_working_temperature=5,
+        nominal_power=1e4,
+    )
+)
+
+# Add demands
+house_2.add(
+    demands.FixedTemperatureHeating(
+        name="Heating_demand",
+        min_flow_temperature=20,
+        return_temperature=10,
+        time_series=[25, 25],
+    )
+)
+
+house_2.add(
+    demands.FixedTemperatureCooling(
+        name="Cooling_demand",
+        return_temperature=30,
+        max_flow_temperature=10,
+        time_series=[50, 50],
+    )
+)
+
 solph_representation = SolphModel(
     energy_system,
     timeindex={
