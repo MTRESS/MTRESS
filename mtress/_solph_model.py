@@ -90,7 +90,6 @@ class SolphModel:
     def graph(self, detail: bool = False, flow_results=None, flow_color:dict=None) -> Digraph:
         """Generate a graph representation of the energy system."""
         graph = Digraph(name="MTRESS model")
-        graph.attr('edge', colorscheme="accent8")
         external_edges = set()
 
         print("#-_-# in SOLPH_MODEL")

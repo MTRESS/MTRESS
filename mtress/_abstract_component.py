@@ -24,11 +24,13 @@ SOLPH_SHAPES = {
 }
 
 TYPE_COLOR = {
-    "1": "orange",
-    "2": 'steelblue',
-    "3": "maroon",
-    "4": "grey"
+    "ElectricityCarrier": "orange",
+    "GasCarrier": 'steelblue',
+    "HeatCarrier": "maroon",
+    "-": "grey"
 }
+
+test_dict = {}
 
 
 class AbstractComponent(NamedElement):
@@ -120,14 +122,16 @@ class AbstractSolphRepresentation(AbstractComponent):
     def add_constraints(self) -> None:
         """Add constraints to the model."""
 
-    def get_flow_color(self, flow_color:dict, color_counter) -> dict:
+    def get_flow_color(self, flow_color:dict, color_counter) -> None:
         # TODO: delete print statements
+        # TODO: what about technologies with MORE THAN ONE output type? (-> FuelCell)
+        # -----> seems to work at the moment, when those connections are with carriers directly. still the color gets overwritten
         print('flow color function --- START')
         if self.identifier[-1] not in flow_color[self.identifier[0]]:
             print('IN IF')
             # create (most likely a carrier)
             flow_color[self.identifier[0]][self.identifier[-1]] = {}
-            color = str(next(color_counter))
+            color = TYPE_COLOR[self.identifier[-1]]
             flow_color[self.identifier[0]][self.identifier[-1]]['color'] = color
             for solph_node in self.solph_nodes:
                 # add solph component with fixed color
@@ -139,12 +143,13 @@ class AbstractSolphRepresentation(AbstractComponent):
                     # add connected mtress components to dict
                     flow_color[self.identifier[0]].setdefault(origin_id[1], {})
                     # add solph node as well - this edge is for sure THIS color
-                    flow_color[self.identifier[0]][origin_id[1]][origin_id[2]] = color
+                    flow_color[self.identifier[0]][origin_id[1]][origin_id[-1]] = color
                 # TODO: question/check this: set color for target nodes as well
                 for target in solph_node.outputs:
                     target_id = tuple(target.label)
                     flow_color[self.identifier[0]].setdefault(target_id[1], {})
-                    flow_color[self.identifier[0]][target_id[1]][target_id[2]] = color
+                    if target_id[-1] not in flow_color[self.identifier[0]][target_id[1]]:
+                        flow_color[self.identifier[0]][target_id[1]][target_id[-1]] = color
         else:
             print("IN ELSE")
             # collect all in- and outputs
@@ -183,6 +188,9 @@ class AbstractSolphRepresentation(AbstractComponent):
                                 break
         print(flow_color)
         print('flow color function --- END')
+
+    def get_flow_color_2(self) -> None:
+        pass
 
     def graph(self, detail: bool = False, flow_results=None, flow_color:dict=None, color_counter=None) -> Tuple[Digraph, set]:
         # TODO: delete print statements
@@ -239,14 +247,14 @@ class AbstractSolphRepresentation(AbstractComponent):
                                 graph.edge(
                                     str(origin.label),
                                     str(solph_node.label),
-                                    label=f"{flow:.3f}",
+                                    label=f"{round(flow, 3)}",
                                     color=edge_color
                                 )
                             else:
                                 graph.edge(
                                     str(origin.label),
                                     str(solph_node.label),
-                                    color="8",
+                                    color="grey",
                                 )
                         else:
                             graph.edge(str(origin.label), str(solph_node.label))
@@ -265,7 +273,7 @@ class AbstractSolphRepresentation(AbstractComponent):
                                     (
                                         str(origin.label),
                                         str(solph_node.label),
-                                        f"{flow:.3f}",
+                                        f"{round(flow, 3)}",
                                         edge_color,
                                     )
                                 )
@@ -275,7 +283,7 @@ class AbstractSolphRepresentation(AbstractComponent):
                                         str(origin.label),
                                         str(solph_node.label),
                                         "",
-                                        "8",
+                                        "grey",
                                     )
                                 )
                         else:
