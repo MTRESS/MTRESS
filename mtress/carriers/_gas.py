@@ -46,12 +46,12 @@ class GasCarrier(AbstractLayeredCarrier, AbstractSolphRepresentation):
                 # Check if this is the first bus for this gas
                 if not self.distribution[gas]:
                     bus = self.create_solph_node(
-                        label=f"{gas.name}_out_{pressure}",
+                        label=f"{gas.name}_{pressure}",
                         node_type=Bus,
                     )
                 else:
                     bus = self.create_solph_node(
-                        label=f"{gas.name}_out_{pressure}",
+                        label=f"{gas.name}_{pressure}",
                         node_type=Bus,
                         outputs={self.distribution[gas][pressure_low]: Flow()},
                     )
