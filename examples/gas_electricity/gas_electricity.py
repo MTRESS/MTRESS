@@ -30,8 +30,9 @@ house_1.add(
     technologies.GasGridConnection(
         name="NG_Grid",
         gas_type=NATURAL_GAS,
-        grid_pressure=20,
+        grid_pressure=10,
         working_rate=5,
+        revenue=None,
     )
 )
 
@@ -39,38 +40,18 @@ house_1.add(
     technologies.GasGridConnection(
         name="H2_Grid",
         gas_type=HYDROGEN,
-        grid_pressure=30,
+        grid_pressure=40,
         working_rate=15,
+        revenue=None,
     )
 )
 
 house_1.add(
     carriers.GasCarrier(
         gases={
-            HYDROGEN: [30],
-            NATURAL_GAS: [20],
+            HYDROGEN: [30, 40],
+            NATURAL_GAS: [10, 20, 30],
         }
-    )
-)
-
-weather = {
-    "ghi": "FILE:../input_file.csv:ghi",
-    "dhi": "FILE:../input_file.csv:dhi",
-    "wind_speed": "FILE:../input_file.csv:wind_speed",
-    "temp_air": "FILE:../input_file.csv:temp_air",
-    "temp_dew": "FILE:../input_file.csv:temp_dew",
-    "pressure": "FILE:../input_file.csv:pressure",
-}
-
-house_1.add(
-    technologies.Photovoltaics(
-        "pv0",
-        (52.729, 8.181),
-        nominal_power=8e5,
-        weather=weather,
-        surface_azimuth=180,
-        surface_tilt=35,
-        fixed=True,
     )
 )
 
