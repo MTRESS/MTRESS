@@ -23,13 +23,6 @@ SOLPH_SHAPES = {
     GenericStorage: "cylinder",
 }
 
-TYPE_COLOR = {
-    "ElectricityCarrier": "orange",
-    "GasCarrier": 'steelblue',
-    "HeatCarrier": "maroon",
-    "-": "grey"
-}
-
 test_dict = {}
 
 
@@ -122,16 +115,16 @@ class AbstractSolphRepresentation(AbstractComponent):
     def add_constraints(self) -> None:
         """Add constraints to the model."""
 
-    def get_flow_color(self, flow_color:dict, color_counter) -> None:
+    def get_flow_color(self, flow_color:dict, colorscheme:dict) -> None:
         # TODO: delete print statements
         # TODO: what about technologies with MORE THAN ONE output type? (-> FuelCell)
         # -----> seems to work at the moment, when those connections are with carriers directly. still the color gets overwritten
-        print('flow color function --- START')
+        # print('flow color function --- START')
         if self.identifier[-1] not in flow_color[self.identifier[0]]:
-            print('IN IF')
+            # print('IN IF')
             # create (most likely a carrier)
             flow_color[self.identifier[0]][self.identifier[-1]] = {}
-            color = TYPE_COLOR[self.identifier[-1]]
+            color = colorscheme[self.identifier[-1]]
             flow_color[self.identifier[0]][self.identifier[-1]]['color'] = color
             for solph_node in self.solph_nodes:
                 # add solph component with fixed color
@@ -151,7 +144,7 @@ class AbstractSolphRepresentation(AbstractComponent):
                     if target_id[-1] not in flow_color[self.identifier[0]][target_id[1]]:
                         flow_color[self.identifier[0]][target_id[1]][target_id[-1]] = color
         else:
-            print("IN ELSE")
+            # print("IN ELSE")
             # collect all in- and outputs
             ext_connections = set()
             for solph_node in self.solph_nodes:
@@ -161,7 +154,7 @@ class AbstractSolphRepresentation(AbstractComponent):
                 for target in solph_node.outputs:
                     if target not in self._solph_nodes:
                         ext_connections.add(tuple(target.label)[1])
-            print(ext_connections)
+            # print(ext_connections)
             if len(ext_connections) == 1:
                 # connected to carrier -> choose carrier color
                 color = flow_color[self.identifier[0]][ext_connections.pop()]['color']
@@ -172,7 +165,6 @@ class AbstractSolphRepresentation(AbstractComponent):
                 # try to find a connection which's color is known -> choose that color
                 for solph_node in self.solph_nodes:
                     solph_node_id = tuple(solph_node.label)
-                    print(solph_node_id)
                     if solph_node_id[-1] not in flow_color[self.identifier[0]][self.identifier[-1]]:
                         for origin in solph_node.inputs:
                             origin_id = tuple(origin.label)
@@ -186,16 +178,16 @@ class AbstractSolphRepresentation(AbstractComponent):
                                 color = flow_color[self.identifier[0]][target_id[1]][target_id[-1]]
                                 flow_color[self.identifier[0]][self.identifier[-1]][solph_node_id[-1]] = color
                                 break
-        print(flow_color)
-        print('flow color function --- END')
+        # print(flow_color)
+        # print('flow color function --- END')
 
     def get_flow_color_2(self) -> None:
         pass
 
-    def graph(self, detail: bool = False, flow_results=None, flow_color:dict=None, color_counter=None) -> Tuple[Digraph, set]:
+    def graph(self, detail: bool = False, flow_results=None, flow_color:dict=None, colorscheme:dict=None) -> Tuple[Digraph, set]:
         # TODO: delete print statements
         print("#-_-# in ABSTRACT COMPONENT", self.identifier)
-        self.get_flow_color(flow_color, color_counter)
+        self.get_flow_color(flow_color, colorscheme)
         """
         Generate graphviz visualization of the MTRESS component.
 

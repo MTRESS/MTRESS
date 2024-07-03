@@ -119,11 +119,11 @@ solph_representation = SolphModel(
 
 solph_representation.build_solph_model()
 
-plot = solph_representation.graph(detail=True)
+""" plot = solph_representation.graph(detail=True)
 plot.render(outfile="hydrogen_plant_detail.png")
 
 plot = solph_representation.graph(detail=False)
-plot.render(outfile="hydrogen_plant_simple.png")
+plot.render(outfile="hydrogen_plant_simple.png") """
 
 solved_model = solph_representation.solve(solve_kwargs={"tee": True})
 
