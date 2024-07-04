@@ -141,7 +141,6 @@ class FuelCell(AbstractTechnology, AbstractSolphRepresentation):
         minimum_temperature: float,
         gas_input_pressure: float,
         gas_type: Gas = HYDROGEN,
-        inverter_efficiency: float = 0.98,
         maximum_load: float = 1,
         offset: bool = False,
     ):
@@ -160,8 +159,6 @@ class FuelCell(AbstractTechnology, AbstractSolphRepresentation):
         :param minimum_temperature: Minimum return temperature level (in °C)
         :param gas_input_pressure: Pressure at which gas is injected to FC.
         :param gas_type: Input gas to FC, by default Hydrogen gas is used.
-        :param inverter_efficiency: Efficiency for conversion from DC output
-            from FC to AC to meet load demands. Default value is 98 %.
         """
         super().__init__(name=name)
 
@@ -177,7 +174,6 @@ class FuelCell(AbstractTechnology, AbstractSolphRepresentation):
         self.gas_input_pressure = gas_input_pressure
         self.gas_type = gas_type
         self.offset = offset
-        self.inverter_efficiency = inverter_efficiency
 
     def build_core(self):
         """Build core structure of oemof.solph representation."""
@@ -203,15 +199,11 @@ class FuelCell(AbstractTechnology, AbstractSolphRepresentation):
         # Electrical efficiency with conversion from gas in kg to electricity in W, also
         # includes inverter efficiency.
         max_load_electrical_output = (
-            self.max_load_electrical_efficiency
-            * self.inverter_efficiency
-            * self.gas_type.LHV
+            self.max_load_electrical_efficiency * self.gas_type.LHV
         )
 
         min_load_electrical_output = (
-            self.min_load_electrical_efficiency
-            * self.inverter_efficiency
-            * self.gas_type.LHV
+            self.min_load_electrical_efficiency * self.gas_type.LHV
         )
 
         # Heat connection for FC heat output
