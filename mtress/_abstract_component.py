@@ -115,83 +115,10 @@ class AbstractSolphRepresentation(AbstractComponent):
     def add_constraints(self) -> None:
         """Add constraints to the model."""
 
-    def get_flow_color_old(self, flow_color:dict, colorscheme:dict) -> None:
-        # TODO: delete print statements
-        # TODO: what about technologies with MORE THAN ONE output type? (-> FuelCell)
-        # -----> seems to work at the moment, when those connections are with carriers directly. still the color gets overwritten
-        # print('flow color function --- START')
-        if self.identifier[-1] not in flow_color[self.identifier[0]]:
-            # print('IN IF')
-            # create (most likely a carrier)
-            flow_color[self.identifier[0]][self.identifier[-1]] = {}
-            color = colorscheme[self.identifier[-1]]
-            flow_color[self.identifier[0]][self.identifier[-1]]['color'] = color
-            for solph_node in self.solph_nodes:
-                # add solph component with fixed color
-                solph_node_id = tuple(solph_node.label)[-1]
-                flow_color[self.identifier[0]][self.identifier[-1]][solph_node_id] = color
-                # set all incoming edges to current color
-                for origin in solph_node.inputs:
-                    origin_id = tuple(origin.label)
-                    # add connected mtress components to dict
-                    flow_color[self.identifier[0]].setdefault(origin_id[1], {})
-                    # add solph node as well - this edge is for sure THIS color
-                    flow_color[self.identifier[0]][origin_id[1]][origin_id[-1]] = color
-                # TODO: question/check this: set color for target nodes as well
-                for target in solph_node.outputs:
-                    target_id = tuple(target.label)
-                    flow_color[self.identifier[0]].setdefault(target_id[1], {})
-                    if target_id[-1] not in flow_color[self.identifier[0]][target_id[1]]:
-                        flow_color[self.identifier[0]][target_id[1]][target_id[-1]] = color
-        else:
-            # print("IN ELSE")
-            # collect all in- and outputs
-            ext_connections = set()
-            for solph_node in self.solph_nodes:
-                for origin in solph_node.inputs:
-                    if origin not in self._solph_nodes:
-                        ext_connections.add(tuple(origin.label)[1])
-                for target in solph_node.outputs:
-                    if target not in self._solph_nodes:
-                        ext_connections.add(tuple(target.label)[1])
-            # print(ext_connections)
-            if len(ext_connections) == 1:
-                # connected to carrier -> choose carrier color
-                color = flow_color[self.identifier[0]][ext_connections.pop()]['color']
-                for solph_node in self.solph_nodes:
-                    solph_node_id = tuple(solph_node.label)[-1]
-                    flow_color[self.identifier[0]][self.identifier[-1]][solph_node_id] = color
-            else:
-                # try to find a connection which's color is known -> choose that color
-                for solph_node in self.solph_nodes:
-                    solph_node_id = tuple(solph_node.label)
-                    if solph_node_id[-1] not in flow_color[self.identifier[0]][self.identifier[-1]]:
-                        for origin in solph_node.inputs:
-                            origin_id = tuple(origin.label)
-                            if origin_id[-1] in flow_color[self.identifier[0]][origin_id[1]]:
-                                color = flow_color[self.identifier[0]][origin_id[1]][origin_id[-1]]
-                                flow_color[self.identifier[0]][self.identifier[-1]][solph_node_id[-1]] = color
-                                break
-                        for target in solph_node.outputs:
-                            target_id = tuple(target.label)
-                            if target_id[-1] in flow_color[self.identifier[0]][target_id[1]]:
-                                color = flow_color[self.identifier[0]][target_id[1]][target_id[-1]]
-                                flow_color[self.identifier[0]][self.identifier[-1]][solph_node_id[-1]] = color
-                                break
-        # print(flow_color)
-        # print('flow color function --- END')
-
     def get_flow_color(self, flow_color:dict, colorscheme:dict=None) -> None:
-        # TODO: 
-        # algorithm to determine color of an edge (not node!) -> {node1: {node2: color1, node3: color2}}
-        # if Carrier in label (use colorscheme) -> use this color
-        # iterate all nodes recursively (edge direction matters? -> NO) until certain solph type is found (source, sink, converter)
-        # and assign color
-        # else (component is not a carrier)
-        # two cases:
-        # 1. component already completely connected
-        # 2. some internal connections need to be connected. check for explicitness (is only allowed to go over nodes with single color until carrier reached)
         def rec(node, color):
+            # recursively iterate nodes until all edges covered 
+            # or node type in [Source, Sink, Converter]
             if type(node) in [Source, Sink, Converter]:
                 return
             node_id = tuple(node.label)
@@ -210,8 +137,16 @@ class AbstractSolphRepresentation(AbstractComponent):
             return
 
         color = colorscheme.get(self.identifier[-1], None)
-        if color != None: # in a carrier
-            print("in a carrier", self.identifier, color)
+        if color == None: # component not a carrier
+            # determine if only connected to ONE carrier
+            own_nodes = [tuple(x.label) for x in self.solph_nodes]
+            connected_nodes = [tuple(y.label) for x in self.solph_nodes for y in x.outputs] + [tuple(y.label) for x in self.solph_nodes for y in x.inputs]
+            external_nodes = set(connected_nodes) - set(own_nodes)
+            external_nodes = set.intersection(*map(set, external_nodes))
+            if external_nodes in [set(x.identifier) for x in self._solph_model._meta_model.components]:
+                color = colorscheme[set.intersection(set(colorscheme.keys()), external_nodes).pop()]
+
+        if color != None: # color nodes
             for solph_node in self.solph_nodes:
                 solph_node_id = tuple(solph_node.label)
                 for origin in solph_node.inputs:
@@ -226,36 +161,6 @@ class AbstractSolphRepresentation(AbstractComponent):
                     if target_id not in flow_color[solph_node_id]:
                         flow_color[solph_node_id][target_id] = color
                     rec(target, color)
-        else:
-            print("not in a carrier", self.identifier)
-            # determine if only connected to ONE carrier
-            own_nodes = [tuple(x.label) for x in self.solph_nodes]
-            connected_nodes = [tuple(y.label) for x in self.solph_nodes for y in x.outputs] + [tuple(y.label) for x in self.solph_nodes for y in x.inputs]
-            external_nodes = set(connected_nodes) - set(own_nodes)
-            print("own", own_nodes)
-            print("con", connected_nodes)
-            print("ext", external_nodes)
-            # !overengineering? could also check lenght
-            # check if external node is contained in model -> yes: only one carrier
-            external_nodes = set.intersection(*map(set, external_nodes))
-            print("ext", external_nodes)
-            if external_nodes in [set(x.identifier) for x in self._solph_model._meta_model.components]:
-                color = colorscheme[set.intersection(set(colorscheme.keys()), external_nodes).pop()]
-                print(color)
-                for solph_node in self.solph_nodes:
-                    solph_node_id = tuple(solph_node.label)
-                    for origin in solph_node.inputs:
-                        origin_id = tuple(origin.label)
-                        flow_color.setdefault(origin_id, {})
-                        if solph_node_id not in flow_color[origin_id]:
-                            flow_color[origin_id][solph_node_id] = color
-                        rec(origin, color)
-                    for target in solph_node.outputs:
-                        target_id = tuple(target.label)
-                        flow_color.setdefault(solph_node_id, {})
-                        if target_id not in flow_color[solph_node_id]:
-                            flow_color[solph_node_id][target_id] = color
-                        rec(target, color)
 
         print(flow_color)
 
