@@ -115,7 +115,7 @@ class AbstractSolphRepresentation(AbstractComponent):
     def add_constraints(self) -> None:
         """Add constraints to the model."""
 
-    def get_flow_color(self, flow_color:dict, colorscheme:dict) -> None:
+    def get_flow_color_old(self, flow_color:dict, colorscheme:dict) -> None:
         # TODO: delete print statements
         # TODO: what about technologies with MORE THAN ONE output type? (-> FuelCell)
         # -----> seems to work at the moment, when those connections are with carriers directly. still the color gets overwritten
@@ -181,8 +181,83 @@ class AbstractSolphRepresentation(AbstractComponent):
         # print(flow_color)
         # print('flow color function --- END')
 
-    def get_flow_color_2(self) -> None:
-        pass
+    def get_flow_color(self, flow_color:dict, colorscheme:dict=None) -> None:
+        # TODO: 
+        # algorithm to determine color of an edge (not node!) -> {node1: {node2: color1, node3: color2}}
+        # if Carrier in label (use colorscheme) -> use this color
+        # iterate all nodes recursively (edge direction matters? -> NO) until certain solph type is found (source, sink, converter)
+        # and assign color
+        # else (component is not a carrier)
+        # two cases:
+        # 1. component already completely connected
+        # 2. some internal connections need to be connected. check for explicitness (is only allowed to go over nodes with single color until carrier reached)
+        def rec(node, color):
+            if type(node) in [Source, Sink, Converter]:
+                return
+            node_id = tuple(node.label)
+            for origin in node.inputs:
+                origin_id = tuple(origin.label)
+                flow_color.setdefault(origin_id, {})
+                if node_id not in flow_color[origin_id]:
+                    flow_color[origin_id][node_id] = color
+                    rec(origin, color)
+            for target in node.outputs:
+                target_id = tuple(target.label)
+                flow_color.setdefault(node_id, {})
+                if target_id not in flow_color[node_id]:
+                    flow_color[node_id][target_id] = color
+                    rec(target, color)
+            return
+
+        color = colorscheme.get(self.identifier[-1], None)
+        if color != None: # in a carrier
+            print("in a carrier", self.identifier, color)
+            for solph_node in self.solph_nodes:
+                solph_node_id = tuple(solph_node.label)
+                for origin in solph_node.inputs:
+                    origin_id = tuple(origin.label)
+                    flow_color.setdefault(origin_id, {})
+                    if solph_node_id not in flow_color[origin_id]:
+                        flow_color[origin_id][solph_node_id] = color
+                    rec(origin, color)
+                for target in solph_node.outputs:
+                    target_id = tuple(target.label)
+                    flow_color.setdefault(solph_node_id, {})
+                    if target_id not in flow_color[solph_node_id]:
+                        flow_color[solph_node_id][target_id] = color
+                    rec(target, color)
+        else:
+            print("not in a carrier", self.identifier)
+            # determine if only connected to ONE carrier
+            own_nodes = [tuple(x.label) for x in self.solph_nodes]
+            connected_nodes = [tuple(y.label) for x in self.solph_nodes for y in x.outputs] + [tuple(y.label) for x in self.solph_nodes for y in x.inputs]
+            external_nodes = set(connected_nodes) - set(own_nodes)
+            print("own", own_nodes)
+            print("con", connected_nodes)
+            print("ext", external_nodes)
+            # !overengineering? could also check lenght
+            # check if external node is contained in model -> yes: only one carrier
+            external_nodes = set.intersection(*map(set, external_nodes))
+            print("ext", external_nodes)
+            if external_nodes in [set(x.identifier) for x in self._solph_model._meta_model.components]:
+                color = colorscheme[set.intersection(set(colorscheme.keys()), external_nodes).pop()]
+                print(color)
+                for solph_node in self.solph_nodes:
+                    solph_node_id = tuple(solph_node.label)
+                    for origin in solph_node.inputs:
+                        origin_id = tuple(origin.label)
+                        flow_color.setdefault(origin_id, {})
+                        if solph_node_id not in flow_color[origin_id]:
+                            flow_color[origin_id][solph_node_id] = color
+                        rec(origin, color)
+                    for target in solph_node.outputs:
+                        target_id = tuple(target.label)
+                        flow_color.setdefault(solph_node_id, {})
+                        if target_id not in flow_color[solph_node_id]:
+                            flow_color[solph_node_id][target_id] = color
+                        rec(target, color)
+
+        print(flow_color)
 
     def graph(self, detail: bool = False, flow_results=None, flow_color:dict=None, colorscheme:dict=None) -> Tuple[Digraph, set]:
         # TODO: delete print statements
@@ -221,7 +296,8 @@ class AbstractSolphRepresentation(AbstractComponent):
             for origin in solph_node.inputs:
                 # print('origin---', origin.label)
                 origin_id = tuple(origin.label)
-                edge_color = flow_color[origin_id[0]][origin_id[1]][origin_id[2]]
+                # edge_color = flow_color[origin_id[0]][origin_id[1]][origin_id[2]]
+                edge_color = flow_color.get(tuple(origin.label), {}).get(tuple(solph_node.label), 'black')
                 if origin in self._solph_nodes:
                     # print("--------- INTERNAL")
                     # This is an internal edge and thus only added if detail is True
@@ -240,7 +316,7 @@ class AbstractSolphRepresentation(AbstractComponent):
                                     str(origin.label),
                                     str(solph_node.label),
                                     label=f"{round(flow, 3)}",
-                                    color=edge_color
+                                    color=edge_color,
                                 )
                             else:
                                 graph.edge(

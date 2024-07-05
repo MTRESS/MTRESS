@@ -94,7 +94,8 @@ class SolphModel:
 
         print("#-_-# in SOLPH_MODEL")
         # TODO: Allow to pass precalculated flow_color dict
-        flow_color = {}
+        if flow_color == None:
+            flow_color = {}
 
         if colorscheme == None:
             # set to default
