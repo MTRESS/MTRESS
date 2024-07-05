@@ -115,8 +115,6 @@ class Location(NamedElement):
 
         external_edges = set()
 
-        print("#-_-# in LOCATION", self.identifier)
-
         for component in self.components:
             subgraph, edges = component.graph(detail, flow_results, flow_color, colorscheme)
 

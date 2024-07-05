@@ -162,11 +162,7 @@ class AbstractSolphRepresentation(AbstractComponent):
                         flow_color[solph_node_id][target_id] = color
                     rec(target, color)
 
-        print(flow_color)
-
     def graph(self, detail: bool = False, flow_results=None, flow_color:dict=None, colorscheme:dict=None) -> Tuple[Digraph, set]:
-        # TODO: delete print statements
-        print("#-_-# in ABSTRACT COMPONENT", self.identifier)
         self.get_flow_color(flow_color, colorscheme)
         """
         Generate graphviz visualization of the MTRESS component.
@@ -189,7 +185,6 @@ class AbstractSolphRepresentation(AbstractComponent):
             graph.node(str(self.identifier), label=self.name)
 
         for solph_node in self.solph_nodes:
-            # print('self--', solph_node.label)
             node_flow = 0
             if detail:
                 graph.node(
@@ -199,18 +194,11 @@ class AbstractSolphRepresentation(AbstractComponent):
                 )
 
             for origin in solph_node.inputs:
-                # print('origin---', origin.label)
-                origin_id = tuple(origin.label)
-                # edge_color = flow_color[origin_id[0]][origin_id[1]][origin_id[2]]
                 edge_color = flow_color.get(tuple(origin.label), {}).get(tuple(solph_node.label), 'black')
                 if origin in self._solph_nodes:
-                    # print("--------- INTERNAL")
                     # This is an internal edge and thus only added if detail is True
                     if detail:
                         flow = 0
-                        # red color for edge if missing or excess heat has flow
-                        # if (set(["excess_heat", "missing_heat"]) & set([solph_node.label.solph_node, origin.label.solph_node])):
-                        #     edge_color = "red"
                         if flow_results is not None:
                             flow = (
                                 flow_results[(origin.label, solph_node.label)]
@@ -232,7 +220,6 @@ class AbstractSolphRepresentation(AbstractComponent):
                         else:
                             graph.edge(str(origin.label), str(solph_node.label))
                 else:
-                    # print("--------- EXTERNAL")
                     # This is an external edge
                     if detail:
                         flow = 0

@@ -92,8 +92,6 @@ class SolphModel:
         graph = Digraph(name="MTRESS model")
         external_edges = set()
 
-        print("#-_-# in SOLPH_MODEL")
-        # TODO: Allow to pass precalculated flow_color dict
         if flow_color == None:
             flow_color = {}
 
