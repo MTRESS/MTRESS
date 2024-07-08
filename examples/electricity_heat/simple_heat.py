@@ -14,7 +14,7 @@ energy_system = MetaModel()
 house_1 = Location(name="house_1")
 energy_system.add_location(house_1)
 
-house_1.add(carriers.Electricity())
+house_1.add(carriers.ElectricityCarrier())
 house_1.add(technologies.ElectricityGridConnection(working_rate=35))
 
 house_1.add(
@@ -26,10 +26,10 @@ house_1.add(
 house_1.add(
     technologies.ResistiveHeater(
         name="Resistive_Heater",
-        nominal_power=None,
+        heating_power=None,
         maximum_temperature=50,
         minimum_temperature=20,
-        efficiency=1,
+        efficiency=0.8,
     )
 )
 house_1.add(
@@ -62,4 +62,6 @@ solved_model = solph_representation.solve(solve_kwargs={"tee": True})
 myresults = results(solved_model)
 flows = get_flows(myresults)
 
-solved_model.write("heat.lp", io_options={"symbolic_solver_labels": True})
+
+plot = solph_representation.graph(detail=True, flow_results=flows)
+plot.render(outfile="heat_results.png")

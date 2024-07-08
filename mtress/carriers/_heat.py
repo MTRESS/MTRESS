@@ -10,6 +10,7 @@ SPDX-FileCopyrightText: Lucas Schmeling
 
 SPDX-License-Identifier: MIT
 """
+import numpy as np
 
 from oemof.solph import Bus, Flow, components
 
@@ -53,14 +54,14 @@ class HeatCarrier(AbstractLayeredCarrier, AbstractSolphRepresentation):
         :param temperature_levels: list of temperatures (in °C)
         :param reference_temperature: Reference temperature (in °C)
         """
-        if reference_temperature not in temperature_levels:
-            temperature_levels = temperature_levels + [reference_temperature]
+        if reference_temperature in temperature_levels:
+            raise ValueError("Reference temperature is not a valid temperature level.")
         super().__init__(
             levels=sorted(temperature_levels),
             reference=reference_temperature,
         )
 
-        self._reference_index = self._levels.index(reference_temperature)
+        self._reference_index = np.searchsorted(self.levels, reference_temperature)
 
         # Properties for solph interfaces
         self.level_nodes = {}
@@ -72,7 +73,7 @@ class HeatCarrier(AbstractLayeredCarrier, AbstractSolphRepresentation):
 
     @property
     def levels_above_reference(self):
-        return self.levels[self._reference_index + 1 :]
+        return self.levels[self._reference_index :]
 
     @property
     def levels_below_reference(self):
@@ -90,30 +91,25 @@ class HeatCarrier(AbstractLayeredCarrier, AbstractSolphRepresentation):
 
     def build_core(self):
         """Build core structure of oemof.solph representation."""
-        higher_level = None
 
-        # Thermal layers, starting from the highest
-        for temperature in reversed(self._levels):
-            if temperature is self.reference:
-                bus = self.create_solph_node(
-                    label="excess_heat",
-                    node_type=components.Sink,
-                    inputs={bus: Flow(variable_costs=1e9)},
-                )
-            else:
-                bus = self.create_solph_node(
-                    label=f"T_{temperature:.0f}",
-                    node_type=Bus,
-                    inputs=higher_level,
-                )
+        for temperature in self._levels:
+            self.level_nodes[temperature] = self.create_solph_node(
+                label=f"T_{temperature:.0f}",
+                node_type=Bus,
+            )
 
-            self.level_nodes[temperature] = bus
-            higher_level = {bus: Flow()}
+        self.create_solph_node(
+            label="excess_heat",
+            node_type=components.Sink,
+            inputs={bus: Flow(variable_costs=1e9) for bus in self.level_nodes.values()},
+        )
 
         self.create_solph_node(
             label=f"missing_heat",
             node_type=components.Source,
-            outputs={self.level_nodes[self._levels[-1]]: Flow(variable_costs=1e9)},
+            outputs={
+                bus: Flow(variable_costs=1e9) for bus in self.level_nodes.values()
+            },
         )
 
     def get_connection_heat_transfer(self, max_temp, min_temp):

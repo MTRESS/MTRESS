@@ -11,7 +11,7 @@ from oemof.solph.components import Converter, OffsetConverter
 
 from .._abstract_component import AbstractSolphRepresentation
 from .._helpers._util import enable_templating
-from ..carriers import Electricity, GasCarrier, HeatCarrier
+from ..carriers import ElectricityCarrier, GasCarrier, HeatCarrier
 from ..physics import HYDROGEN
 from ._abstract_technology import AbstractTechnology
 
@@ -119,7 +119,7 @@ class AbstractElectrolyser(AbstractTechnology, AbstractSolphRepresentation):
     def build_core(self):
         """Build core structure of oemof.solph representation."""
         # Electrical connection
-        self.electricity_carrier = self.location.get_carrier(Electricity)
+        self.electricity_carrier = self.location.get_carrier(ElectricityCarrier)
         self.electrical_bus = self.electricity_carrier.distribution
 
         # Hydrogen connection
