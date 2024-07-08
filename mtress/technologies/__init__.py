@@ -28,10 +28,10 @@ from ._fuel_cell import AEMFC, AFC, PEMFC, FuelCell, OffsetFuelCell
 from ._heat_exchanger import HeatExchanger, HeatSink, HeatSource
 from ._heat_pump import HeatPump
 from ._heat_storage import FullyMixedHeatStorage, LayeredHeatStorage
+from ._heater import ResistiveHeater
 from ._photovoltaics import Photovoltaics
 from ._pressure_storage import H2Storage
 from ._renewable_electricity_source import RenewableElectricitySource
-from ._resistive_heater import ResistiveHeater
 from .grid_connection import ElectricityGridConnection, GasGridConnection
 
 __all__ = [
