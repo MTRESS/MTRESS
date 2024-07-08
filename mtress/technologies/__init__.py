@@ -31,7 +31,7 @@ from ._photovoltaics import Photovoltaics
 from ._pressure_storage import H2Storage
 from ._renewable_electricity_source import RenewableElectricitySource
 from .grid_connection import ElectricityGridConnection, GasGridConnection
-from ._resistive_heater import ResistiveHeater
+from ._heater import ResistiveHeater
 
 __all__ = [
     "ElectricityGridConnection",
