@@ -4,15 +4,14 @@ import logging
 from dataclasses import dataclass
 from typing import Optional
 
-import numpy as np
+from oemof import solph
 from oemof.solph import Flow
-from oemof.solph.components import Converter
+from oemof.solph.components import Converter, OffsetConverter
 
-from .._abstract_component import AbstractSolphRepresentation
 from .._helpers._util import enable_templating
-from ..carriers import ElectricityCarrier, GasCarrier, HeatCarrier
+from ..carriers import ElectricityCarrier, GasCarrier
 from ..physics import HYDROGEN
-from ._abstract_technology import AbstractTechnology
+from ._heater import AbstractHeater
 
 LOGGER = logging.getLogger(__file__)
 
@@ -43,8 +42,11 @@ class ElectrolyserTemplate:
 
     """
 
-    hydrogen_efficiency: float
-    thermal_efficiency: float
+    full_load_hydrogen_efficiency: float
+    min_load_hydrogen_efficiency: float
+    full_load_thermal_efficiency: float
+    min_load_thermal_efficiency: float
+    minimum_load: float
     maximum_temperature: float
     minimum_temperature: float
     hydrogen_output_pressure: float
@@ -56,45 +58,118 @@ class ElectrolyserTemplate:
 #  as it gets older.
 
 PEM_ELECTROLYSER = ElectrolyserTemplate(
-    hydrogen_efficiency=0.63,
-    thermal_efficiency=0.25,
+    full_load_hydrogen_efficiency=0.63,
+    min_load_hydrogen_efficiency=0.70,
+    full_load_thermal_efficiency=0.25,
+    min_load_thermal_efficiency=0.20,
+    minimum_load=0.15,
     maximum_temperature=57,
     minimum_temperature=20,
     hydrogen_output_pressure=30,
 )
 
 ALKALINE_ELECTROLYSER = ElectrolyserTemplate(
-    hydrogen_efficiency=0.66,
-    thermal_efficiency=0.20,
+    full_load_hydrogen_efficiency=0.66,
+    min_load_hydrogen_efficiency=0.71,
+    full_load_thermal_efficiency=0.20,
+    min_load_thermal_efficiency=0.15,
+    minimum_load=0.25,
     maximum_temperature=65,
     minimum_temperature=20,
     hydrogen_output_pressure=30,
 )
 
 AEM_ELECTROLYSER = ElectrolyserTemplate(
-    hydrogen_efficiency=0.625,
-    thermal_efficiency=0.29,
+    full_load_hydrogen_efficiency=0.625,
+    min_load_hydrogen_efficiency=0.71,
+    full_load_thermal_efficiency=0.29,
+    min_load_thermal_efficiency=0.20,
+    minimum_load=0.30,
     maximum_temperature=50,
     minimum_temperature=20,
     hydrogen_output_pressure=35,
 )
 
 
-class Electrolyser(AbstractTechnology, AbstractSolphRepresentation):
+class AbstractElectrolyser(AbstractHeater):
+    """
+    Abstract class for electrolysers
+    """
+
+    def __init__(
+        self,
+        name: str,
+        nominal_power: float,
+        full_load_hydrogen_efficiency: float,
+        full_load_thermal_efficiency: float,
+        maximum_temperature: float,
+        minimum_temperature: float,
+        hydrogen_output_pressure: float,
+    ):
+        super().__init__(
+            name=name,
+            maximum_temperature=maximum_temperature,
+            minimum_temperature=minimum_temperature,
+        )
+        self.nominal_power = nominal_power
+        self.full_load_hydrogen_efficiency = full_load_hydrogen_efficiency
+        self.full_load_thermal_efficiency = full_load_thermal_efficiency
+        self.maximum_temperature = maximum_temperature
+        self.minimum_temperature = minimum_temperature
+        self.hydrogen_output_pressure = hydrogen_output_pressure
+
+    def build_core(self):
+        """Build core structure of oemof.solph representation."""
+        super().build_core()
+        # Electrical connection
+        self.electricity_carrier = self.location.get_carrier(ElectricityCarrier)
+        self.electrical_bus = self.electricity_carrier.distribution
+
+        # Hydrogen connection
+        self.gas_carrier = self.location.get_carrier(GasCarrier)
+
+        self.pressure, _ = self.gas_carrier.get_surrounding_levels(
+            HYDROGEN, self.hydrogen_output_pressure
+        )
+
+        self.h2_bus = self.gas_carrier.inputs[HYDROGEN][self.pressure]
+
+        # H2 output in kg at max load
+        self.full_load_h2_output = self.full_load_hydrogen_efficiency / HYDROGEN.LHV
+
+
+class Electrolyser(AbstractElectrolyser):
     """
     Electrolyser split water into hydrogen and oxygen with the electricity as input
-    source of energy. Hydrogen can be used as an energy carrier for various applications.
-    Excess heat from low-temperature electrolyser (PEM, Alk, AEM) can also be utilised for
-    space heating and hot water in: offices, commercial building, residential applications,
-    either directly or via a district heating network. Heat requirement for Anaerobic Digestion
-    (AD) Plant or some industrial processes can also be provided via Electrolysers. Waste heat
-    utilisation can increase the system efficiency of up to 91 %. Oxygen produced in the
-    electrolysis process is not considered in MTRESS.
+    source of energy.Hydrogen can be used as an energy carrier for various applications.
+    Excess heat from electrolyser (PEM, Alk, AEM) can also be utilised for space heating
+    and hot water in: offices, commercial building, residential applications, either
+    directly or via a district heating network. Heat requirement for Anaerobic Digestion
+    (AD) Plant or some industrial processes can also be provided via Electrolysers.
+    Waste heat utilisation can increase the system efficiency of up to 91 %. Oxygen
+    produced in the electrolysis process is not considered in MTRESS.
 
-    There are various types of electrolyser : PEM, Alkaline, AEM, etc. The SOEC technology is
-    not yet considered in MTRESS. This class module takes PEM electrolyser as default technology,
-    but user can select different technology type or can also user-defined their own technology
-    as per the requirements.
+    There are various types of electrolyser : PEM, Alkaline, AEM, etc. The SOEC is not
+    considered in MTRESS. This class module can use electrolyser template for PEM,
+    Alkaline, and AEM, with their default parameters as follows:
+
+    from mtress.technologies import PEM_ELECTROLYSER
+
+    house_1.add(
+        technologies.Electrolyser(
+            name="PEM",
+            nominal_power=10e5,
+            template=PEM_ELECTROLYSER
+        )
+    )
+
+    but user can also overite the default parameters as per the requirements or user can
+    ignore using the template and define all parameters manually.
+
+    Note: This Electrolyser class do not consider the offset and partload operation of
+    the electrolyser i.e., electrolyser operates at full load range with fixed
+    efficiency and do not consider the part load operation. To consider partload
+    operation please use OffsetElectrolyser class.
     """
 
     @enable_templating(ElectrolyserTemplate)
@@ -102,8 +177,8 @@ class Electrolyser(AbstractTechnology, AbstractSolphRepresentation):
         self,
         name: str,
         nominal_power: float,
-        hydrogen_efficiency: float,
-        thermal_efficiency: float,
+        full_load_hydrogen_efficiency: float,
+        full_load_thermal_efficiency: float,
         maximum_temperature: float,
         minimum_temperature: float,
         hydrogen_output_pressure: float,
@@ -113,64 +188,162 @@ class Electrolyser(AbstractTechnology, AbstractSolphRepresentation):
 
         :param name: Name of the component
         :param nominal_power: Nominal electrical power (in W) of the component
-        :param hydrogen_efficiency: Hydrogen production efficiency of the electrolyser,
-            i.e., the ratio of hydrogen output and electrical input
-        :param thermal_efficiency: Thermal efficiency of the electrolyser,
+        :param max_load_hydrogen_efficiency: Hydrogen production efficiency at nominal
+            load, i.e., the ratio of hydrogen output and electrical input
+        :param max_load_thermal_efficiency: Thermal efficiency at the nominal load
+            i.e., ratio of thermal output and electrical input
+        :param maximum_temperature: Maximum waste heat temperature level (in °C).
+        :param minimum_temperature: Minimum return temperature level (in °C)
+        """
+        super().__init__(
+            name=name,
+            nominal_power=nominal_power,
+            full_load_hydrogen_efficiency=full_load_hydrogen_efficiency,
+            full_load_thermal_efficiency=full_load_thermal_efficiency,
+            maximum_temperature=maximum_temperature,
+            minimum_temperature=minimum_temperature,
+            hydrogen_output_pressure=hydrogen_output_pressure,
+        )
+
+    def build_core(self):
+        """Build core structure of oemof.solph representation."""
+        super().build_core()
+        self.create_solph_node(
+            label="electrolyser",
+            node_type=Converter,
+            inputs={
+                self.electrical_bus: Flow(nominal_value=self.nominal_power),
+            },
+            outputs={
+                self.h2_bus: Flow(),
+                self.heat_bus: Flow(),
+            },
+            conversion_factors={
+                self.electrical_bus: 1,
+                self.h2_bus: self.full_load_h2_output,
+                self.heat_bus: self.full_load_thermal_efficiency,
+            },
+        )
+
+
+class OffsetElectrolyser(AbstractElectrolyser):
+    """
+    Electrolyser split water into hydrogen and oxygen with the electricity as input
+    source of energy.Hydrogen can be used as an energy carrier for various applications.
+    Excess heat from electrolyser (PEM, Alk, AEM) can also be utilised for space heating
+    and hot water in: offices, commercial building, residential applications, either
+    directly or via a district heating network. Heat requirement for Anaerobic Digestion
+    (AD) Plant or some industrial processes can also be provided via Electrolysers.
+    Waste heat utilisation can increase the system efficiency of up to 91 %. Oxygen
+    produced in the electrolysis process is not considered in MTRESS.
+
+    There are various types of electrolyser : PEM, Alkaline, AEM, etc. The SOEC is not
+    considered in MTRESS. This class module can use electrolyser template for PEM,
+    Alkaline, and AEM, with their default parameters as follows:
+
+    from mtress.technologies import PEM_ELECTROLYSER
+
+    house_1.add(
+        technologies.OffsetElectrolyser(
+            name="PEM",
+            nominal_power=10e5,
+            template=PEM_ELECTROLYSER
+        )
+    )
+
+    but user can also overite the default parameters as per the requirements or user can
+    ignore using the template and define all parameters manually.
+
+    Note: This Electrolyser class consider the offsets and partload operation of
+    the electrolyser.
+    """
+
+    @enable_templating(ElectrolyserTemplate)
+    def __init__(
+        self,
+        name: str,
+        nominal_power: float,
+        full_load_hydrogen_efficiency: float,
+        full_load_thermal_efficiency: float,
+        maximum_temperature: float,
+        minimum_temperature: float,
+        hydrogen_output_pressure: float,
+        min_load_hydrogen_efficiency: Optional[float] = None,
+        min_load_thermal_efficiency: Optional[float] = None,
+        minimum_load: Optional[float] = None,
+        maximum_load: float = 1,
+    ):
+        """
+        Initialize Electrolyser
+
+        :param name: Name of the component
+        :param nominal_power: Nominal electrical power (in W) of the component
+        :param max_load_hydrogen_efficiency: Hydrogen production efficiency at nominal
+            load, i.e., the ratio of hydrogen output and electrical input
+        :param max_load_thermal_efficiency: Thermal efficiency at the nominal load
             i.e., ratio of thermal output and electrical input
         :param maximum_temperature: Maximum waste heat temperature level (in °C).
         :param minimum_temperature: Minimum return temperature level (in °C)
         :param hydrogen_output_pressure: Hydrogen output pressure (in bar)
+        :param min_load_hydrogen_efficiency: Hydrogen production efficiency at minimum
+           load.
+        :param min_load_thermal_efficiency: Thermal efficiency at minimum load
+        :param minimum_load: Minimum load level (fraction of the nominal/maximum load)
+        :param maximum_load: Maximum load level, default is 1
         """
-        super().__init__(name=name)
+        super().__init__(
+            name=name,
+            nominal_power=nominal_power,
+            full_load_hydrogen_efficiency=full_load_hydrogen_efficiency,
+            full_load_thermal_efficiency=full_load_thermal_efficiency,
+            minimum_temperature=minimum_temperature,
+            maximum_temperature=maximum_temperature,
+            hydrogen_output_pressure=hydrogen_output_pressure,
+        )
 
-        self.nominal_power = nominal_power
-        self.hydrogen_efficiency = hydrogen_efficiency
-        self.thermal_efficiency = thermal_efficiency
-        self.maximum_temperature = maximum_temperature
-        self.minimum_temperature = minimum_temperature
-        self.hydrogen_output_pressure = hydrogen_output_pressure
+        self.min_load_hydrogen_efficiency = min_load_hydrogen_efficiency
+        self.min_load_thermal_efficiency = min_load_thermal_efficiency
+        self.minimum_load = minimum_load
+        self.maximum_load = maximum_load
 
     def build_core(self):
         """Build core structure of oemof.solph representation."""
-        # Electrical connection
-        electricity_carrier = self.location.get_carrier(ElectricityCarrier)
-        electrical_bus = electricity_carrier.distribution
+        super().build_core()
 
-        # Hydrogen connection
-        gas_carrier = self.location.get_carrier(GasCarrier)
+        min_load_h2_output = self.min_load_hydrogen_efficiency / HYDROGEN.LHV
 
-        pressure, _ = gas_carrier.get_surrounding_levels(
-            HYDROGEN, self.hydrogen_output_pressure
+        slope_h2, offset_h2 = solph.components.slope_offset_from_nonconvex_input(
+            self.maximum_load,
+            self.minimum_load,
+            self.full_load_h2_output,
+            min_load_h2_output,
         )
 
-        h2_bus = gas_carrier.inputs[HYDROGEN][pressure]
-
-        # H2 output in kg
-        h2_output = self.hydrogen_efficiency / HYDROGEN.LHV
-
-        # Heat connection
-        heat_carrier = self.location.get_carrier(HeatCarrier)
-        heat_bus_warm, heat_bus_cold, ratio = heat_carrier.get_connection_heat_transfer(
-            self.maximum_temperature,
-            self.minimum_temperature,
+        slope_th, offset_th = solph.components.slope_offset_from_nonconvex_input(
+            self.maximum_load,
+            self.minimum_load,
+            self.full_load_thermal_efficiency,
+            self.min_load_thermal_efficiency,
         )
 
-        # TODO: Minimal power implementieren
         self.create_solph_node(
-            label="converter",
-            node_type=Converter,
+            label="electrolyser",
+            node_type=OffsetConverter,
             inputs={
-                electrical_bus: Flow(nominal_value=self.nominal_power),
-                heat_bus_cold: Flow(),
+                self.electrical_bus: Flow(
+                    nominal_value=self.nominal_power,
+                    max=self.maximum_load,
+                    min=self.minimum_load,
+                    nonconvex=solph.NonConvex(),
+                ),
             },
-            outputs={
-                h2_bus: Flow(),
-                heat_bus_warm: Flow(),
-            },
+            outputs={self.h2_bus: Flow(), self.heat_bus: Flow()},
             conversion_factors={
-                electrical_bus: 1,
-                heat_bus_cold: self.thermal_efficiency * ratio / (1 - ratio),
-                h2_bus: h2_output,
-                heat_bus_warm: self.thermal_efficiency / (1 - ratio),
+                self.h2_bus: slope_h2,
+                self.heat_bus: slope_th,
+            },
+            normed_offsets={
+                self.h2_bus: offset_h2,
+                self.heat_bus: offset_th,
             },
         )
