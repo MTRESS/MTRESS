@@ -22,7 +22,7 @@ house_1 = Location(name="house_1")
 energy_system.add_location(house_1)
 
 
-house_1.add(carriers.Electricity())
+house_1.add(carriers.ElectricityCarrier())
 house_1.add(technologies.ElectricityGridConnection(working_rate=70e-6))
 
 house_1.add(
@@ -45,19 +45,26 @@ house_1.add(
 house_1.add(
     carriers.HeatCarrier(
         temperature_levels=[20, 40],
-        reference_temperature=10,
+        reference_temperature=0,
     )
 )
 
 house_1.add(
-    technologies.Electrolyser(
+    technologies.OffsetElectrolyser(
         name="PEM_Ely",
         nominal_power=150e3,
         template=PEM_ELECTROLYSER,
-        offset=True,
     )
 )
 
+house_1.add(
+    demands.FixedTemperatureHeating(
+        name="heating_demand",
+        min_flow_temperature=40,
+        return_temperature=20,
+        time_series=[3000, 3000, 3000],
+    )
+)
 solph_representation = SolphModel(
     energy_system,
     timeindex={
@@ -83,5 +90,7 @@ myresults = results(solved_model)
 flows = get_flows(myresults)
 
 results_df = pd.DataFrame(flows)
+plot = solph_representation.graph(detail=True, flow_results=flows)
+plot.render(outfile="offset_ely_detail_flows.png")
 
 solved_model.write("offset.lp", io_options={"symbolic_solver_labels": True})
