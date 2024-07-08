@@ -8,7 +8,7 @@ from oemof.solph import Flow
 from oemof.solph.components import Converter, OffsetConverter
 
 from .._helpers._util import enable_templating
-from ..carriers import ElectricityCarrier, GasCarrier, HeatCarrier
+from ..carriers import ElectricityCarrier, GasCarrier
 from ..physics import HYDROGEN, Gas
 from ._heater import AbstractHeater
 
@@ -133,9 +133,6 @@ class AbstractFuelCell(AbstractHeater):
         self.max_load_electrical_output = (
             self.max_load_electrical_efficiency * self.gas_type.LHV
         )
-
-        # Heat connection for FC heat output
-        self.heat_carrier = self.location.get_carrier(HeatCarrier)
 
         # thermal efficiency with conversion from gas in kg to heat in W.
         self.max_load_heat_output = self.max_load_thermal_efficiency * self.gas_type.LHV

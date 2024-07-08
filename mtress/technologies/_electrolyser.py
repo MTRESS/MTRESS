@@ -9,7 +9,7 @@ from oemof.solph import Flow
 from oemof.solph.components import Converter, OffsetConverter
 
 from .._helpers._util import enable_templating
-from ..carriers import ElectricityCarrier, GasCarrier, HeatCarrier
+from ..carriers import ElectricityCarrier, GasCarrier
 from ..physics import HYDROGEN
 from ._heater import AbstractHeater
 
@@ -136,9 +136,6 @@ class AbstractElectrolyser(AbstractHeater):
 
         # H2 output in kg at max load
         self.max_load_h2_output = self.max_load_hydrogen_efficiency / HYDROGEN.LHV
-
-        # Heat connection
-        self.heat_carrier = self.location.get_carrier(HeatCarrier)
 
 
 class Electrolyser(AbstractElectrolyser):
