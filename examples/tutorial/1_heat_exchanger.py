@@ -53,11 +53,11 @@ solph_representation = SolphModel(
 
 solph_representation.build_solph_model()
 
-""" plot = solph_representation.graph(detail=False)
+plot = solph_representation.graph(detail=False)
 plot.render(outfile="air_heat_exchanger_simple.png")
 
 plot = solph_representation.graph(detail=True)
-plot.render(outfile="air_heat_exchanger_detail.png") """
+plot.render(outfile="air_heat_exchanger_detail.png")
 
 solved_model = solph_representation.solve(solve_kwargs={"tee": True})
 myresults = results(solved_model)

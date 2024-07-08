@@ -102,13 +102,10 @@ solved_model = solph_representation.solve(solve_kwargs={"tee": True})
 myresults = results(solved_model)
 flows = get_flows(myresults)
 
-plot = solph_representation.graph(detail=True, flow_results=flows, flow_color=None)
+plot = solph_representation.graph(detail=True, flow_results=flows)
 plot.render(outfile="electricity_heat_results.png")
 
 myresults = results(solved_model)
 flows = get_flows(myresults)
-
-plot = solph_representation.graph(detail=True, flow_results=flows)
-plot.render(outfile="air_heat_exchanger_results.png")
 
 solved_model.write("electricity_heat.lp", io_options={"symbolic_solver_labels": True})
