@@ -1,18 +1,16 @@
-"""This module provides PEM fuel cell."""
+"""This module provides fuel cell."""
 
 import logging
 from dataclasses import dataclass
 
-import numpy as np
 from oemof import solph
 from oemof.solph import Flow
 from oemof.solph.components import Converter, OffsetConverter
 
-from .._abstract_component import AbstractSolphRepresentation
 from .._helpers._util import enable_templating
 from ..carriers import ElectricityCarrier, GasCarrier, HeatCarrier
 from ..physics import HYDROGEN, Gas
-from ._abstract_technology import AbstractTechnology
+from ._heater import AbstractHeater
 
 LOGGER = logging.getLogger(__file__)
 
@@ -82,7 +80,7 @@ AEMFC = FuelCellTemplate(
 )
 
 
-class AbstractFuelCell(AbstractTechnology, AbstractSolphRepresentation):
+class AbstractFuelCell(AbstractHeater):
     """
     Abstract base class for all Fuel Cell Technologies.
     """
@@ -98,18 +96,20 @@ class AbstractFuelCell(AbstractTechnology, AbstractSolphRepresentation):
         gas_input_pressure: float,
         gas_type: Gas = HYDROGEN,
     ):
-        super().__init__(name=name)
+        super().__init__(
+            name=name,
+            maximum_temperature=maximum_temperature,
+            minimum_temperature=minimum_temperature,
+        )
         self.nominal_power = nominal_power
         self.max_load_electrical_efficiency = max_load_electrical_efficiency
         self.max_load_thermal_efficiency = max_load_thermal_efficiency
-        self.maximum_temperature = maximum_temperature
-        self.minimum_temperature = minimum_temperature
         self.gas_input_pressure = gas_input_pressure
         self.gas_type = gas_type
 
     def build_core(self):
         """Build core structure of oemof.solph representation."""
-
+        super().build_core()
         # Gas connection as an input to Fuel Cell
         self.gas_carrier = self.location.get_carrier(GasCarrier)
 
@@ -135,13 +135,7 @@ class AbstractFuelCell(AbstractTechnology, AbstractSolphRepresentation):
         )
 
         # Heat connection for FC heat output
-        heat_carrier = self.location.get_carrier(HeatCarrier)
-        self.heat_bus_warm, self.heat_bus_cold, self.ratio = (
-            heat_carrier.get_connection_heat_transfer(
-                self.maximum_temperature,
-                self.minimum_temperature,
-            )
-        )
+        self.heat_carrier = self.location.get_carrier(HeatCarrier)
 
         # thermal efficiency with conversion from gas in kg to heat in W.
         self.max_load_heat_output = self.max_load_thermal_efficiency * self.gas_type.LHV
@@ -252,19 +246,15 @@ class FuelCell(AbstractFuelCell):
             node_type=Converter,
             inputs={
                 self.gas_bus: Flow(nominal_value=self.nominal_gas_consumption),
-                self.heat_bus_cold: Flow(),
             },
             outputs={
                 self.electricity_bus: Flow(),
-                self.heat_bus_warm: Flow(),
+                self.heat_bus: Flow(),
             },
             conversion_factors={
                 self.gas_bus: 1,
-                self.heat_bus_cold: self.max_load_thermal_efficiency
-                * self.ratio
-                / (1 - self.ratio),
                 self.electricity_bus: self.max_load_electrical_output,
-                self.heat_bus_warm: self.max_load_heat_output / (1 - self.ratio),
+                self.heat_bus: self.max_load_heat_output,
             },
         )
 
@@ -402,7 +392,7 @@ class OffsetFuelCell(AbstractFuelCell):
         )
 
         self.create_solph_node(
-            label="offset_conv",
+            label="offset_Converter",
             node_type=OffsetConverter,
             inputs={
                 self.gas_bus: Flow(
@@ -414,14 +404,14 @@ class OffsetFuelCell(AbstractFuelCell):
             },
             outputs={
                 self.electricity_bus: Flow(),
-                self.heat_bus_warm: Flow(),
+                self.heat_bus: Flow(),
             },
             conversion_factors={
                 self.electricity_bus: slope_el,
-                self.heat_bus_warm: slope_ht,
+                self.heat_bus: slope_ht,
             },
             normed_offsets={
                 self.electricity_bus: offset_el,
-                self.heat_bus_warm: offset_ht,
+                self.heat_bus: offset_ht,
             },
         )

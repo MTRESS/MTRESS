@@ -4,16 +4,14 @@ import logging
 from dataclasses import dataclass
 from typing import Optional
 
-import numpy as np
 from oemof import solph
 from oemof.solph import Flow
 from oemof.solph.components import Converter, OffsetConverter
 
-from .._abstract_component import AbstractSolphRepresentation
 from .._helpers._util import enable_templating
 from ..carriers import ElectricityCarrier, GasCarrier, HeatCarrier
 from ..physics import HYDROGEN
-from ._abstract_technology import AbstractTechnology
+from ._heater import AbstractHeater
 
 LOGGER = logging.getLogger(__file__)
 
@@ -93,7 +91,7 @@ AEM_ELECTROLYSER = ElectrolyserTemplate(
 )
 
 
-class AbstractElectrolyser(AbstractTechnology, AbstractSolphRepresentation):
+class AbstractElectrolyser(AbstractHeater):
     """
     Abstract class for electrolysers
     """
@@ -108,7 +106,11 @@ class AbstractElectrolyser(AbstractTechnology, AbstractSolphRepresentation):
         minimum_temperature: float,
         hydrogen_output_pressure: float,
     ):
-        super().__init__(name=name)
+        super().__init__(
+            name=name,
+            maximum_temperature=maximum_temperature,
+            minimum_temperature=minimum_temperature,
+        )
         self.nominal_power = nominal_power
         self.max_load_hydrogen_efficiency = max_load_hydrogen_efficiency
         self.max_load_thermal_efficiency = max_load_thermal_efficiency
@@ -118,6 +120,7 @@ class AbstractElectrolyser(AbstractTechnology, AbstractSolphRepresentation):
 
     def build_core(self):
         """Build core structure of oemof.solph representation."""
+        super().build_core()
         # Electrical connection
         self.electricity_carrier = self.location.get_carrier(ElectricityCarrier)
         self.electrical_bus = self.electricity_carrier.distribution
@@ -136,12 +139,6 @@ class AbstractElectrolyser(AbstractTechnology, AbstractSolphRepresentation):
 
         # Heat connection
         self.heat_carrier = self.location.get_carrier(HeatCarrier)
-        self.heat_bus_warm, self.heat_bus_cold, self.ratio = (
-            self.heat_carrier.get_connection_heat_transfer(
-                self.maximum_temperature,
-                self.minimum_temperature,
-            )
-        )
 
 
 class Electrolyser(AbstractElectrolyser):
@@ -219,19 +216,15 @@ class Electrolyser(AbstractElectrolyser):
             node_type=Converter,
             inputs={
                 self.electrical_bus: Flow(nominal_value=self.nominal_power),
-                self.heat_bus_cold: Flow(),
             },
             outputs={
                 self.h2_bus: Flow(),
-                self.heat_bus_warm: Flow(),
+                self.heat_bus: Flow(),
             },
             conversion_factors={
                 self.electrical_bus: 1,
-                self.heat_bus_cold: self.max_load_thermal_efficiency
-                * self.ratio
-                / (1 - self.ratio),
                 self.h2_bus: self.max_load_h2_output,
-                self.heat_bus_warm: self.max_load_thermal_efficiency / (1 - self.ratio),
+                self.heat_bus: self.max_load_thermal_efficiency,
             },
         )
 
@@ -337,7 +330,7 @@ class OffsetElectrolyser(AbstractElectrolyser):
         )
 
         self.create_solph_node(
-            label="Offset_conv",
+            label="Offset_Converter",
             node_type=OffsetConverter,
             inputs={
                 self.electrical_bus: Flow(
@@ -347,13 +340,13 @@ class OffsetElectrolyser(AbstractElectrolyser):
                     nonconvex=solph.NonConvex(),
                 ),
             },
-            outputs={self.h2_bus: Flow(), self.heat_bus_warm: Flow()},
+            outputs={self.h2_bus: Flow(), self.heat_bus: Flow()},
             conversion_factors={
                 self.h2_bus: slope_h2,
-                self.heat_bus_warm: slope_th,
+                self.heat_bus: slope_th,
             },
             normed_offsets={
                 self.h2_bus: offset_h2,
-                self.heat_bus_warm: offset_th,
+                self.heat_bus: offset_th,
             },
         )
