@@ -42,9 +42,9 @@ class ElectrolyserTemplate:
 
     """
 
-    max_load_hydrogen_efficiency: float
+    full_load_hydrogen_efficiency: float
     min_load_hydrogen_efficiency: float
-    max_load_thermal_efficiency: float
+    full_load_thermal_efficiency: float
     min_load_thermal_efficiency: float
     minimum_load: float
     maximum_temperature: float
@@ -58,9 +58,9 @@ class ElectrolyserTemplate:
 #  as it gets older.
 
 PEM_ELECTROLYSER = ElectrolyserTemplate(
-    max_load_hydrogen_efficiency=0.63,
+    full_load_hydrogen_efficiency=0.63,
     min_load_hydrogen_efficiency=0.70,
-    max_load_thermal_efficiency=0.25,
+    full_load_thermal_efficiency=0.25,
     min_load_thermal_efficiency=0.20,
     minimum_load=0.15,
     maximum_temperature=57,
@@ -69,9 +69,9 @@ PEM_ELECTROLYSER = ElectrolyserTemplate(
 )
 
 ALKALINE_ELECTROLYSER = ElectrolyserTemplate(
-    max_load_hydrogen_efficiency=0.66,
+    full_load_hydrogen_efficiency=0.66,
     min_load_hydrogen_efficiency=0.71,
-    max_load_thermal_efficiency=0.20,
+    full_load_thermal_efficiency=0.20,
     min_load_thermal_efficiency=0.15,
     minimum_load=0.25,
     maximum_temperature=65,
@@ -80,9 +80,9 @@ ALKALINE_ELECTROLYSER = ElectrolyserTemplate(
 )
 
 AEM_ELECTROLYSER = ElectrolyserTemplate(
-    max_load_hydrogen_efficiency=0.625,
+    full_load_hydrogen_efficiency=0.625,
     min_load_hydrogen_efficiency=0.71,
-    max_load_thermal_efficiency=0.29,
+    full_load_thermal_efficiency=0.29,
     min_load_thermal_efficiency=0.20,
     minimum_load=0.30,
     maximum_temperature=50,
@@ -100,8 +100,8 @@ class AbstractElectrolyser(AbstractHeater):
         self,
         name: str,
         nominal_power: float,
-        max_load_hydrogen_efficiency: float,
-        max_load_thermal_efficiency: float,
+        full_load_hydrogen_efficiency: float,
+        full_load_thermal_efficiency: float,
         maximum_temperature: float,
         minimum_temperature: float,
         hydrogen_output_pressure: float,
@@ -112,8 +112,8 @@ class AbstractElectrolyser(AbstractHeater):
             minimum_temperature=minimum_temperature,
         )
         self.nominal_power = nominal_power
-        self.max_load_hydrogen_efficiency = max_load_hydrogen_efficiency
-        self.max_load_thermal_efficiency = max_load_thermal_efficiency
+        self.full_load_hydrogen_efficiency = full_load_hydrogen_efficiency
+        self.full_load_thermal_efficiency = full_load_thermal_efficiency
         self.maximum_temperature = maximum_temperature
         self.minimum_temperature = minimum_temperature
         self.hydrogen_output_pressure = hydrogen_output_pressure
@@ -135,7 +135,7 @@ class AbstractElectrolyser(AbstractHeater):
         self.h2_bus = self.gas_carrier.inputs[HYDROGEN][self.pressure]
 
         # H2 output in kg at max load
-        self.max_load_h2_output = self.max_load_hydrogen_efficiency / HYDROGEN.LHV
+        self.full_load_h2_output = self.full_load_hydrogen_efficiency / HYDROGEN.LHV
 
 
 class Electrolyser(AbstractElectrolyser):
@@ -177,8 +177,8 @@ class Electrolyser(AbstractElectrolyser):
         self,
         name: str,
         nominal_power: float,
-        max_load_hydrogen_efficiency: float,
-        max_load_thermal_efficiency: float,
+        full_load_hydrogen_efficiency: float,
+        full_load_thermal_efficiency: float,
         maximum_temperature: float,
         minimum_temperature: float,
         hydrogen_output_pressure: float,
@@ -198,8 +198,8 @@ class Electrolyser(AbstractElectrolyser):
         super().__init__(
             name=name,
             nominal_power=nominal_power,
-            max_load_hydrogen_efficiency=max_load_hydrogen_efficiency,
-            max_load_thermal_efficiency=max_load_thermal_efficiency,
+            full_load_hydrogen_efficiency=full_load_hydrogen_efficiency,
+            full_load_thermal_efficiency=full_load_thermal_efficiency,
             maximum_temperature=maximum_temperature,
             minimum_temperature=minimum_temperature,
             hydrogen_output_pressure=hydrogen_output_pressure,
@@ -209,7 +209,7 @@ class Electrolyser(AbstractElectrolyser):
         """Build core structure of oemof.solph representation."""
         super().build_core()
         self.create_solph_node(
-            label="converter",
+            label="electrolyser",
             node_type=Converter,
             inputs={
                 self.electrical_bus: Flow(nominal_value=self.nominal_power),
@@ -220,8 +220,8 @@ class Electrolyser(AbstractElectrolyser):
             },
             conversion_factors={
                 self.electrical_bus: 1,
-                self.h2_bus: self.max_load_h2_output,
-                self.heat_bus: self.max_load_thermal_efficiency,
+                self.h2_bus: self.full_load_h2_output,
+                self.heat_bus: self.full_load_thermal_efficiency,
             },
         )
 
@@ -263,8 +263,8 @@ class OffsetElectrolyser(AbstractElectrolyser):
         self,
         name: str,
         nominal_power: float,
-        max_load_hydrogen_efficiency: float,
-        max_load_thermal_efficiency: float,
+        full_load_hydrogen_efficiency: float,
+        full_load_thermal_efficiency: float,
         maximum_temperature: float,
         minimum_temperature: float,
         hydrogen_output_pressure: float,
@@ -294,8 +294,8 @@ class OffsetElectrolyser(AbstractElectrolyser):
         super().__init__(
             name=name,
             nominal_power=nominal_power,
-            max_load_hydrogen_efficiency=max_load_hydrogen_efficiency,
-            max_load_thermal_efficiency=max_load_thermal_efficiency,
+            full_load_hydrogen_efficiency=full_load_hydrogen_efficiency,
+            full_load_thermal_efficiency=full_load_thermal_efficiency,
             minimum_temperature=minimum_temperature,
             maximum_temperature=maximum_temperature,
             hydrogen_output_pressure=hydrogen_output_pressure,
@@ -315,19 +315,19 @@ class OffsetElectrolyser(AbstractElectrolyser):
         slope_h2, offset_h2 = solph.components.slope_offset_from_nonconvex_input(
             self.maximum_load,
             self.minimum_load,
-            self.max_load_h2_output,
+            self.full_load_h2_output,
             min_load_h2_output,
         )
 
         slope_th, offset_th = solph.components.slope_offset_from_nonconvex_input(
             self.maximum_load,
             self.minimum_load,
-            self.max_load_thermal_efficiency,
+            self.full_load_thermal_efficiency,
             self.min_load_thermal_efficiency,
         )
 
         self.create_solph_node(
-            label="Offset_Converter",
+            label="electrolyser",
             node_type=OffsetConverter,
             inputs={
                 self.electrical_bus: Flow(

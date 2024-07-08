@@ -33,9 +33,9 @@ class FuelCellTemplate:
     MCFC, etc.).
     """
 
-    max_load_electrical_efficiency: float
+    full_load_electrical_efficiency: float
     min_load_electrical_efficiency: float
-    max_load_thermal_efficiency: float
+    full_load_thermal_efficiency: float
     min_load_thermal_efficiency: float
     minimum_load: float
     maximum_temperature: float
@@ -45,9 +45,9 @@ class FuelCellTemplate:
 
 # Polymer Exchange Membrane Fuel Cell (PEMFC)
 PEMFC = FuelCellTemplate(
-    max_load_electrical_efficiency=0.36,
+    full_load_electrical_efficiency=0.36,
     min_load_electrical_efficiency=0.54,
-    max_load_thermal_efficiency=0.50,
+    full_load_thermal_efficiency=0.50,
     min_load_thermal_efficiency=0.25,
     minimum_load=0.1,
     maximum_temperature=70,
@@ -57,9 +57,9 @@ PEMFC = FuelCellTemplate(
 
 # Alkaline Fuel Cell (AFC)
 AFC = FuelCellTemplate(
-    max_load_electrical_efficiency=0.37,
+    full_load_electrical_efficiency=0.37,
     min_load_electrical_efficiency=0.534,
-    max_load_thermal_efficiency=0.45,
+    full_load_thermal_efficiency=0.45,
     min_load_thermal_efficiency=0.18,
     minimum_load=0.25,
     maximum_temperature=65,
@@ -69,9 +69,9 @@ AFC = FuelCellTemplate(
 
 #  Anion Exchange Membrane Fuel Cell (AEMFC)
 AEMFC = FuelCellTemplate(
-    max_load_electrical_efficiency=0.33,
+    full_load_electrical_efficiency=0.33,
     min_load_electrical_efficiency=0.52,
-    max_load_thermal_efficiency=0.42,
+    full_load_thermal_efficiency=0.42,
     min_load_thermal_efficiency=0.27,
     minimum_load=0.25,
     maximum_temperature=55,
@@ -89,8 +89,8 @@ class AbstractFuelCell(AbstractHeater):
         self,
         name: str,
         nominal_power: float,
-        max_load_electrical_efficiency: float,
-        max_load_thermal_efficiency: float,
+        full_load_electrical_efficiency: float,
+        full_load_thermal_efficiency: float,
         maximum_temperature: float,
         minimum_temperature: float,
         gas_input_pressure: float,
@@ -102,8 +102,8 @@ class AbstractFuelCell(AbstractHeater):
             minimum_temperature=minimum_temperature,
         )
         self.nominal_power = nominal_power
-        self.max_load_electrical_efficiency = max_load_electrical_efficiency
-        self.max_load_thermal_efficiency = max_load_thermal_efficiency
+        self.full_load_electrical_efficiency = full_load_electrical_efficiency
+        self.full_load_thermal_efficiency = full_load_thermal_efficiency
         self.gas_input_pressure = gas_input_pressure
         self.gas_type = gas_type
 
@@ -122,20 +122,21 @@ class AbstractFuelCell(AbstractHeater):
         # Convert nominal power capacity of FC in W to nominal gas consumption
         # capacity in kg
         self.nominal_gas_consumption = self.nominal_power / (
-            self.max_load_electrical_efficiency * self.gas_type.LHV
+            self.full_load_electrical_efficiency * self.gas_type.LHV
         )
 
         # Electrical connection for FC electrical output
         self.electricity_carrier = self.location.get_carrier(ElectricityCarrier)
 
-        # Electrical efficiency with conversion from gas in kg to electricity in W, also
-        # includes inverter efficiency.
-        self.max_load_electrical_output = (
-            self.max_load_electrical_efficiency * self.gas_type.LHV
+        # Electrical efficiency with conversion from gas in kg to electricity in W
+        self.full_load_electrical_output = (
+            self.full_load_electrical_efficiency * self.gas_type.LHV
         )
 
         # thermal efficiency with conversion from gas in kg to heat in W.
-        self.max_load_heat_output = self.max_load_thermal_efficiency * self.gas_type.LHV
+        self.full_load_heat_output = (
+            self.full_load_thermal_efficiency * self.gas_type.LHV
+        )
 
         # electricity bus connection
         self.electricity_bus = self.electricity_carrier.distribution
@@ -201,8 +202,8 @@ class FuelCell(AbstractFuelCell):
         self,
         name: str,
         nominal_power: float,
-        max_load_electrical_efficiency: float,
-        max_load_thermal_efficiency: float,
+        full_load_electrical_efficiency: float,
+        full_load_thermal_efficiency: float,
         maximum_temperature: float,
         minimum_temperature: float,
         gas_input_pressure: float,
@@ -214,9 +215,9 @@ class FuelCell(AbstractFuelCell):
         :param name: Name of the component
         :param nominal_power: Nominal electrical power output of Fuel Cell (FC)
             (in W)
-        :param max_load_electrical_efficiency: Electrical efficiency at max/nom load,
+        :param full_load_electrical_efficiency: Electrical efficiency at max/nom load,
             i.e. ratio of electrical output and gas input
-        :param max_load_thermal_efficiency: Thermal efficiency at the max/nom load,
+        :param full_load_thermal_efficiency: Thermal efficiency at the max/nom load,
             i.e. ratio of thermal output and gas input
         :param maximum_temperature: Maximum temperature (in °C) at which heat could
             be extracted from FC.
@@ -227,8 +228,8 @@ class FuelCell(AbstractFuelCell):
         super().__init__(
             name=name,
             nominal_power=nominal_power,
-            max_load_electrical_efficiency=max_load_electrical_efficiency,
-            max_load_thermal_efficiency=max_load_thermal_efficiency,
+            full_load_electrical_efficiency=full_load_electrical_efficiency,
+            full_load_thermal_efficiency=full_load_thermal_efficiency,
             maximum_temperature=maximum_temperature,
             minimum_temperature=minimum_temperature,
             gas_input_pressure=gas_input_pressure,
@@ -239,7 +240,7 @@ class FuelCell(AbstractFuelCell):
         super().build_core()
 
         self.create_solph_node(
-            label="converter",
+            label="fuel_cell",
             node_type=Converter,
             inputs={
                 self.gas_bus: Flow(nominal_value=self.nominal_gas_consumption),
@@ -250,8 +251,8 @@ class FuelCell(AbstractFuelCell):
             },
             conversion_factors={
                 self.gas_bus: 1,
-                self.electricity_bus: self.max_load_electrical_output,
-                self.heat_bus: self.max_load_heat_output,
+                self.electricity_bus: self.full_load_electrical_output,
+                self.heat_bus: self.full_load_heat_output,
             },
         )
 
@@ -314,9 +315,9 @@ class OffsetFuelCell(AbstractFuelCell):
         self,
         name: str,
         nominal_power: float,
-        max_load_electrical_efficiency: float,
+        full_load_electrical_efficiency: float,
         min_load_electrical_efficiency: float,
-        max_load_thermal_efficiency: float,
+        full_load_thermal_efficiency: float,
         min_load_thermal_efficiency: float,
         minimum_load: float,
         maximum_temperature: float,
@@ -331,10 +332,10 @@ class OffsetFuelCell(AbstractFuelCell):
         :param name: Name of the component
         :param nominal_power: Nominal electrical power output of Fuel Cell (FC)
             (in W)
-        :param max_load_electrical_efficiency: Electrical efficiency at max/nom load,
+        :param full_load_electrical_efficiency: Electrical efficiency at max/nom load,
             i.e. ratio of electrical output and gas input
         :param min_load_electrical_efficiency: Electrical efficiency at minimum load,
-        :param max_load_thermal_efficiency: Thermal efficiency at the max/nom load,
+        :param full_load_thermal_efficiency: Thermal efficiency at the max/nom load,
             i.e. ratio of thermal output and gas input
         :param min_load_thermal_efficiency: Thermal efficiency at the minimum load,
         :param maximum_temperature: Maximum temperature (in °C) at which heat could
@@ -350,8 +351,8 @@ class OffsetFuelCell(AbstractFuelCell):
         super().__init__(
             name=name,
             nominal_power=nominal_power,
-            max_load_electrical_efficiency=max_load_electrical_efficiency,
-            max_load_thermal_efficiency=max_load_thermal_efficiency,
+            full_load_electrical_efficiency=full_load_electrical_efficiency,
+            full_load_thermal_efficiency=full_load_thermal_efficiency,
             maximum_temperature=maximum_temperature,
             minimum_temperature=minimum_temperature,
             gas_input_pressure=gas_input_pressure,
@@ -377,19 +378,19 @@ class OffsetFuelCell(AbstractFuelCell):
         slope_el, offset_el = solph.components.slope_offset_from_nonconvex_input(
             self.maximum_load,
             self.minimum_load,
-            self.max_load_electrical_output,
+            self.full_load_electrical_output,
             min_load_electrical_output,
         )
 
         slope_ht, offset_ht = solph.components.slope_offset_from_nonconvex_input(
             self.maximum_load,
             self.minimum_load,
-            self.max_load_heat_output,
+            self.full_load_heat_output,
             min_load_heat_output,
         )
 
         self.create_solph_node(
-            label="offset_Converter",
+            label="fuel_cell",
             node_type=OffsetConverter,
             inputs={
                 self.gas_bus: Flow(
