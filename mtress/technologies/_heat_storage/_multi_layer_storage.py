@@ -94,7 +94,7 @@ class LayeredHeatStorage(AbstractHeatStorage):
                 else:
                     (
                         loss_rate,
-                        fixed_losses_relative,  # MW
+                        fixed_losses_relative,
                         fixed_losses_absolute,  # MW
                     ) = stratified_thermal_storage.calculate_losses(
                         u_value=self.u_value,
@@ -106,7 +106,7 @@ class LayeredHeatStorage(AbstractHeatStorage):
                             kind=TimeseriesType.INTERVAL,
                         ),
                     )
-                    fixed_losses_relative = mega_to_one(fixed_losses_relative)
+                    fixed_losses_relative = fixed_losses_relative
                     fixed_losses_absolute = mega_to_one(fixed_losses_absolute)
 
                 # losses to the upper side of the storage will just leave the

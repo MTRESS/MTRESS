@@ -1,6 +1,5 @@
 """Abstract carrier class to ensure a unified interface."""
 
-
 import numpy as np
 
 from .._abstract_component import AbstractComponent
