@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 from typing import Optional
 
@@ -8,10 +10,12 @@ from mtress._abstract_component import AbstractSolphRepresentation
 from mtress.carriers import GasCarrier
 from mtress.physics import Gas
 
+from ._abstract_grid_connection import AbstractGridConnection
+
 LOGGER = logging.getLogger(__file__)
 
 
-class GasGridConnection(AbstractSolphRepresentation):
+class GasGridConnection(AbstractGridConnection, AbstractSolphRepresentation):
     """
     The gas grid connection represents the distribution pipelines for
     a specific gas type, identified by the `gas_type` parameter. It
@@ -22,6 +26,8 @@ class GasGridConnection(AbstractSolphRepresentation):
 
     Note: Working_rate must be defined to enable gas import for your
           energy system.
+          Revenue must be defined to enable the gas export to gas grid connection of
+          the same location.
     """
 
     def __init__(
@@ -31,7 +37,7 @@ class GasGridConnection(AbstractSolphRepresentation):
         grid_pressure: float,
         working_rate: Optional[float] = None,
         demand_rate: Optional[float] = 0,
-        revenue: float = 0,
+        revenue: Optional[float] = None,
         **kwargs,
     ):
         """
@@ -42,45 +48,34 @@ class GasGridConnection(AbstractSolphRepresentation):
         :revenue: in currency/Wh
         """
 
-        super().__init__(**kwargs)
+        super().__init__()
         self.gas_type = gas_type
         self.grid_pressure = grid_pressure
         self.working_rate = working_rate
         self.demand_rate = demand_rate
         self.revenue = revenue
 
+        self.b_grid_import = None
+        self.b_grid_export = None
+
     def build_core(self):
         gas_carrier = self.location.get_carrier(GasCarrier)
 
-        _, pressure_level = gas_carrier.get_surrounding_levels(
+        pressure_level_low, pressure_level_high = gas_carrier.get_surrounding_levels(
             self.gas_type, self.grid_pressure
         )
 
-        pressure_levels = gas_carrier.pressure_levels[self.gas_type]
+        self.b_grid_export = self.create_solph_node(
+            label="grid_export",
+            node_type=Bus,
+            inputs={gas_carrier.inputs[self.gas_type][pressure_level_high]: Flow()},
+        )
 
-        pressure_index = pressure_levels.index(pressure_level)
-
-        # Get the adjacent levels
-        adjacent_levels = pressure_levels[
-            max(0, pressure_index - 1) : min(len(pressure_levels), pressure_index + 2)
-        ]
-
-        _b_grid_export = {}
-        _b_grid_import = {}
-
-        for level in adjacent_levels:
-            if self.revenue is not None:
-                _b_grid_export[level] = self.create_solph_node(
-                    label=f"grid_export_{level}",
-                    node_type=Bus,
-                    inputs={gas_carrier.inputs[self.gas_type][level]: Flow()},
-                )
-
-            _b_grid_import[level] = self.create_solph_node(
-                label=f"grid_import_{level}",
-                node_type=Bus,
-                outputs={gas_carrier.inputs[self.gas_type][level]: Flow()},
-            )
+        self.b_grid_import = self.create_solph_node(
+            label="grid_import",
+            node_type=Bus,
+            outputs={gas_carrier.inputs[self.gas_type][pressure_level_low]: Flow()},
+        )
 
         if self.working_rate is not None:
             if self.demand_rate:
@@ -88,17 +83,11 @@ class GasGridConnection(AbstractSolphRepresentation):
             else:
                 demand_rate = None
 
-            grid_import_bus = self.create_solph_node(
-                label="grid_import_bus",
-                node_type=Bus,
-                outputs={_b_grid_import[level]: Flow() for level in adjacent_levels},
-            )
-
             self.create_solph_node(
                 label="source_import",
                 node_type=Source,
                 outputs={
-                    grid_import_bus: Flow(
+                    self.b_grid_import: Flow(
                         variable_costs=self.working_rate,
                         investment=demand_rate,
                     )
@@ -106,18 +95,26 @@ class GasGridConnection(AbstractSolphRepresentation):
             )
 
         if self.revenue is not None:
-            grid_export_bus = self.create_solph_node(
-                label="grid_export_bus",
-                node_type=Bus,
-                inputs={_b_grid_export[level]: Flow() for level in adjacent_levels},
-            )
-
             self.create_solph_node(
-                label="grid_export",
+                label="sink_export",
                 node_type=Sink,
                 inputs={
-                    grid_export_bus: Flow(
+                    self.b_grid_export: Flow(
                         variable_costs=-self.revenue,
                     )
                 },
+            )
+
+    def connect(
+        self,
+        other: GasGridConnection,
+    ):
+        # TODO create the actual flows between the location in establish interconnections
+        self.b_grid_export.outputs[other.b_grid_import] = Flow()
+        if self.grid_pressure < other.grid_pressure:
+            raise ValueError(
+                "Pressure level of the exporting GasGridConnection should be higher "
+                "than or equal to importing GasGridConnection at another location "
+                "(destination). Alternative is to use compressor to raise the pressure "
+                " level, which is not yet implemented."
             )
