@@ -6,9 +6,11 @@ from typing import Optional
 
 from oemof.solph import Bus, Flow, Investment
 from oemof.solph.components import Sink, Source
+
+from mtress._abstract_component import AbstractSolphRepresentation
 from mtress._data_handler import TimeseriesSpecifier, TimeseriesType
 from mtress.carriers import ElectricityCarrier
-from mtress._abstract_component import AbstractSolphRepresentation
+
 from ._abstract_grid_connection import AbstractGridConnection
 
 
@@ -28,6 +30,7 @@ class ElectricityGridConnection(AbstractGridConnection, AbstractSolphRepresentat
 
         self.working_rate = working_rate
         self.demand_rate = demand_rate
+        self.revenue = revenue
 
         self.grid_export = None
         self.grid_import = None
@@ -35,23 +38,29 @@ class ElectricityGridConnection(AbstractGridConnection, AbstractSolphRepresentat
     def build_core(self):
         electricity_carrier = self.location.get_carrier(ElectricityCarrier)
 
-        self.grid_export = b_grid_export = self.create_solph_node(
-            label="grid_export",
-            node_type=Bus,
-            inputs={electricity_carrier.feed_in: Flow()},
-        )
-
         self.grid_import = b_grid_import = self.create_solph_node(
             label="grid_import",
             node_type=Bus,
             outputs={electricity_carrier.distribution: Flow()},
         )
 
-        self.create_solph_node(
-            label="sink_export",
-            node_type=Sink,
-            inputs={b_grid_export: Flow()},
-        )
+        if self.revenue is not None:
+            self.grid_export = b_grid_export = self.create_solph_node(
+                label="grid_export",
+                node_type=Bus,
+                inputs={electricity_carrier.feed_in: Flow()},
+            )
+            self.create_solph_node(
+                label="sink_export",
+                node_type=Sink,
+                inputs={
+                    b_grid_export: Flow(
+                        variable_costs=-self._solph_model.data.get_timeseries(
+                            self.revenue, kind=TimeseriesType.INTERVAL
+                        )
+                    )
+                },
+            )
 
         if self.working_rate is not None:
             if self.demand_rate:
@@ -76,4 +85,5 @@ class ElectricityGridConnection(AbstractGridConnection, AbstractSolphRepresentat
         self,
         other: ElectricityGridConnection,
     ):
+        # TODO create the actual flows between the location in establish interconnections
         self.grid_export.outputs[other.grid_import] = Flow()
