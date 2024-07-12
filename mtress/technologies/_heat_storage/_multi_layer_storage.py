@@ -8,6 +8,8 @@ SPDX-FileCopyrightText: Deutsches Zentrum für Luft und Raumfahrt
 SPDX-License-Identifier: MIT
 """
 
+from pyomo import environ as po
+
 from numpy import power
 from oemof.solph import Bus
 from oemof.solph import Flow
@@ -184,14 +186,18 @@ class LayeredHeatStorage(AbstractHeatStorage):
                 upper_temperature - reference_temperature
             )
 
-            for t in self._solph_model.model.TIMESTEPS:
-                equate_variables(
-                    model=model,
-                    var1=model.GenericStorageBlock.storage_losses[
+            def equate_variables_rule(_, t):
+                return (
+                    (ratio / (1 - ratio))
+                    * model.GenericStorageBlock.storage_losses[
                         self.storage_components[upper_temperature], t
-                    ],
-                    var2=model.flow[
-                        self.buses[upper_temperature], self.buses[lower_temperature], t
-                    ],
-                    factor1=ratio / (1 - ratio),
-                )
+                    ]
+                ) == model.flow[
+                    self.buses[upper_temperature], self.buses[lower_temperature], t
+                ]
+
+            setattr(
+                model,
+                str(self.create_label(f"losses_{upper_temperature}")),
+                po.Constraint(model.TIMESTEPS, rule=equate_variables_rule),
+            )
