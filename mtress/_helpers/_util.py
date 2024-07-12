@@ -1,7 +1,7 @@
 """Utility functions."""
 
-
 import dataclasses
+import inspect
 from pathlib import Path
 from typing import Any
 
@@ -112,6 +112,8 @@ def enable_templating(template_class):
 
     def _decorator(func):
         param_names = [field.name for field in dataclasses.fields(template_class)]
+        func_signature = inspect.signature(func)
+        func_params = func_signature.parameters
 
         def _wrapper(*args, template=None, **kwargs):
             if template is not None:
@@ -119,7 +121,7 @@ def enable_templating(template_class):
                     raise TypeError(f"template should be of type {template_class}")
 
                 for param in param_names:
-                    if param not in kwargs:
+                    if param not in kwargs and param in func_params:
                         # Take the value from the template if it is not provided as keyword
                         # argument
                         kwargs[param] = getattr(template, param)
