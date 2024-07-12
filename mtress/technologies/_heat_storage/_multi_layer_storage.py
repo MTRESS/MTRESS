@@ -14,7 +14,6 @@ from numpy import power
 from oemof.solph import Bus
 from oemof.solph import Flow
 from oemof.solph.components import GenericStorage
-from oemof.solph.constraints import equate_variables
 from oemof.solph.constraints import shared_limit
 from oemof.thermal import stratified_thermal_storage
 
@@ -189,9 +188,25 @@ class LayeredHeatStorage(AbstractHeatStorage):
             def equate_variables_rule(_, t):
                 return (
                     (ratio / (1 - ratio))
-                    * model.GenericStorageBlock.storage_losses[
-                        self.storage_components[upper_temperature], t
-                    ]
+                    * (
+                        model.GenericStorageBlock.storage_losses[
+                            self.storage_components[upper_temperature], t
+                        ]
+                        + (
+                            model.flow[
+                                self.storage_components[upper_temperature],
+                                self.buses[upper_temperature],
+                                t,
+                            ]
+                        )
+                        - (
+                            model.flow[
+                                self.buses[upper_temperature],
+                                self.storage_components[upper_temperature],
+                                t,
+                            ]
+                        )
+                    )
                 ) == model.flow[
                     self.buses[upper_temperature], self.buses[lower_temperature], t
                 ]
