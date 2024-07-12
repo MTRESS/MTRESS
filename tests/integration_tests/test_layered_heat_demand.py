@@ -20,12 +20,12 @@ def test_layered_heat_storage():
     house_1 = Location(name="house_1")
     house_1.add(
         carriers.HeatCarrier(
-            temperature_levels=[5, 10, 20, 30],
+            temperature_levels=[10, 20, 30],
             reference_temperature=0,
         )
     )
 
-    reservoir_temperature = np.zeros(n_days * 24)
+    reservoir_temperature = np.full(n_days * 24, 20)
     reservoir_temperature[0] = 40
 
     house_1.add(
@@ -41,8 +41,8 @@ def test_layered_heat_storage():
     house_1.add(
         demands.FixedTemperatureHeating(
             name="HD",
-            min_flow_temperature=20,
-            return_temperature=10,
+            min_flow_temperature=30,
+            return_temperature=20,
             time_series=1,
         )
     )
@@ -52,7 +52,7 @@ def test_layered_heat_storage():
             name="stor",
             diameter=1,
             volume=10,
-            ambient_temperature=25,
+            ambient_temperature=0,
             u_value=None,
             power_limit=1e6,
             max_temperature=30,
@@ -66,7 +66,7 @@ def test_layered_heat_storage():
         timeindex={
             "start": "2021-01-01 00:00:00",
             "end": f"2021-01-{n_days+1} 00:00:00",
-            "freq": "60T",
+            "freq": "60min",
         },
     )
 
@@ -95,7 +95,10 @@ if __name__ == "__main__":
     index = None
     for key, result in myresults.items():
         if "storage_content" in result["sequences"]:
-            plt.plot(result["sequences"]["storage_content"], label=str(key))
+            plt.plot(
+                result["sequences"]["storage_content"],
+                label=str(key[0].label.solph_node),
+            )
             total_content += result["sequences"]["storage_content"]
             index = result["sequences"].index
     plt.plot(index, total_content, label="total")
@@ -105,4 +108,4 @@ if __name__ == "__main__":
     plot = solph_representation.graph(detail=True, flow_results=flows)
     plot.render(outfile="layered_heat_demand.png")
 
-    plt.show()
+    # plt.show()
