@@ -109,4 +109,8 @@ solved_model = solph_representation.solve(solve_kwargs={"tee": True})
 myresults = results(solved_model)
 flows = get_flows(myresults)
 results = pd.DataFrame(flows)
+
+plot = solph_representation.graph(detail=True, flow_results=flows)
+plot.render(outfile="conn_pv_results.png")
+
 solved_model.write("electricity_pv.lp", io_options={"symbolic_solver_labels": True})
