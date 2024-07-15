@@ -76,15 +76,26 @@ solph_representation = SolphModel(
 
 solph_representation.build_solph_model()
 
-plot = solph_representation.graph(detail=True)
-plot.render(outfile="heat_pump_cooling_detail.png")
-
 plot = solph_representation.graph(detail=False)
 plot.render(outfile="heat_pump_cooling_simple.png")
+
+plot = solph_representation.graph(detail=True)
+plot.render(outfile="heat_pump_cooling_detail.png")
 
 solved_model = solph_representation.solve(solve_kwargs={"tee": True})
 myresults = results(solved_model)
 flows = get_flows(myresults)
 
-plot = solph_representation.graph(detail=True, flow_results=flows)
+flow_color = {
+    ("house_1", "HeatCarrier", "missing_heat"): {
+        ("house_1", "HeatCarrier", "T_40"): "red"
+    },
+    ("house_1", "HeatCarrier", "T_5"): {
+        ("house_1", "HeatCarrier", "excess_heat"): "red"
+    },
+}
+
+plot = solph_representation.graph(
+    detail=True, flow_results=flows, flow_color=flow_color
+)
 plot.render(outfile="heat_pump_cooling_results.png")

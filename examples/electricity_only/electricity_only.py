@@ -60,9 +60,10 @@ solved_model.write("electricity_only.lp", io_options={"symbolic_solver_labels": 
 myresults = solph.processing.results(solved_model)
 flows = get_flows(myresults)
 
-print(
-    flows[
-        ("house_1", "electricity demand", "input"),
-        ("house_1", "electricity demand", "sink"),
-    ]
-)
+print(flows[
+    ('house_1', 'electricity demand', 'input'),
+    ('house_1', 'electricity demand', 'sink')
+])
+
+plot = solph_representation.graph(detail=True, flow_results=flows, flow_color=None)
+plot.render(outfile="electricity_only_results.png")
