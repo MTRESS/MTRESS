@@ -59,7 +59,15 @@ class GasGridConnection(AbstractGridConnection, AbstractSolphRepresentation):
         self.b_grid_export = None
 
     def build_core(self):
+
         gas_carrier = self.location.get_carrier(GasCarrier)
+
+        for key, values in gas_carrier.levels.items():
+            if key.name == self.gas_type.name:
+                if self.grid_pressure not in values:
+                    raise ValueError(
+                        f"{key.name} grid pressure is not in pressure levels"
+                    )
 
         pressure_level_low, pressure_level_high = gas_carrier.get_surrounding_levels(
             self.gas_type, self.grid_pressure
