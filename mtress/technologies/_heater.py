@@ -83,9 +83,9 @@ class ResistiveHeater(AbstractHeater):
         Initialize ResistiveHeater.
 
         :param name: Set the name of the component.
-        :param nominal_power: Nominal heating capacity of the heating rod (in W)
         :param maximum_temperature: Temperature (in °C) of the heat output.
         :param minimum_temperature: Lowest possible temperature (in °C) of the inlet.
+        :param heating_power: Nominal heating capacity of the heating rod (in W).
         :param efficiency: Thermal conversion efficiency.
         """
         super().__init__(
