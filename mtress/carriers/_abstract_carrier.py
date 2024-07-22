@@ -64,12 +64,12 @@ class AbstractLayeredCarrier(AbstractCarrier):
             min_index = i
         # max
         if maximum in self.levels:
-            max_index = self.levels.index(maximum)+1
+            max_index = self.levels.index(maximum) + 1
         else:
             for i, _l in enumerate(self.levels[::-1]):
                 if maximum > _l:
                     break
-            max_index = len(self.levels)-i
+            max_index = len(self.levels) - i
         return self.levels[min_index:max_index]
 
     @property
