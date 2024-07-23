@@ -8,6 +8,7 @@ SPDX-License-Identifier: MIT
 """
 
 from ._battery_storage import BatteryStorage
+from ._gas_boiler import GasBoiler
 from ._chp import (
     BIOGAS_CHP,
     BIOMETHANE_CHP,
@@ -66,4 +67,5 @@ __all__ = [
     "LayeredHeatStorage",
     "Photovoltaics",
     "RenewableElectricitySource",
+    "GasBoiler",
 ]
