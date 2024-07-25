@@ -45,7 +45,7 @@ house_1.add(
         name="hot water",
         min_flow_temperature=50,
         return_temperature=20,
-        time_series=[10000],
+        time_series=[10000, 2000],
     )
 )
 
@@ -65,7 +65,7 @@ solph_representation = SolphModel(
     energy_system,
     timeindex={
         "start": "2021-07-10 00:00:00",
-        "end": "2021-07-10 01:00:00",
+        "end": "2021-07-10 02:00:00",
         "freq": "60T",
     },
 )
@@ -73,7 +73,7 @@ solph_representation = SolphModel(
 solph_representation.build_solph_model()
 
 plot = solph_representation.graph(detail=True)
-plot.render(outfile="boiler_detail.png")
+plot.render(outfile="gas_heat_detail.png")
 
 solved_model = solph_representation.solve(solve_kwargs={"tee": False})
 
@@ -81,4 +81,4 @@ myresults = results(solved_model)
 flows = get_flows(myresults)
 
 plot = solph_representation.graph(detail=True, flow_results=flows)
-plot.render(outfile="boiler_flows.png")
+plot.render(outfile="gas_heat_result.png")
