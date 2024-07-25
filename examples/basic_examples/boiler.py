@@ -45,7 +45,7 @@ house_1.add(
         name="hot water",
         min_flow_temperature=50,
         return_temperature=20,
-        time_series=[100],
+        time_series=[10000],
     )
 )
 
@@ -55,8 +55,8 @@ house_1.add(
         name="Boiler",
         gas_type=NATURAL_GAS,
         maximum_temperature=55,
-        minimum_temperature=30,
-        nominal_power=5000,  #  W
+        minimum_temperature=20,
+        nominal_power=50000,  #  W
         thermal_efficiency=0.85,
         input_pressure=10,
     )

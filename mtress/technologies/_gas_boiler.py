@@ -61,7 +61,7 @@ class GasBoiler(AbstractTechnology, AbstractSolphRepresentation):
         gas_bus = gas_carrier.inputs[self.gas_type][pressure_level]
 
         # convert gas in kg to heat in Wh with thermal efficiency conversion
-        heat_output = self.thermal_efficiency * self.nominal_power
+        nominal_gas_consumption = 1 / (self.thermal_efficiency * self.gas_type.LHV)
 
         heat_carrier = self.location.get_carrier(HeatCarrier)
 
@@ -77,18 +77,19 @@ class GasBoiler(AbstractTechnology, AbstractSolphRepresentation):
         if self.maximum_temperature - temp_level > 15:
             LOGGER.info("higher than suitable temperature level")
 
-        nominal_gas_consumption = heat_output / self.gas_type.LHV
-
         self.create_solph_node(
             label="converter",
             node_type=Converter,
             inputs={
-                gas_bus: Flow(nominal_value=nominal_gas_consumption),
+                gas_bus: Flow(),
+                heat_bus_cold: Flow(),
             },
             outputs={
-                heat_bus_warm: Flow(),
+                heat_bus_warm: Flow(nominal_value=self.nominal_power),
             },
             conversion_factors={
-                heat_bus_warm: heat_output,
+                gas_bus: nominal_gas_consumption * (1 - ratio),
+                heat_bus_cold: ratio,
+                heat_bus_warm: 1,
             },
         )
