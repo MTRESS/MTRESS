@@ -105,7 +105,4 @@ flows = get_flows(myresults)
 plot = solph_representation.graph(detail=True, flow_results=flows)
 plot.render(outfile="electricity_heat_results.png")
 
-myresults = results(solved_model)
-flows = get_flows(myresults)
-
 solved_model.write("electricity_heat.lp", io_options={"symbolic_solver_labels": True})
