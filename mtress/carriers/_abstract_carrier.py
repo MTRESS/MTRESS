@@ -52,8 +52,7 @@ class AbstractLayeredCarrier(AbstractCarrier):
         return self._levels
 
     def get_levels_between(self, minimum, maximum):
-        """Returns the levels existing between a lower and an upper bound."""
-        # if minimum and maximum match any of the levels, they will be included
+        """Returns the levels existing in a closed interval."""
         # min
         if minimum in self.levels:
             min_index = self.levels.index(minimum)

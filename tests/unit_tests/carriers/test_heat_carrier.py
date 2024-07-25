@@ -48,6 +48,10 @@ def test_heat_carrier_with_reference():
     assert heat_carrier.get_levels_between(36, 9) == []
     # wrong order, matching existing levels
     assert heat_carrier.get_levels_between(35, 10) == []
+    # minimum and maximum match, coincide with a level
+    assert heat_carrier.get_levels_between(10, 10) == [10]
+    # minimum and maximum match, do not coincide with a level
+    assert heat_carrier.get_levels_between(15, 15) == []
 
     reference_level = heat_carrier.reference_level
     assert reference_level == 2  # [-10, 10, (*15*), ...]
