@@ -57,18 +57,12 @@ class AbstractLayeredCarrier(AbstractCarrier):
         if minimum in self.levels:
             min_index = self.levels.index(minimum)
         else:
-            for i, _l in enumerate(self.levels):
-                if minimum < _l:
-                    min_index = i
-                    break
+            min_index = np.searchsorted(self.levels, minimum)
 
         if maximum in self.levels:
             max_index = self.levels.index(maximum) + 1
         else:
-            for i, _l in enumerate(self.levels[::-1]):
-                if maximum > _l:
-                    max_index = len(self.levels) - i
-                    break
+            max_index = np.searchsorted(self.levels, maximum)
 
         return self.levels[min_index:max_index]
 
