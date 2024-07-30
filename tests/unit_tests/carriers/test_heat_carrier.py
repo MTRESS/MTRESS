@@ -16,24 +16,24 @@ def test_heat_carrier_with_reference():
     # temperature levels will be sorted internally
     temperatures = [10, 80, 35, -10, 75]
     ref_temperature = 15
-    heat_carier = HeatCarrier(
+    heat_carrier = HeatCarrier(
         temperature_levels=temperatures,
         reference_temperature=ref_temperature,
     )
-    assert heat_carier.levels == sorted(temperatures)
+    assert heat_carrier.levels == sorted(temperatures)
 
-    assert heat_carier.get_surrounding_levels(15) == (10, 35)
+    assert heat_carrier.get_surrounding_levels(15) == (10, 35)
 
-    assert heat_carier.get_levels_between(9, 36) == [10, 35]
-    assert heat_carier.get_levels_between(10, 35) == [10, 35]
+    assert heat_carrier.get_levels_between(9, 36) == [10, 35]
+    assert heat_carrier.get_levels_between(10, 35) == [10, 35]
 
-    reference_level = heat_carier.reference_level
+    reference_level = heat_carrier.reference_level
     assert reference_level == 2  # [-10, 10, (*15*), ...]
-    assert heat_carier.levels[reference_level] > ref_temperature
-    assert heat_carier.levels[reference_level - 1] < ref_temperature
+    assert heat_carrier.levels[reference_level] > ref_temperature
+    assert heat_carrier.levels[reference_level - 1] < ref_temperature
 
-    assert heat_carier.levels_below_reference == [-10, 10]
-    assert heat_carier.levels_above_reference == [35, 75, 80]
+    assert heat_carrier.levels_below_reference == [-10, 10]
+    assert heat_carrier.levels_above_reference == [35, 75, 80]
 
 
 def test_heat_carrier_without_reference():
