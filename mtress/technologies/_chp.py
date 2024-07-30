@@ -3,15 +3,13 @@
 import logging
 from dataclasses import dataclass
 
-import numpy as np
 from oemof.solph import Flow
 from oemof.solph.components import Converter
 
-from .._abstract_component import AbstractSolphRepresentation
 from .._helpers._util import enable_templating
-from ..carriers import ElectricityCarrier, GasCarrier, HeatCarrier
+from ..carriers import ElectricityCarrier, GasCarrier
 from ..physics import BIO_METHANE, BIOGAS, HYDROGEN, NATURAL_GAS, Gas
-from ._abstract_technology import AbstractTechnology
+from ._heater import AbstractHeater
 
 LOGGER = logging.getLogger(__file__)
 
@@ -117,7 +115,7 @@ HYDROGEN_MIXED_CHP = CHPTemplate(
 )
 
 
-class CHP(AbstractTechnology, AbstractSolphRepresentation):
+class CHP(AbstractHeater):
     """
     Combined heat and power (CHP) technology, also known as cogeneration,
     produces electricity and heat on-site. CHP systems increase energy
@@ -171,11 +169,13 @@ class CHP(AbstractTechnology, AbstractSolphRepresentation):
         :param thermal_efficiency: Thermal conversion efficiency (LHV) of the CHP
 
         """
-        super().__init__(name=name)
+        super().__init__(
+            name=name,
+            maximum_temperature=maximum_temperature,
+            minimum_temperature=minimum_temperature,
+        )
 
         self.gas_type = gas_type
-        self.maximum_temperature = maximum_temperature
-        self.minimum_temperature = minimum_temperature
         self.nominal_power = nominal_power
         self.input_pressure = input_pressure
         self.electric_efficiency = electric_efficiency
@@ -183,6 +183,7 @@ class CHP(AbstractTechnology, AbstractSolphRepresentation):
 
     def build_core(self):
         """Build core structure of oemof.solph representation."""
+        super().build_core()
 
         # Convert volume (vol% )fraction into mass fraction (%) as unit of gases
         # in MTRESS are considered in mass (kg).
@@ -212,11 +213,6 @@ class CHP(AbstractTechnology, AbstractSolphRepresentation):
 
         # convert gas in kg to heat in Wh with thermal efficiency conversion
         heat_output = self.thermal_efficiency * gas_LHV
-        heat_carrier = self.location.get_carrier(HeatCarrier)
-        heat_bus_warm, heat_bus_cold, ratio = heat_carrier.get_connection_heat_transfer(
-            self.maximum_temperature,
-            self.minimum_temperature,
-        )
         # Add electrical connection
         electricity_carrier = self.location.get_carrier(ElectricityCarrier)
         electrical_bus = electricity_carrier.distribution
@@ -228,29 +224,25 @@ class CHP(AbstractTechnology, AbstractSolphRepresentation):
             self.electric_efficiency * gas_LHV
         )
 
-        # Conversion factors of the oemof converter
+        # Conversion factors for the converter
         conversion = {gas_bus[gas]: share for gas, share in self.gas_type.items()}
         conversion.update(
             {
-                heat_bus_warm: heat_output / (1 - ratio),
-                heat_bus_cold: heat_output * ratio / (1 - ratio),
+                self.heat_bus: heat_output,
                 electrical_bus: electrical_output,
             }
         )
 
-        inputs = {
-            gas_bus[gas]: Flow(nominal_value=nominal_gas_consumption)
-            for gas, share in self.gas_type.items()
-        }
-        inputs.update({heat_bus_cold: Flow()})
-
         self.create_solph_node(
-            label="converter",
+            label="CHP",
             node_type=Converter,
-            inputs=inputs,
+            inputs={
+                gas_bus[gas]: Flow(nominal_value=nominal_gas_consumption)
+                for gas, share in self.gas_type.items()
+            },
             outputs={
                 electrical_bus: Flow(),
-                heat_bus_warm: Flow(),
+                self.heat_bus: Flow(),
             },
             conversion_factors=conversion,
         )
