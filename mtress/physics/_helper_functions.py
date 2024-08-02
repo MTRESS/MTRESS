@@ -161,5 +161,4 @@ def calc_isothermal_compression_energy(p_in, p_out, T=20, R=4124.2):
     :param R: Gas constant ( in J/(kg * K)), by default to 4124.2 J/(kg * K)
     :return: Energy required for compression (in Wh)
     """
-    T += 273.15  # Convert temperature to Kelvin
     return R * celsius_to_kelvin(T) * np.log(p_out / p_in) / SECONDS_PER_HOUR
