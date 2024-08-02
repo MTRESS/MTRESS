@@ -1,16 +1,14 @@
 """
-Basic working 'heat' example to ilustrate the use of a boiler. 
+Basic working 'heat' example to ilustrate the use of a boiler.
 """
 
 import os
 
-from mtress import Location, MetaModel, SolphModel, carriers, demands, technologies
-from mtress.physics import NATURAL_GAS
-
 from oemof.solph.processing import results
-from mtress._helpers import get_flows
 
-import pandas as pd
+from mtress import Location, MetaModel, SolphModel, carriers, demands, technologies
+from mtress._helpers import get_flows
+from mtress.physics import NATURAL_GAS
 
 os.chdir(os.path.dirname(__file__))
 
@@ -30,7 +28,7 @@ house_1.add(
 )
 
 # Add carriers
-house_1.add(carriers.GasCarrier(gases={NATURAL_GAS: [1, 10]}))
+house_1.add(carriers.GasCarrier(gases={NATURAL_GAS: [10]}))
 
 house_1.add(
     carriers.HeatCarrier(
@@ -56,8 +54,8 @@ house_1.add(
         gas_type=NATURAL_GAS,
         maximum_temperature=55,
         minimum_temperature=20,
-        nominal_power=50000,  #  W
-        thermal_efficiency=0.85,
+        heating_power=50000,  #  W
+        efficiency=0.85,
         input_pressure=10,
     )
 )
