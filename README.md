@@ -11,7 +11,9 @@ and the Federal Ministry of Education and Research (BMBF) of Germany
 in the project ENaQ (project number 03SBE111).
 The development of the heat sector formulations in Version 3 was funded by the Federal Ministry of
 Education and Research (BMBF) of Germany in the project Wärmewende Nordwest (project number 03SF0624).
-
+The development of the gas sector formulations in Version 3 was funded by the Federal 
+Ministry of Education and Research (BMBF) of Germany in the project H2Giga-Systogen100 
+(project number 03HY115E).
 
 ## Installation
 
