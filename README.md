@@ -1,10 +1,48 @@
 # Model Template for Renewable Energy Supply Systems (MTRESS)
 
-This is a generic model for [oemof.solph](https://github.com/oemof/oemof-solph/)
-that provides a variety of possible technology combinations for energy supply systems.
-It is tailored for optimising control strategies fulfilling fixed demand time series
-for electricity, heat, gas (including hydrogen), and domestic hot water using any 
-selected combination of the implemented supply technologies.
+## Introduction
+The DLR Institute of Networked Energy Systems has developed the MTRESS tool that can be 
+used to optimise energy supply systems for new and existing projects at any location. 
+MTRESS facilitates the creation of energy system optimisation models for individual 
+residential and commercial buildings, as well as for neighbourhoods and entire industrial
+properties.  It enables users to include a wide range of influencing factors and energy
+options in the simulation and minimises the planning effort.
+
+This is a generic model for community-based open source [oemof.solph](https://github.com/oemof/oemof-solph/) tool.
+MTRESS offers a variety of possible technology combinations for energy supply systems.
+It includes pre-built technologies that are commonly considered in energy systems, such as:
+ - Photovoltaic (PV) and/or Renewable Energy Source (with generation time series)
+ - Heat Pumps
+ - Heat Exchangers
+ - Electrolysers (PEM, Alkaline, AEM)
+ - Fuel Cells (PEM, Alkaline, AEM)
+ - Compressors
+ - Combined Heat and Power (CHP) with various gas types inputs
+ - Storages (Battery, Heat Storage, Gas Storage (Hydrogen))
+ - Resistive Heater and Gas Boiler
+
+It covers different sectors including Electricity, Heat and Gas (e.g., H2, Natural Gas,
+Biogas, etc.). It is tailored for optimising control strategies fulfilling fixed 
+demand time series for electricity, heat, gas (including hydrogen), and domestic hot 
+water using any selected combination of the implemented supply technologies.
+
+MTRESS requires appropriately prepared initial data on the boundary conditions of the 
+respective project. A wide range of data sources can be used, including 
+historical energy consumption data for the project, but also higher-level data 
+on the location, for example from climate models or the solar cadastre. Moreover, the
+forecasted demands and renewable generations could also be used for scheduling optimized
+operation for next days. 
+It could be used for long-term planning and the assumptions about the development of 
+costs and the CO2 impact of the future energy mix can also be incorporated into the 
+modelling.
+
+As an open-source model, MTRESS is available to users in a wide range of areas. It can
+be utilized for both research and commercial purposes. Researchers, utility owners, and
+policymakers can all benefit from this tool for energy system planning and operation. 
+Applications are not just limited to municipal heating plans, home automation offerings,
+hydrogen infrastructure planning, and optimized operation of sector-coupled energy 
+systems, but extend to any scenario requiring comprehensive energy optimization and 
+management.
 
 The development of Version 2 was funded by the Federal Ministry for Economic Affairs and Energy (BMWi)
 and the Federal Ministry of Education and Research (BMBF) of Germany
