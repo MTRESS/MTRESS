@@ -56,10 +56,18 @@ Ministry of Education and Research (BMBF) of Germany in the project H2Giga-Systo
 ## Installation
 
 MTRESS depends on solph, which is automatically instaled using pip
-if you `pip install mtress`. However, pip will not install a solver,
+```bash 
+pip install mtress
+``` 
+However, pip will not install a solver,
 to perform the actual optimisation. Please refer to the
 [documentation of solph](https://oemof-solph.readthedocs.io/en/v0.4.4/readme.html#installing-a-solver)
 to learn how to install a solver.
+
+Install all the other dependencies:
+```bash 
+pip install -r requirements.txt
+``` 
 
 ## Documentation
 
