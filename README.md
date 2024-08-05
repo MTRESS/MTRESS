@@ -67,11 +67,11 @@ The auto-generated documentation can be found on the [GitLab pages](https://mtre
 ## Acknowledgements
 The development of Version 2 was funded by the Federal Ministry for Economic Affairs and Energy (BMWi)
 and the Federal Ministry of Education and Research (BMBF) of Germany
-in the project ENaQ (project number 03SBE111).
+in the project [ENaQ](https://www.enaq-fliegerhorst.de/) (project number 03SBE111).
 The development of the heat sector formulations in Version 3 was funded by the Federal Ministry of
-Education and Research (BMBF) of Germany in the project Wärmewende Nordwest (project number 03SF0624).
+Education and Research (BMBF) of Germany in the project [Wärmewende Nordwest](https://www.waermewende-nordwest.de/) (project number 03SF0624).
 The development of the gas sector formulations in Version 3 was funded by the Federal 
-Ministry of Education and Research (BMBF) of Germany in the project H2Giga-Systogen100 
+Ministry of Education and Research (BMBF) of Germany in the project [H2Giga-Systogen100](https://www.region-heide.de/projekte/systogen100.html)  
 (project number 03HY115E).
 
 ## Contributing
