@@ -44,15 +44,6 @@ hydrogen infrastructure planning, and optimized operation of sector-coupled ener
 systems, but extend to any scenario requiring comprehensive energy optimization and 
 management.
 
-The development of Version 2 was funded by the Federal Ministry for Economic Affairs and Energy (BMWi)
-and the Federal Ministry of Education and Research (BMBF) of Germany
-in the project ENaQ (project number 03SBE111).
-The development of the heat sector formulations in Version 3 was funded by the Federal Ministry of
-Education and Research (BMBF) of Germany in the project Wärmewende Nordwest (project number 03SF0624).
-The development of the gas sector formulations in Version 3 was funded by the Federal 
-Ministry of Education and Research (BMBF) of Germany in the project H2Giga-Systogen100 
-(project number 03HY115E).
-
 ## Installation
 
 MTRESS depends on solph, which is automatically instaled using pip
@@ -73,6 +64,15 @@ pip install -r requirements.txt
 
 The auto-generated documentation can be found on the [GitLab pages](https://mtress-ecosystem.pages.gitlab.dlr.de/mtress).
 
+## Acknowledgements
+The development of Version 2 was funded by the Federal Ministry for Economic Affairs and Energy (BMWi)
+and the Federal Ministry of Education and Research (BMBF) of Germany
+in the project ENaQ (project number 03SBE111).
+The development of the heat sector formulations in Version 3 was funded by the Federal Ministry of
+Education and Research (BMBF) of Germany in the project Wärmewende Nordwest (project number 03SF0624).
+The development of the gas sector formulations in Version 3 was funded by the Federal 
+Ministry of Education and Research (BMBF) of Germany in the project H2Giga-Systogen100 
+(project number 03HY115E).
 
 ## Contributing
 
