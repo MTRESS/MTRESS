@@ -103,6 +103,11 @@ If you use MTRESS Software for your research, please consider citation as follow
 }
 ``` 
 
+## Reference
+<a id="1">[1]</a>
+Schönfeldt, Patrik and Schlüters, Sunke and Oltmanns, Keno,"MTRESS 3.0--Modell Template for Residential Energy Supply Systems",
+arXiv preprint, 2022, [arXiv:2211.14080](https://arxiv.org/abs/2211.14080).
+
 ## Contact
 
 The software development is administrated by [Patrik Schönfeldt](mailto:patrik.schoenfeldt@dlr.de),
