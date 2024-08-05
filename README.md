@@ -71,8 +71,7 @@ in the project [ENaQ](https://www.enaq-fliegerhorst.de/) (project number 03SBE11
 The development of the heat sector formulations in Version 3 was funded by the Federal Ministry of
 Education and Research (BMBF) of Germany in the project [Wärmewende Nordwest](https://www.waermewende-nordwest.de/) (project number 03SF0624).
 The development of the gas sector formulations in Version 3 was funded by the Federal 
-Ministry of Education and Research (BMBF) of Germany in the project [H2Giga-Systogen100](https://www.region-heide.de/projekte/systogen100.html)  
-(project number 03HY115E).
+Ministry of Education and Research (BMBF) of Germany in the project [H2Giga-Systogen100](https://www.region-heide.de/projekte/systogen100.html)  (project number 03HY115E).
 
 ## Contributing
 
