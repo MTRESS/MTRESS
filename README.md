@@ -46,7 +46,7 @@ management.
 
 ## Installation
 
-MTRESS depends on solph, which is automatically instaled using pip
+MTRESS depends on solph, which is automatically installed using pip
 ```bash 
 pip install mtress
 ``` 
