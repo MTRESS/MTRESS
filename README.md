@@ -64,6 +64,14 @@ pip install -r requirements.txt
 
 The auto-generated documentation can be found on the [GitLab pages](https://mtress-ecosystem.pages.gitlab.dlr.de/mtress).
 
+## Usage and Tutorials
+Please refer to the examples folder in this repository to get acquainted with building 
+and optimizing energy systems in MTRESS. These examples will help you understand the 
+basics and guide you through the process before you start creating your own energy system. 
+
+Please feel free to contact us if you have any questions or need further assistance. 
+Contact information can be found below. 
+
 ## Acknowledgements
 The development of Version 2 was funded by the Federal Ministry for Economic Affairs and Energy (BMWi)
 and the Federal Ministry of Education and Research (BMBF) of Germany
