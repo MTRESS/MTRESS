@@ -42,6 +42,8 @@ class LayeredHeatStorage(AbstractHeatStorage):
         u_value: float | None = None,
         max_temperature: float | None = None,
         min_temperature: float | None = None,
+        balanced: bool = True,
+        initial_storage_levels: dict | None = None,
     ):
         """
         Create layered heat storage component.
@@ -68,6 +70,12 @@ class LayeredHeatStorage(AbstractHeatStorage):
         self.storage_components = {}
         self.buses = {}
 
+        self.balanced = balanced
+        if initial_storage_levels is None:
+            initial_storage_levels = {}
+
+        self.initial_storage_levels = initial_storage_levels
+
     def build_core(self):
         """Build core structure of oemof.solph representation."""
         # Create storage components according to the temperature levels defined
@@ -83,6 +91,11 @@ class LayeredHeatStorage(AbstractHeatStorage):
         for temperature in temperature_levels:
             if self.min_temperature <= temperature <= self.max_temperature:
                 level_node = heat_carrier.level_nodes[temperature]
+
+                if temperature in self.initial_storage_levels:
+                    initial_storage_level = self.initial_storage_levels[temperature]
+                else:
+                    initial_storage_level = None
 
                 capacity = (
                     self.volume
@@ -124,8 +137,9 @@ class LayeredHeatStorage(AbstractHeatStorage):
                 bus = self.create_solph_node(
                     label=f"b_{temperature:.0f}",
                     node_type=Bus,
-                    inputs={level_node: Flow()},
-                    outputs={level_node: Flow()} | loss_flow,
+                    inputs={level_node: Flow(nominal_value=self.power_limit)},
+                    outputs={level_node: Flow(nominal_value=self.power_limit)}
+                    | loss_flow,
                 )
 
                 self.buses[temperature] = bus
@@ -137,6 +151,8 @@ class LayeredHeatStorage(AbstractHeatStorage):
                     outputs={bus: Flow()},
                     nominal_storage_capacity=capacity,
                     loss_rate=loss_rate,
+                    balanced=self.balanced,
+                    initial_storage_level=initial_storage_level,
                     fixed_losses_absolute=fixed_losses_absolute,
                     fixed_losses_relative=fixed_losses_relative,
                 )
@@ -166,6 +182,7 @@ class LayeredHeatStorage(AbstractHeatStorage):
 
         model = self._solph_model.model
 
+        # >= && <= should be replaced by ==
         shared_limit(
             model=model,
             quantity=model.GenericStorageBlock.storage_content,
@@ -173,9 +190,11 @@ class LayeredHeatStorage(AbstractHeatStorage):
             components=components,
             weights=weights,
             upper_limit=self.volume,
+            lower_limit=self.volume,
         )
 
         temperatures = list(self.storage_components.keys())
+        heat_carrier = self.location.get_carrier(HeatCarrier)
 
         # When a storage loses energy, in reality it will not direktly go to the lowest
         # temperature. We mimic this by (additional) step-wise downshifting of the
@@ -192,20 +211,6 @@ class LayeredHeatStorage(AbstractHeatStorage):
                         model.GenericStorageBlock.storage_losses[
                             self.storage_components[upper_temperature], t
                         ]
-                        + (
-                            model.flow[
-                                self.storage_components[upper_temperature],
-                                self.buses[upper_temperature],
-                                t,
-                            ]
-                        )
-                        - (
-                            model.flow[
-                                self.buses[upper_temperature],
-                                self.storage_components[upper_temperature],
-                                t,
-                            ]
-                        )
                     )
                 ) == model.flow[
                     self.buses[upper_temperature], self.buses[lower_temperature], t

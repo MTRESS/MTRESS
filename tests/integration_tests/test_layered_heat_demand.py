@@ -26,37 +26,51 @@ def test_layered_heat_storage():
     )
 
     reservoir_temperature = np.full(n_days * 24, 20)
-    reservoir_temperature[0] = 40
-
+    reservoir_temperature[10 * 24 : 12 * 24] = 0
     house_1.add(
         technologies.HeatSource(
             name="source",
-            reservoir_temperature=reservoir_temperature,
+            reservoir_temperature=20,
             nominal_power=1e6,
             maximum_working_temperature=40,
-            minimum_working_temperature=0,
+            minimum_working_temperature=10,
         )
     )
 
+    waste_heat = np.zeros(n_days * 24)
+    waste_heat[14 * 24] = 10e3
+    house_1.add(
+        demands.FixedTemperatureCooling(
+            name="CD",
+            max_flow_temperature=20,
+            return_temperature=30,
+            time_series=waste_heat,
+        )
+    )
+
+    heat_demand = np.zeros(n_days * 24)
+    heat_demand[7 * 24] = 5e3
     house_1.add(
         demands.FixedTemperatureHeating(
             name="HD",
             min_flow_temperature=30,
             return_temperature=20,
-            time_series=1,
+            time_series=heat_demand,
         )
     )
 
     house_1.add(
         technologies.LayeredHeatStorage(
-            name="stor",
+            name="HS",
             diameter=1,
             volume=10,
             ambient_temperature=0,
-            u_value=None,
-            power_limit=1e6,
+            u_value=0.1,
+            power_limit=None,
             max_temperature=30,
             min_temperature=10,
+            initial_storage_levels={30: 0.9},
+            balanced=False,
         )
     )
     meta_model = MetaModel(locations=[house_1])
@@ -108,4 +122,4 @@ if __name__ == "__main__":
     plot = solph_representation.graph(detail=True, flow_results=flows)
     plot.render(outfile="layered_heat_demand.png")
 
-    # plt.show()
+    plt.show()
