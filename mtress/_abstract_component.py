@@ -23,6 +23,8 @@ SOLPH_SHAPES = {
     GenericStorage: "cylinder",
 }
 
+test_dict = {}
+
 
 class AbstractComponent(NamedElement):
     """Abstract MTRESS component."""
@@ -113,7 +115,67 @@ class AbstractSolphRepresentation(AbstractComponent):
     def add_constraints(self) -> None:
         """Add constraints to the model."""
 
-    def graph(self, detail: bool = False, flow_results=None) -> Tuple[Digraph, set]:
+    def get_flow_color(self, flow_color: dict, colorscheme: dict = None) -> None:
+        def rec(node, color):
+            # recursively iterate nodes until all edges covered
+            # or node type in [Source, Sink, Converter]
+            if type(node) in [Source, Sink, Converter]:
+                return
+            node_id = tuple(node.label)
+            for origin in node.inputs:
+                origin_id = tuple(origin.label)
+                flow_color.setdefault(origin_id, {})
+                if node_id not in flow_color[origin_id]:
+                    flow_color[origin_id][node_id] = color
+                    rec(origin, color)
+            for target in node.outputs:
+                target_id = tuple(target.label)
+                flow_color.setdefault(node_id, {})
+                if target_id not in flow_color[node_id]:
+                    flow_color[node_id][target_id] = color
+                    rec(target, color)
+            return
+
+        color = colorscheme.get(self.identifier[-1], None)
+        if color == None:  # component not a carrier
+            # determine if only connected to ONE carrier
+            own_nodes = [tuple(x.label) for x in self.solph_nodes]
+            connected_nodes = [
+                tuple(y.label) for x in self.solph_nodes for y in x.outputs
+            ] + [tuple(y.label) for x in self.solph_nodes for y in x.inputs]
+            external_nodes = set(connected_nodes) - set(own_nodes)
+            external_nodes = set.intersection(*map(set, external_nodes))
+            if external_nodes in [
+                set(x.identifier) for x in self._solph_model._meta_model.components
+            ]:
+                color = colorscheme[
+                    set.intersection(set(colorscheme.keys()), external_nodes).pop()
+                ]
+
+        if color != None:  # color nodes
+            for solph_node in self.solph_nodes:
+                solph_node_id = tuple(solph_node.label)
+                for origin in solph_node.inputs:
+                    origin_id = tuple(origin.label)
+                    flow_color.setdefault(origin_id, {})
+                    if solph_node_id not in flow_color[origin_id]:
+                        flow_color[origin_id][solph_node_id] = color
+                    rec(origin, color)
+                for target in solph_node.outputs:
+                    target_id = tuple(target.label)
+                    flow_color.setdefault(solph_node_id, {})
+                    if target_id not in flow_color[solph_node_id]:
+                        flow_color[solph_node_id][target_id] = color
+                    rec(target, color)
+
+    def graph(
+        self,
+        detail: bool = False,
+        flow_results=None,
+        flow_color: dict = None,
+        colorscheme: dict = None,
+    ) -> Tuple[Digraph, set]:
+        self.get_flow_color(flow_color, colorscheme)
         """
         Generate graphviz visualization of the MTRESS component.
 
@@ -127,6 +189,7 @@ class AbstractSolphRepresentation(AbstractComponent):
             label=self.name,
             # Draw border of cluster only for detail representation
             style="dashed" if detail else "invis",
+            color="black",
         )
 
         if not detail:
@@ -143,6 +206,9 @@ class AbstractSolphRepresentation(AbstractComponent):
                 )
 
             for origin in solph_node.inputs:
+                edge_color = flow_color.get(tuple(origin.label), {}).get(
+                    tuple(solph_node.label), "black"
+                )
                 if origin in self._solph_nodes:
                     # This is an internal edge and thus only added if detail is True
                     if detail:
@@ -156,7 +222,8 @@ class AbstractSolphRepresentation(AbstractComponent):
                                 graph.edge(
                                     str(origin.label),
                                     str(solph_node.label),
-                                    label=f"{flow}",
+                                    label=f"{round(flow, 3)}",
+                                    color=edge_color,
                                 )
                             else:
                                 graph.edge(
@@ -180,8 +247,8 @@ class AbstractSolphRepresentation(AbstractComponent):
                                     (
                                         str(origin.label),
                                         str(solph_node.label),
-                                        f"{flow}",
-                                        "black",
+                                        f"{round(flow, 3)}",
+                                        edge_color,
                                     )
                                 )
                             else:

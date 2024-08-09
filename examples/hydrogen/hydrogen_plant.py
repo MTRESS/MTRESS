@@ -131,4 +131,7 @@ logging.info("Optimise the energy system")
 myresults = results(solved_model)
 flows = get_flows(myresults)
 
+plot = solph_representation.graph(detail=True, flow_results=flows, flow_color=None)
+plot.render(outfile="hydrogen_plant_results.png")
+
 solved_model.write("hydrogen_plant.lp", io_options={"symbolic_solver_labels": True})
