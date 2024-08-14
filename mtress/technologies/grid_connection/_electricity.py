@@ -44,12 +44,12 @@ class ElectricityGridConnection(AbstractGridConnection, AbstractSolphRepresentat
             outputs={electricity_carrier.distribution: Flow()},
         )
 
+        self.grid_export = b_grid_export = self.create_solph_node(
+            label="grid_export",
+            node_type=Bus,
+            inputs={electricity_carrier.feed_in: Flow()},
+        )
         if self.revenue is not None:
-            self.grid_export = b_grid_export = self.create_solph_node(
-                label="grid_export",
-                node_type=Bus,
-                inputs={electricity_carrier.feed_in: Flow()},
-            )
             self.create_solph_node(
                 label="sink_export",
                 node_type=Sink,
