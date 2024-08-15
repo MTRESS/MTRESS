@@ -14,7 +14,6 @@ from mtress._helpers import get_flows
 n_days = 30
 
 
-@pytest.mark.skip(reason="Not adjusted to new HeatCarrier.")
 def test_layered_heat_storage():
 
     house_1 = Location(name="house_1")
@@ -26,7 +25,7 @@ def test_layered_heat_storage():
     )
 
     reservoir_temperature = np.full(n_days * 24, 20)
-    reservoir_temperature[10 * 24 : 12 * 24] = 0
+    reservoir_temperature[: 12 * 24] = 0
     house_1.add(
         technologies.HeatSource(
             name="source",
@@ -69,7 +68,7 @@ def test_layered_heat_storage():
             power_limit=None,
             max_temperature=30,
             min_temperature=10,
-            initial_storage_levels={30: 0.9},
+            initial_storage_levels={30: 0.8, 10: 0.1},
             balanced=False,
         )
     )
@@ -96,7 +95,7 @@ if __name__ == "__main__":
     import matplotlib.pyplot as plt
     import numpy as np
 
-    matplotlib.use("Qt5Agg")
+    matplotlib.use("QtAgg")
 
     os.chdir(os.path.dirname(__file__))
 
@@ -110,12 +109,13 @@ if __name__ == "__main__":
     for key, result in myresults.items():
         if "storage_content" in result["sequences"]:
             plt.plot(
-                result["sequences"]["storage_content"],
+                result["sequences"]["storage_content"] * 1e-3,
                 label=str(key[0].label.solph_node),
             )
             total_content += result["sequences"]["storage_content"]
             index = result["sequences"].index
-    plt.plot(index, total_content, label="total")
+    plt.plot(index, total_content * 1e-3, label="total")
+    plt.ylabel("Energy (kWh)")
 
     plt.legend()
 
