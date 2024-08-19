@@ -12,6 +12,7 @@ This is a generic model for community-based open source [oemof.solph](https://gi
 MTRESS offers a variety of possible technology combinations for energy supply systems.
 It includes pre-built technologies that are commonly considered in energy systems, such as:
  - Photovoltaic (PV) and/or Renewable Energy Source
+ - Grid Connection (Electricity, Heat and Gas)
  - Heat Pumps
  - Heat Exchangers
  - Electrolysers (PEM, Alkaline, AEM)
