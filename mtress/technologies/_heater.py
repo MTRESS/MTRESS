@@ -1,12 +1,17 @@
 """This module provides simple heater components (X to heat)"""
 
-from oemof.solph import Bus
-from oemof.solph import Flow
+import logging
+
+import numpy as np
+from oemof.solph import Bus, Flow
 from oemof.solph.components import Converter
 
 from .._abstract_component import AbstractSolphRepresentation
-from ..carriers import ElectricityCarrier, HeatCarrier
+from ..carriers import ElectricityCarrier, GasCarrier, HeatCarrier
+from ..physics import Gas
 from ._abstract_technology import AbstractTechnology
+
+LOGGER = logging.getLogger(__file__)
 
 
 class AbstractHeater(AbstractTechnology, AbstractSolphRepresentation):
@@ -83,9 +88,9 @@ class ResistiveHeater(AbstractHeater):
         Initialize ResistiveHeater.
 
         :param name: Set the name of the component.
-        :param nominal_power: Nominal heating capacity of the heating rod (in W)
         :param maximum_temperature: Temperature (in °C) of the heat output.
         :param minimum_temperature: Lowest possible temperature (in °C) of the inlet.
+        :param heating_power: Nominal heating capacity of the heating rod (in W).
         :param efficiency: Thermal conversion efficiency.
         """
         super().__init__(
@@ -114,5 +119,72 @@ class ResistiveHeater(AbstractHeater):
             conversion_factors={
                 electrical_bus: 1,
                 self.heat_bus: self.efficiency,
+            },
+        )
+
+
+class GasBoiler(AbstractHeater):
+    """
+    A gas boiler is a closed vessel in which fluid (generally water) is heated.
+    """
+
+    def __init__(
+        self,
+        name: str,
+        gas_type: Gas,
+        maximum_temperature: float,
+        minimum_temperature: float,
+        heating_power: float,
+        efficiency: float,
+        input_pressure: float,
+    ):
+        """
+        Initialize Gas Boiler component.
+
+        :param name: Set the name of the component
+        :param gas_type: (Gas) type of gas from gas carrier and its share in
+                         vol %
+        :parma maximum_temperature: Temperature (in °C) of the heat output
+        :parma minimum_temperature: Lowest possible temperature (in °C) of the inlet.
+        :param heating_power: Nominal heat output capacity (in Watts).
+        :param input_pressure: Input pressure of gas or gases (in bar).
+        :param efficiency: Thermal conversion efficiency (LHV).
+
+        """
+        super().__init__(
+            name=name,
+            maximum_temperature=maximum_temperature,
+            minimum_temperature=minimum_temperature,
+        )
+
+        self.gas_type = gas_type
+        self.maximum_temperature = maximum_temperature
+        self.minimum_temperature = minimum_temperature
+        self.heating_power = heating_power
+        self.input_pressure = input_pressure
+        self.efficiency = efficiency
+
+    def build_core(self):
+        """Build core structure of oemof.solph representation."""
+
+        super().build_core()
+
+        gas_carrier = self.location.get_carrier(GasCarrier)
+        _, pressure_level = gas_carrier.get_surrounding_levels(
+            self.gas_type, self.input_pressure
+        )
+        gas_bus = gas_carrier.inputs[self.gas_type][pressure_level]
+
+        self.create_solph_node(
+            label="converter",
+            node_type=Converter,
+            inputs={
+                gas_bus: Flow(),
+            },
+            outputs={
+                self.heat_bus: Flow(nominal_value=self.heating_power),
+            },
+            conversion_factors={
+                self.heat_bus: self.efficiency * self.gas_type.LHV,
             },
         )
