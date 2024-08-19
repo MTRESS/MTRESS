@@ -90,18 +90,8 @@ please open an issue first, so that we can discuss beforehand and avoid double w
 Also, please report bugs by opening an issue.
 
 ## Citation
-If you use MTRESS Software for your research, please consider citation as follows:
-```bash 
-@misc{https://doi.org/10.5281/zenodo.11205762,
-  doi = {10.5281/ZENODO.11205762},
-  url = {https://zenodo.org/doi/10.5281/zenodo.11205762},
-  author = {Schönfeldt, Patrik and Schlüters, Sunke and Upadhaya, Ajay and Oltmanns, Keno},
-  title = {Model Template for Residential Energy Supply Systems (MTRESS)},
-  publisher = {Zenodo},
-  year = {2024},
-  copyright = {MIT License}
-}
-``` 
+If you use MTRESS Software for your research, please consider citation as follows using the
+[Zenodo record, doi:10.5281/zenodo.6395909](https://zenodo.org/doi/10.5281/zenodo.6395909).
 
 ## Reference
 <a id="1">[1]</a>
