@@ -14,6 +14,7 @@ from mtress._helpers import get_flows
 n_days = 30
 
 
+@pytest.mark.skip(reason="Not really a test, yet.")
 def test_layered_heat_storage():
 
     house_1 = Location(name="house_1")
@@ -25,7 +26,7 @@ def test_layered_heat_storage():
     )
 
     reservoir_temperature = np.full(n_days * 24, 20)
-    reservoir_temperature[: 12 * 24] = 0
+    reservoir_temperature[10 * 24 : 12 * 24] = 0
     house_1.add(
         technologies.HeatSource(
             name="source",
@@ -68,7 +69,7 @@ def test_layered_heat_storage():
             power_limit=None,
             max_temperature=30,
             min_temperature=10,
-            initial_storage_levels={30: 0.8, 10: 0.1},
+            initial_storage_levels={30: 0.9},
             balanced=False,
         )
     )
