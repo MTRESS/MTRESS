@@ -4,7 +4,7 @@
 
 - [ ] I have read and understand the guidelines for contributions
 
-- [ ] This report is made in strict agreement with the project's license and intellectual property rights
+- [ ] This bug report is made in strict agreement with the project's license and intellectual property rights
 
 - [ ] The problem is not addressed in the documentation nor in the tutorials
 
@@ -14,17 +14,13 @@
 
 <!-- Summarize the bug encountered concisely. -->
 
-## What is the current *bug* behavior?
+<!-- (What is the current *bug* behavior?) Describe what actually happens. -->
 
-<!-- Describe what actually happens. -->
-
-## What is the expected *correct* behavior?
-
-<!-- Describe what you should see instead. -->
+<!-- (What is the expected *correct* behavior?) Describe what you should see instead. -->
 
 ## Minimal reproducible example
 
-<!-- Please provide the smallest and simplest way to reproduce your issue. Insert the code below. -->
+<!-- Please provide the smallest and simplest way to reproduce the bug. Insert the code below. -->
 
 ```
 # insert your code below this line
