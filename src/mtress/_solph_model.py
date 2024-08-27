@@ -90,7 +90,7 @@ class SolphModel:
     def graph(
         self,
         detail: bool = False,
-        flow_results=None,
+        flow_results: dict = None,
         flow_color: dict = None,
         colorscheme: dict = None,
     ) -> Digraph:
@@ -120,6 +120,48 @@ class SolphModel:
             for edge in external_edges:
                 graph.edge(edge[0], edge[1], label=edge[2], color=edge[3])
         return graph
+
+    def graph_series(
+        self,
+        flow_results: dict,
+        step: pd.Timedelta,
+        start: pd.Timestamp = None,
+        stop: pd.Timestamp = None,
+        flow_color: dict = None,
+        colorscheme: dict = None,
+    ) -> list[Digraph]:
+        """Wrapper for graph function to generate multiple graphs as a series."""
+        if start == None:
+            # use first entry of time series
+            temp_flow = list(flow_results.items())[0][1]
+            start = temp_flow.index[0]
+        if stop == None:
+            # use last entry of time series
+            temp_flow = list(flow_results.items())[0][1]
+            stop = temp_flow.index[-1]
+        current = start
+        graphs = []
+        while current + step <= stop:
+            current_flow = {
+                k: v[current : current + step] for k, v in flow_results.items()
+            }
+            g = self.graph(
+                detail=True,
+                flow_results=current_flow,
+                flow_color=flow_color,
+                colorscheme=colorscheme,
+            )
+            g.attr(
+                label=(
+                    current.strftime("%Y-%m-%d %X")
+                    + " - "
+                    + (current + step).strftime("%Y-%m-%d %X")
+                )
+            )
+            graphs.append(g)
+            current += step
+
+        return graphs
 
     def solve(
         self,
