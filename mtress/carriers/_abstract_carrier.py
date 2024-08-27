@@ -52,9 +52,22 @@ class AbstractLayeredCarrier(AbstractCarrier):
         return self._levels
 
     def get_levels_between(self, minimum, maximum):
-        levels = np.concatenate(([np.NINF], self.levels, [np.PINF]))
-        min_index = np.searchsorted(levels, minimum) - 1
-        max_index = np.searchsorted(levels, maximum)
+        """Returns the levels existing in a closed interval."""
+
+        if minimum > maximum:
+            raise ValueError(
+                "Minimum level must be smaller or equal to the maximum level."
+            )
+        if minimum in self.levels:
+            min_index = self.levels.index(minimum)
+        else:
+            min_index = np.searchsorted(self.levels, minimum)
+
+        if maximum in self.levels:
+            max_index = self.levels.index(maximum) + 1
+        else:
+            max_index = np.searchsorted(self.levels, maximum)
+
         return self.levels[min_index:max_index]
 
     @property

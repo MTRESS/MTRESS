@@ -8,7 +8,10 @@ SPDX-FileCopyrightText: Deutsches Zentrum für Luft und Raumfahrt
 SPDX-License-Identifier: MIT
 """
 
+from pyomo import environ as po
+
 from numpy import power
+from oemof.solph import Bus
 from oemof.solph import Flow
 from oemof.solph.components import GenericStorage
 from oemof.solph.constraints import shared_limit
@@ -39,6 +42,8 @@ class LayeredHeatStorage(AbstractHeatStorage):
         u_value: float | None = None,
         max_temperature: float | None = None,
         min_temperature: float | None = None,
+        balanced: bool = True,
+        initial_storage_levels: dict | None = None,
     ):
         """
         Create layered heat storage component.
@@ -63,6 +68,13 @@ class LayeredHeatStorage(AbstractHeatStorage):
         # Solph specific params
         # Bookkeeping of oemof components
         self.storage_components = {}
+        self.buses = {}
+
+        self.balanced = balanced
+        if initial_storage_levels is None:
+            initial_storage_levels = {}
+
+        self.initial_storage_levels = initial_storage_levels
 
     def build_core(self):
         """Build core structure of oemof.solph representation."""
@@ -74,9 +86,16 @@ class LayeredHeatStorage(AbstractHeatStorage):
 
         temperature_levels = heat_carrier.levels
 
+        loss_flow = {}
+
         for temperature in temperature_levels:
             if self.min_temperature <= temperature <= self.max_temperature:
-                bus = heat_carrier.level_nodes[temperature]
+                level_node = heat_carrier.level_nodes[temperature]
+
+                if temperature in self.initial_storage_levels:
+                    initial_storage_level = self.initial_storage_levels[temperature]
+                else:
+                    initial_storage_level = None
 
                 capacity = (
                     self.volume
@@ -115,6 +134,16 @@ class LayeredHeatStorage(AbstractHeatStorage):
                 if temperature != max(temperature_levels):
                     fixed_losses_relative = fixed_losses_absolute = 0
 
+                bus = self.create_solph_node(
+                    label=f"b_{temperature:.0f}",
+                    node_type=Bus,
+                    inputs={level_node: Flow(nominal_value=self.power_limit)},
+                    outputs={level_node: Flow(nominal_value=self.power_limit)}
+                    | loss_flow,
+                )
+
+                self.buses[temperature] = bus
+
                 storage = self.create_solph_node(
                     label=f"{temperature:.0f}",
                     node_type=GenericStorage,
@@ -122,11 +151,15 @@ class LayeredHeatStorage(AbstractHeatStorage):
                     outputs={bus: Flow()},
                     nominal_storage_capacity=capacity,
                     loss_rate=loss_rate,
+                    balanced=self.balanced,
+                    initial_storage_level=initial_storage_level,
                     fixed_losses_absolute=fixed_losses_absolute,
                     fixed_losses_relative=fixed_losses_relative,
                 )
 
                 self.storage_components[temperature] = storage
+
+                loss_flow = {bus: Flow(bidirectional=True)}
 
     def add_constraints(self):
         """Add constraints to the model."""
@@ -147,11 +180,44 @@ class LayeredHeatStorage(AbstractHeatStorage):
             ]
         )
 
+        model = self._solph_model.model
+
+        # >= && <= should be replaced by ==
         shared_limit(
-            model=self._solph_model.model,
-            quantity=self._solph_model.model.GenericStorageBlock.storage_content,
+            model=model,
+            quantity=model.GenericStorageBlock.storage_content,
             limit_name=str(self.create_label("storage_limit")),
             components=components,
             weights=weights,
             upper_limit=self.volume,
+            lower_limit=self.volume,
         )
+
+        temperatures = list(self.storage_components.keys())
+        heat_carrier = self.location.get_carrier(HeatCarrier)
+
+        # When a storage loses energy, in reality it will not direktly go to the lowest
+        # temperature. We mimic this by (additional) step-wise downshifting of the
+        # remaining heat.
+        for lower_temperature, upper_temperature in zip(temperatures, temperatures[1:]):
+            ratio = (lower_temperature - reference_temperature) / (
+                upper_temperature - reference_temperature
+            )
+
+            def equate_variables_rule(_, t):
+                return (
+                    (ratio / (1 - ratio))
+                    * (
+                        model.GenericStorageBlock.storage_losses[
+                            self.storage_components[upper_temperature], t
+                        ]
+                    )
+                ) == model.flow[
+                    self.buses[upper_temperature], self.buses[lower_temperature], t
+                ]
+
+            setattr(
+                model,
+                str(self.create_label(f"losses_{upper_temperature}")),
+                po.Constraint(model.TIMESTEPS, rule=equate_variables_rule),
+            )

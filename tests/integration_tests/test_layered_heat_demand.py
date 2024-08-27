@@ -4,73 +4,123 @@ Tests for MTRESS FixedTemperatureHeat Demand.
 """
 import os
 
-import numpy as np
-from oemof import solph
+from oemof.solph.processing import results
 import pytest
 
-from mtress import carriers, Location, MetaModel, SolphModel
-from mtress.demands import FixedTemperatureHeating as HeatDemand
+from mtress import carriers, Location, MetaModel, SolphModel, technologies, demands
+from mtress._helpers import get_flows
 
-@pytest.mark.skip(reason="Not adjusted to new HeatCarrier.")
-def test_layered_heat_demand():
+
+n_days = 30
+
+
+@pytest.mark.skip(reason="Not really a test, yet.")
+def test_layered_heat_storage():
+
     house_1 = Location(name="house_1")
     house_1.add(
         carriers.HeatCarrier(
-            temperature_levels=[0, 5, 10, 20, 30],
-            reference_temperature=10,
+            temperature_levels=[10, 20, 30],
+            reference_temperature=0,
         )
     )
 
-    demand_levels =[
-        (30, 20),
-        (20, 0),
-        (20, 10),
-        (5, 0),
-    ]
-    demand_series = np.array([0, 2, 1, 0])
-    for flow_temperature, return_temperature in demand_levels:
-        house_1.add(HeatDemand(
-            name=f"{flow_temperature}_{return_temperature}",
-            min_flow_temperature=flow_temperature,
-            return_temperature=return_temperature,
-            time_series=demand_series,
-        ))
+    reservoir_temperature = np.full(n_days * 24, 20)
+    reservoir_temperature[10 * 24 : 12 * 24] = 0
+    house_1.add(
+        technologies.HeatSource(
+            name="source",
+            reservoir_temperature=20,
+            nominal_power=1e6,
+            maximum_working_temperature=40,
+            minimum_working_temperature=10,
+        )
+    )
+
+    waste_heat = np.zeros(n_days * 24)
+    waste_heat[14 * 24] = 10e3
+    house_1.add(
+        demands.FixedTemperatureCooling(
+            name="CD",
+            max_flow_temperature=20,
+            return_temperature=30,
+            time_series=waste_heat,
+        )
+    )
+
+    heat_demand = np.zeros(n_days * 24)
+    heat_demand[7 * 24] = 5e3
+    house_1.add(
+        demands.FixedTemperatureHeating(
+            name="HD",
+            min_flow_temperature=30,
+            return_temperature=20,
+            time_series=heat_demand,
+        )
+    )
+
+    house_1.add(
+        technologies.LayeredHeatStorage(
+            name="HS",
+            diameter=1,
+            volume=10,
+            ambient_temperature=0,
+            u_value=0.1,
+            power_limit=None,
+            max_temperature=30,
+            min_temperature=10,
+            initial_storage_levels={30: 0.9},
+            balanced=False,
+        )
+    )
     meta_model = MetaModel(locations=[house_1])
 
-    solph_model = SolphModel(
+    solph_representation = SolphModel(
         meta_model=meta_model,
         timeindex={
-            "start": "2021-07-10 00:00:00",
-            "end": "2021-07-10 01:00:00",
-            "freq": "15T",
+            "start": "2021-01-01 00:00:00",
+            "end": f"2021-01-{n_days+1} 00:00:00",
+            "freq": "60min",
         },
     )
 
-    in_80 = list(solph_model.energy_system.nodes)[0]
-    heat_source = solph.components.Source(
-            label="heat_source",
-            outputs={in_80: solph.Flow()}
-    )
-    solph_model.energy_system.add(heat_source)
+    solph_representation.build_solph_model()
 
-    solph_model.build_solph_model()
+    solved_model = solph_representation.solve(solve_kwargs={"tee": True})
 
-    solph_model.solve()
+    return solph_representation, solved_model
 
-    meta_results = solph.processing.meta_results(solph_model.model)
-    results = solph.processing.results(solph_model.model)
-
-    assert meta_results["solver"]["Termination condition"] == "optimal"
-    supply_series = results[(heat_source, in_80)]["sequences"].squeeze()[:-1]
-
-    assert (len(demand_levels) * demand_series == supply_series).all()
-
-    return solph_model
 
 if __name__ == "__main__":
-    os.chdir(os.path.dirname (__file__))
+    import matplotlib
+    import matplotlib.pyplot as plt
+    import numpy as np
 
-    solph_model = test_layered_heat_demand()
-    
-    plot = solph_model.graph(detail=True)
+    matplotlib.use("QtAgg")
+
+    os.chdir(os.path.dirname(__file__))
+
+    solph_representation, solved_model = test_layered_heat_storage()
+
+    myresults = results(solved_model)
+    flows = get_flows(myresults)
+
+    total_content = np.zeros(n_days * 24 + 1)
+    index = None
+    for key, result in myresults.items():
+        if "storage_content" in result["sequences"]:
+            plt.plot(
+                result["sequences"]["storage_content"] * 1e-3,
+                label=str(key[0].label.solph_node),
+            )
+            total_content += result["sequences"]["storage_content"]
+            index = result["sequences"].index
+    plt.plot(index, total_content * 1e-3, label="total")
+    plt.ylabel("Energy (kWh)")
+
+    plt.legend()
+
+    plot = solph_representation.graph(detail=True, flow_results=flows)
     plot.render(outfile="layered_heat_demand.png")
+
+    plt.show()
