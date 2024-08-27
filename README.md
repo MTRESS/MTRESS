@@ -56,11 +56,6 @@ to perform the actual optimisation. Please refer to the
 [documentation of solph](https://oemof-solph.readthedocs.io/en/stable/readme.html#installing-a-solver)
 to learn how to install a solver.
 
-Install all the other dependencies:
-```bash 
-pip install -r requirements.txt
-``` 
-
 ## Documentation
 
 The auto-generated documentation can be found on the [GitLab pages](https://mtress-ecosystem.pages.gitlab.dlr.de/mtress).
