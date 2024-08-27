@@ -1,0 +1,50 @@
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[tool.flit.sdist]
+include = [
+    "CITATION.cff",
+    "LICENSE",
+    "README.md",
+    "doc/",
+    "examples/",
+    "mtress/",
+    "tests/",
+]
+
+[project]
+name = "mtress"
+dynamic = ["version"]
+description = "Energy System Model Template"
+readme = "README.md"
+authors = [
+    {name = "Deutsches Zentrum für Luft- und Raumfahrt e.V. (DLR)", email = "patrik.schoenfeldt@dlr.de"},
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: Unix",
+    "Operating System :: POSIX",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: MacOS",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Topic :: Utilities",
+]
+
+requires-python = ">=3.10"
+dependencies = [
+    "graphviz",
+    "oemof.solph>=0.5.4",
+    "oemof.thermal>=0.0.6.dev1",
+    "pandas>=1.3.4",
+    "PyYAML>=6.0",
+    "numpy>=1.21.4",
+    "setuptools>=59.1.1",
+    "pvlib",
+]
+license = {text = "MIT"}
