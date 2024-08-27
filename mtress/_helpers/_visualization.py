@@ -1,6 +1,9 @@
 """Visulisation of energy system."""
-import re
 
+import re
+from shutil import rmtree
+
+import imageio
 import graphviz
 from oemof.solph import Bus
 from oemof.solph.components import GenericStorage, Sink, Source, Converter
@@ -56,3 +59,18 @@ def generate_graph(energysystem, label_extractor=None):
             dot.edge(nodes[node], nodes[output])
 
     return dot
+
+
+def render_series(plots: list[graphviz.Digraph], path: str, duration: int) -> None:
+    """Generate a gif from a series of graphs."""
+    images = []
+    for i, plot in enumerate(plots):
+        # render graph
+        filename = f"{path}/{i}.png"
+        plot.render(outfile=filename)
+
+        # read image for animation creation
+        images.append(imageio.imread_v2(filename))
+    imageio.mimsave(f"{path}.gif", images, duration=duration)
+
+    rmtree(path=path)

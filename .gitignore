@@ -22,4 +22,5 @@ example/meta_model_config.yaml
 examples/*/*.lp
 examples/*/*.png
 examples/*/*.gv
+examples/*/*.gif
 
