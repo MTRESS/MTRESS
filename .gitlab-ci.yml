@@ -16,7 +16,7 @@ cache:
   before_script:
     - apt-get update -qy
     - apt-get install -y coinor-cbc git
-    - pip install -r requirements.txt
+    - pip install .
 
 # Make the default stages explicit
 stages:
