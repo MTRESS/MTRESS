@@ -9,7 +9,6 @@ SPDX-FileCopyrightText: Lucas Schmeling
 SPDX-License-Identifier: MIT
 """
 
-
 from oemof.solph import Bus, Flow
 from oemof.solph.components import Converter, Source
 

@@ -9,7 +9,6 @@ SPDX-License-Identifier: MIT
 """
 
 
-
 from oemof.network.network import Node
 from oemof.solph import Bus, Model
 from oemof.solph.components import GenericStorage

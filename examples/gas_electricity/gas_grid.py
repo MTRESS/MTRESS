@@ -8,7 +8,14 @@ import os
 
 from oemof.solph.processing import results
 
-from mtress import Location, MetaModel, SolphModel, carriers, demands, technologies
+from mtress import (
+    Location,
+    MetaModel,
+    SolphModel,
+    carriers,
+    demands,
+    technologies,
+)
 from mtress.physics import HYDROGEN
 from mtress.technologies import HYDROGEN_CHP
 
@@ -100,7 +107,9 @@ house_2.add(
 )
 
 house_2.add(
-    demands.GasDemand(name="H2_demand", gas_type=HYDROGEN, time_series=1, pressure=30)
+    demands.GasDemand(
+        name="H2_demand", gas_type=HYDROGEN, time_series=1, pressure=30
+    )
 )
 
 solph_representation = SolphModel(

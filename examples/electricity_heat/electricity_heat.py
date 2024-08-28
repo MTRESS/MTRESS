@@ -25,7 +25,14 @@ import os
 
 from oemof.solph.processing import results
 
-from mtress import Location, MetaModel, SolphModel, carriers, demands, technologies
+from mtress import (
+    Location,
+    MetaModel,
+    SolphModel,
+    carriers,
+    demands,
+    technologies,
+)
 from mtress._helpers import get_flows
 
 os.chdir(os.path.dirname(__file__))
@@ -106,4 +113,6 @@ flows = get_flows(myresults)
 plot = solph_representation.graph(detail=True, flow_results=flows)
 plot.render(outfile="electricity_heat_results.png")
 
-solved_model.write("electricity_heat.lp", io_options={"symbolic_solver_labels": True})
+solved_model.write(
+    "electricity_heat.lp", io_options={"symbolic_solver_labels": True}
+)

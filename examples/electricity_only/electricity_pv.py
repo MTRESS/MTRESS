@@ -7,7 +7,14 @@ import os
 import pandas as pd
 from oemof.solph.processing import results
 
-from mtress import Location, MetaModel, SolphModel, carriers, demands, technologies
+from mtress import (
+    Location,
+    MetaModel,
+    SolphModel,
+    carriers,
+    demands,
+    technologies,
+)
 from mtress._helpers import get_flows
 from mtress._helpers._visualization import render_series
 
@@ -68,7 +75,9 @@ solved_model = solph_representation.solve(solve_kwargs={"tee": True})
 myresults = results(solved_model)
 flows = get_flows(myresults)
 
-plot = solph_representation.graph(detail=True, flow_results=flows, flow_color=None)
+plot = solph_representation.graph(
+    detail=True, flow_results=flows, flow_color=None
+)
 plot.render(outfile="electricity_pv_results.png")
 
 plot_series = solph_representation.graph_series(
@@ -76,4 +85,6 @@ plot_series = solph_representation.graph_series(
 )
 render_series(plot_series, "electricity_pv_series", 1000)
 
-solved_model.write("electricity_pv.lp", io_options={"symbolic_solver_labels": True})
+solved_model.write(
+    "electricity_pv.lp", io_options={"symbolic_solver_labels": True}
+)
