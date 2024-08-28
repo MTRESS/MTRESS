@@ -16,7 +16,7 @@ cache:
   before_script:
     - apt-get update -qy
     - apt-get install -y coinor-cbc git
-    - pip install -r requirements.txt
+    - pip install .
 
 # Make the default stages explicit
 stages:
@@ -31,7 +31,7 @@ ruff:
   script:
     - pip install ruff
     - ruff check --output-format=gitlab .
-  allow_failure: true
+  allow_failure: false
 
 pytest:
   extends: .base_environment
@@ -50,7 +50,7 @@ pytest:
         coverage_format: cobertura
         path: coverage.xml
 
-  allow_failure: true
+  allow_failure: false
 
 pages:
   extends: .base_environment
