@@ -9,11 +9,10 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import logging
-
 from typing import TYPE_CHECKING, Dict, Tuple
 
-from graphviz import Digraph
 import pandas as pd
+from graphviz import Digraph
 from oemof.solph import EnergySystem, Model
 
 from ._data_handler import DataHandler

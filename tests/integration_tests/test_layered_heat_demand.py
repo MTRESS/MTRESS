@@ -4,19 +4,11 @@ Tests for MTRESS FixedTemperatureHeat Demand.
 """
 import os
 
-from oemof.solph.processing import results
 import pytest
+from oemof.solph.processing import results
 
-from mtress import (
-    carriers,
-    Location,
-    MetaModel,
-    SolphModel,
-    technologies,
-    demands,
-)
+from mtress import Location, MetaModel, SolphModel, carriers, demands, technologies
 from mtress._helpers import get_flows
-
 
 n_days = 30
 

@@ -1,12 +1,11 @@
 """Room heating technologies."""
 
 from oemof.solph import Bus, Flow
-from oemof.solph.components import Source, Sink, Converter
-
-from .._data_handler import TimeseriesType
-from ..carriers import HeatCarrier
+from oemof.solph.components import Converter, Sink, Source
 
 from .._abstract_component import AbstractSolphRepresentation
+from .._data_handler import TimeseriesType
+from ..carriers import HeatCarrier
 from ._abstract_demand import AbstractDemand
 
 

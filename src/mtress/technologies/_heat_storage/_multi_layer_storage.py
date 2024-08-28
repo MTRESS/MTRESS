@@ -8,23 +8,16 @@ SPDX-FileCopyrightText: Deutsches Zentrum für Luft und Raumfahrt
 SPDX-License-Identifier: MIT
 """
 
-from pyomo import environ as po
-
 from numpy import power
-from oemof.solph import Bus
-from oemof.solph import Flow
+from oemof.solph import Bus, Flow
 from oemof.solph.components import GenericStorage
 from oemof.solph.constraints import shared_limit
 from oemof.thermal import stratified_thermal_storage
+from pyomo import environ as po
 
 from mtress._data_handler import TimeseriesSpecifier, TimeseriesType
 from mtress.carriers import HeatCarrier
-from mtress.physics import (
-    H2O_DENSITY,
-    H2O_HEAT_CAPACITY,
-    SECONDS_PER_HOUR,
-    mega_to_one,
-)
+from mtress.physics import H2O_DENSITY, H2O_HEAT_CAPACITY, SECONDS_PER_HOUR, mega_to_one
 
 from ._abstract_heat_storage import AbstractHeatStorage
 

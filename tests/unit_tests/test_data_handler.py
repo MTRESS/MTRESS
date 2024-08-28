@@ -6,8 +6,7 @@ Tests for the MTRESS data handler.
 import pandas as pd
 import pytest
 
-from mtress._data_handler import DataHandler
-from mtress._data_handler import TimeseriesType
+from mtress._data_handler import DataHandler, TimeseriesType
 
 
 @pytest.fixture

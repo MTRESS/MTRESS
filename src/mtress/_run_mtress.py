@@ -10,10 +10,11 @@ SPDX-FileCopyrightText: Patrik Schönfeldt
 SPDX-License-Identifier: MIT
 """
 
-import yaml
 import os
-import pandas as pd
 import sys
+
+import pandas as pd
+import yaml
 
 from mtress import MetaModel
 

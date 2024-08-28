@@ -12,7 +12,7 @@ SPDX-License-Identifier: MIT
 from typing import Optional
 
 from oemof.solph import Bus, Flow
-from oemof.solph.components import Source, Converter
+from oemof.solph.components import Converter, Source
 
 from .._abstract_component import AbstractSolphRepresentation
 from ..carriers import ElectricityCarrier, HeatCarrier

@@ -1,4 +1,4 @@
-from mtress.physics import NATURAL_GAS, HYDROGEN
+from mtress.physics import HYDROGEN, NATURAL_GAS
 from mtress.technologies import GasGridConnection
 
 

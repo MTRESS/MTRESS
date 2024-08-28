@@ -11,7 +11,6 @@ SPDX-FileCopyrightText: Lucas Schmeling
 SPDX-License-Identifier: MIT
 """
 import numpy as np
-
 from oemof.solph import Bus, Flow, components
 
 from .._abstract_component import AbstractSolphRepresentation

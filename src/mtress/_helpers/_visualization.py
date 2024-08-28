@@ -3,10 +3,10 @@
 import re
 from shutil import rmtree
 
-import imageio
 import graphviz
+import imageio
 from oemof.solph import Bus
-from oemof.solph.components import GenericStorage, Sink, Source, Converter
+from oemof.solph.components import Converter, GenericStorage, Sink, Source
 
 from ._util import update_in_dict
 

@@ -5,8 +5,9 @@ here.
 """
 
 from dataclasses import dataclass
-from ._helper_functions import bar_to_pascal
+
 from ._constants import IDEAL_GAS_CONSTANT
+from ._helper_functions import bar_to_pascal
 
 # Some parameters for different gases are given below
 

@@ -1,5 +1,5 @@
-from mtress.technologies import CHP, NATURALGAS_CHP
 from mtress.physics import NATURAL_GAS
+from mtress.technologies import CHP, NATURALGAS_CHP
 
 
 def test_fuelcell():

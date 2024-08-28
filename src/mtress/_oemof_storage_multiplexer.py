@@ -11,10 +11,10 @@ SPDX-License-Identifier: MIT
 
 from typing import Dict, Tuple
 
+from oemof.network.network import Node
 from oemof.solph import Bus, Model
 from oemof.solph.components import GenericStorage
 from pyomo import environ as po
-from oemof.network.network import Node
 
 
 def storage_multiplexer_constraint(

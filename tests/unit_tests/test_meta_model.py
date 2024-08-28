@@ -3,13 +3,12 @@
 Tests for the bare MTRESS meta model.
 """
 
-import pytest
-
 from typing import Iterable
 
+import pytest
+
 from mtress import Connection, Location, MetaModel
-from mtress.carriers import ElectricityCarrier
-from mtress.carriers import HeatCarrier
+from mtress.carriers import ElectricityCarrier, HeatCarrier
 
 
 def test_minimal_initialisation():

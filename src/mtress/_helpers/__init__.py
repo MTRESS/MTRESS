@@ -9,8 +9,8 @@ SPDX-FileCopyrightText: Patrik Schönfeldt
 SPDX-License-Identifier: MIT
 """
 from ._array_cast import numeric_array
-from ._util import get_from_dict, read_input_data, update_in_dict
 from ._results import get_flows
+from ._util import get_from_dict, read_input_data, update_in_dict
 
 __all__ = [
     "numeric_array",

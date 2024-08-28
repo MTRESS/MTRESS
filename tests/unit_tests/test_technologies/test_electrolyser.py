@@ -1,4 +1,4 @@
-from mtress.technologies import Electrolyser, ALKALINE_ELECTROLYSER
+from mtress.technologies import ALKALINE_ELECTROLYSER, Electrolyser
 
 
 def test_electrolyser():

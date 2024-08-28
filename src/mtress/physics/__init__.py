@@ -15,12 +15,23 @@ from ._constants import (
     H2O_HEAT_FUSION,
     HHV_WP,
     HS_PER_HI_GAS,
-    IDEAL_GAS_CONSTANT,
     HS_PER_HI_WP,
+    IDEAL_GAS_CONSTANT,
     SECONDS_PER_HOUR,
     TC_CONCRETE,
     TC_INSULATION,
     ZERO_CELSIUS,
+)
+from ._gas_definition import (
+    BIO_METHANE,
+    BIOGAS,
+    HYDROGEN,
+    NATURAL_GAS,
+    Gas,
+    calc_biogas_heating_value,
+    calc_biogas_molar_mass,
+    calc_hydrogen_density,
+    calc_natural_gas_molar_mass,
 )
 from ._helper_functions import (
     bar_to_pascal,
@@ -30,22 +41,10 @@ from ._helper_functions import (
     kelvin_to_celsius,
     kilo_to_mega,
     kJ_to_MWh,
-    lorenz_cop,
     logarithmic_mean_temperature,
+    lorenz_cop,
     mega_to_one,
     one_to_mega,
-)
-
-from ._gas_definition import (
-    Gas,
-    HYDROGEN,
-    NATURAL_GAS,
-    BIO_METHANE,
-    BIOGAS,
-    calc_hydrogen_density,
-    calc_biogas_heating_value,
-    calc_biogas_molar_mass,
-    calc_natural_gas_molar_mass,
 )
 
 __all__ = [

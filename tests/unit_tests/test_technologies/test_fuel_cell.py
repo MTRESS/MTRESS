@@ -1,4 +1,4 @@
-from mtress.technologies import FuelCell, PEMFC, AFC
+from mtress.technologies import AFC, PEMFC, FuelCell
 
 
 def test_fuelcell():

@@ -4,8 +4,9 @@ from typing import Optional
 
 from oemof.solph import Bus, Flow, Source
 
-from mtress.carriers import HeatCarrier
 from mtress._abstract_component import AbstractSolphRepresentation
+from mtress.carriers import HeatCarrier
+
 from ._abstract_grid_connection import AbstractGridConnection
 
 

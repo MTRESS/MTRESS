@@ -2,9 +2,10 @@
 
 from oemof.solph import Flow
 from oemof.solph.components import GenericStorage
+
 from .._abstract_component import AbstractSolphRepresentation
-from ._abstract_technology import AbstractTechnology
 from ..carriers import ElectricityCarrier
+from ._abstract_technology import AbstractTechnology
 
 
 class BatteryStorage(AbstractTechnology, AbstractSolphRepresentation):

@@ -6,8 +6,7 @@ SPDX-FileCopyrightText: Deutsches Zentrum für Luft und Raumfahrt
 SPDX-License-Identifier: MIT
 """
 
-from mtress.physics import HYDROGEN
-from mtress.physics import calc_hydrogen_density
+from mtress.physics import HYDROGEN, calc_hydrogen_density
 
 from .._abstract_homogenous_storage import Implementation
 from ._gas_storage import GasStorage
