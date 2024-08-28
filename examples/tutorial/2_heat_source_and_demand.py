@@ -1,5 +1,5 @@
 import os
-import pandas as pd
+
 from oemof.solph.processing import results
 
 from mtress import Location, MetaModel, SolphModel, carriers, demands, technologies

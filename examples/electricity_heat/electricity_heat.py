@@ -23,8 +23,9 @@ created and the solver output is written to an .lp file.
 
 import os
 
-from mtress import Location, MetaModel, SolphModel, carriers, demands, technologies
 from oemof.solph.processing import results
+
+from mtress import Location, MetaModel, SolphModel, carriers, demands, technologies
 from mtress._helpers import get_flows
 
 os.chdir(os.path.dirname(__file__))

@@ -9,7 +9,6 @@ SPDX-FileCopyrightText: Lucas Schmeling
 SPDX-License-Identifier: MIT
 """
 
-from typing import Optional
 
 from oemof.solph import Bus, Flow
 from oemof.solph.components import Converter, Source
@@ -17,7 +16,7 @@ from oemof.solph.components import Converter, Source
 from .._abstract_component import AbstractSolphRepresentation
 from ..carriers import ElectricityCarrier, HeatCarrier
 from ..physics import calc_cop, celsius_to_kelvin
-from ._abstract_technology import AbstractAnergySource, AbstractTechnology
+from ._abstract_technology import AbstractTechnology
 
 
 class HeatPump(AbstractTechnology, AbstractSolphRepresentation):

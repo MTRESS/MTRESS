@@ -3,6 +3,7 @@ Basic working 'electricity' example.
 """
 
 import os
+
 import pandas as pd
 from oemof.solph.processing import results
 

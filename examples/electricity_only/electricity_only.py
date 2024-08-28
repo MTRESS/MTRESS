@@ -14,8 +14,8 @@ solver output is written to an .lp file.
 """
 
 import os
-from oemof import solph
 
+from oemof import solph
 
 from mtress import Location, MetaModel, SolphModel, carriers, demands, technologies
 from mtress._helpers import get_flows

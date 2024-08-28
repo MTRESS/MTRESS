@@ -141,7 +141,7 @@ class AbstractSolphRepresentation(AbstractComponent):
             return
 
         color = colorscheme.get(self.identifier[-1], None)
-        if color == None:  # component not a carrier
+        if color is None:  # component not a carrier
             # determine if only connected to ONE carrier
             own_nodes = [tuple(x.label) for x in self.solph_nodes]
             connected_nodes = [
@@ -159,7 +159,7 @@ class AbstractSolphRepresentation(AbstractComponent):
                     ).pop()
                 ]
 
-        if color != None:  # color nodes
+        if color is not None:  # color nodes
             for solph_node in self.solph_nodes:
                 solph_node_id = tuple(solph_node.label)
                 for origin in solph_node.inputs:

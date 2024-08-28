@@ -9,7 +9,6 @@ SPDX-License-Identifier: MIT
 """
 
 
-from typing import Dict, Tuple
 
 from oemof.network.network import Node
 from oemof.solph import Bus, Model

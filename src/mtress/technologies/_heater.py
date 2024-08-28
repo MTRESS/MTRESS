@@ -2,7 +2,6 @@
 
 import logging
 
-import numpy as np
 from oemof.solph import Bus, Flow
 from oemof.solph.components import Converter
 

@@ -49,7 +49,7 @@ class DataHandler:
                     if not matching_index.all():
                         raise KeyError(
                             "Provided series doesn't cover time index: "
-                            + f"{list(self.timeindex[matching_index == False])}"
+                            + f"{list(self.timeindex[not matching_index])}"
                         )
                     return series.reindex(target_index)
                 else:

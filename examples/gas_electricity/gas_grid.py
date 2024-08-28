@@ -9,8 +9,8 @@ import os
 from oemof.solph.processing import results
 
 from mtress import Location, MetaModel, SolphModel, carriers, demands, technologies
-from mtress.physics import HYDROGEN, NATURAL_GAS
-from mtress.technologies import HYDROGEN_CHP, HYDROGEN_MIXED_CHP
+from mtress.physics import HYDROGEN
+from mtress.technologies import HYDROGEN_CHP
 
 LOGGER = logging.getLogger(__file__)
 from mtress._helpers import get_flows

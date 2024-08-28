@@ -49,6 +49,8 @@ from ._helper_functions import (
 
 __all__ = [
     "kilo_to_mega",
+    "calc_biogas_molar_mass",
+    "calc_natural_gas_molar_mass",
     "celsius_to_kelvin",
     "kelvin_to_celsius",
     "kJ_to_MWh",

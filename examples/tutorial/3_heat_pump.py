@@ -1,5 +1,5 @@
-import imageio
 import os
+
 import pandas as pd
 from oemof.solph.processing import results
 

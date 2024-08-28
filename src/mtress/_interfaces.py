@@ -1,6 +1,5 @@
 """Helper interfaces for MTRESS elements."""
 
-import re
 from abc import ABC, abstractmethod
 
 

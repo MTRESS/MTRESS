@@ -101,10 +101,10 @@ class SolphModel:
         graph = Digraph(name="MTRESS model")
         external_edges = set()
 
-        if flow_color == None:
+        if flow_color is None:
             flow_color = {}
 
-        if colorscheme == None:
+        if colorscheme is None:
             # set to default
             colorscheme = {
                 "ElectricityCarrier": "orange",
@@ -134,11 +134,11 @@ class SolphModel:
         colorscheme: dict = None,
     ) -> list[Digraph]:
         """Wrapper for graph function to generate multiple graphs as a series."""
-        if start == None:
+        if start is None:
             # use first entry of time series
             temp_flow = list(flow_results.items())[0][1]
             start = temp_flow.index[0]
-        if stop == None:
+        if stop is None:
             # use last entry of time series
             temp_flow = list(flow_results.items())[0][1]
             stop = temp_flow.index[-1]

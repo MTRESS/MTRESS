@@ -111,7 +111,7 @@ class HeatCarrier(AbstractLayeredCarrier, AbstractSolphRepresentation):
         )
 
         self.create_solph_node(
-            label=f"missing_heat",
+            label="missing_heat",
             node_type=components.Source,
             outputs={
                 bus: Flow(variable_costs=1e9)

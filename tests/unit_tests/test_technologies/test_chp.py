@@ -20,4 +20,4 @@ def test_fuelcell():
     assert chp.maximum_temperature == NATURALGAS_CHP.maximum_temperature == 85
     assert chp.input_pressure == NATURALGAS_CHP.input_pressure == 1
     assert chp.gas_type == {NATURAL_GAS: 1}
-    assert type(chp.gas_type) == dict
+    assert type(chp.gas_type) is dict

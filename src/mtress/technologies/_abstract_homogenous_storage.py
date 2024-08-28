@@ -18,7 +18,6 @@ from oemof.solph.constraints import storage_level_constraint
 
 from .._abstract_component import AbstractSolphRepresentation
 from .._oemof_storage_multiplexer import storage_multiplexer_constraint
-from ..carriers import AbstractLayeredCarrier
 
 
 class Implementation(Enum):
