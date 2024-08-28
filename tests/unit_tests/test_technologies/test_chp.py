@@ -4,7 +4,7 @@ from mtress.physics import NATURAL_GAS
 
 def test_fuelcell():
     chp_name = ("CHP",)
-    chp_nominal_power = (100e3)
+    chp_nominal_power = 100e3
 
     # Considering NATURALGAS_CHP template type
     chp = CHP(

@@ -68,7 +68,10 @@ class AbstactHeatExchanger(AbstractTechnology, AbstractSolphRepresentation):
         self._build_core()
 
         highest_warm_level, _ = self.heat_carrier.get_surrounding_levels(
-            min(max(self.reservoir_temperature), self.maximum_working_temperature)
+            min(
+                max(self.reservoir_temperature),
+                self.maximum_working_temperature,
+            )
         )
 
         _, cold_level = self.heat_carrier.get_surrounding_levels(
@@ -76,7 +79,10 @@ class AbstactHeatExchanger(AbstractTechnology, AbstractSolphRepresentation):
         )
         _, lowest_warm_level = self.heat_carrier.get_surrounding_levels(
             max(
-                min(min(self.reservoir_temperature), self.minimum_working_temperature),
+                min(
+                    min(self.reservoir_temperature),
+                    self.minimum_working_temperature,
+                ),
                 (cold_level + self.minimum_delta),
             )
         )
@@ -110,8 +116,12 @@ class AbstactHeatExchanger(AbstractTechnology, AbstractSolphRepresentation):
                 warm_temperature - self.heat_carrier.reference
             )
 
-            heat_bus_warm_source = self.heat_carrier.level_nodes[warm_temperature]
-            heat_bus_cold_source = self.heat_carrier.level_nodes[cold_temperature]
+            heat_bus_warm_source = self.heat_carrier.level_nodes[
+                warm_temperature
+            ]
+            heat_bus_cold_source = self.heat_carrier.level_nodes[
+                cold_temperature
+            ]
 
             internal_sequence = [
                 1 if temp >= warm_temperature else 0
@@ -182,7 +192,8 @@ class AbstactHeatExchanger(AbstractTechnology, AbstractSolphRepresentation):
             heat_bus_cold_sink = self.heat_carrier.level_nodes[cold_level]
 
             internal_sequence = [
-                1 if temp <= cold_level else 0 for temp in self.reservoir_temperature
+                1 if temp <= cold_level else 0
+                for temp in self.reservoir_temperature
             ]
 
             self.create_solph_node(

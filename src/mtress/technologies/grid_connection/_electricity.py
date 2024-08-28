@@ -14,7 +14,9 @@ from mtress.carriers import ElectricityCarrier
 from ._abstract_grid_connection import AbstractGridConnection
 
 
-class ElectricityGridConnection(AbstractGridConnection, AbstractSolphRepresentation):
+class ElectricityGridConnection(
+    AbstractGridConnection, AbstractSolphRepresentation
+):
     def __init__(
         self,
         working_rate: Optional[TimeseriesSpecifier] = None,

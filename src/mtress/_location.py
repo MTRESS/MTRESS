@@ -9,7 +9,9 @@ from graphviz import Digraph
 from ._abstract_component import AbstractComponent
 from ._interfaces import NamedElement
 from .carriers._abstract_carrier import AbstractCarrier
-from .technologies.grid_connection._abstract_grid_connection import AbstractGridConnection
+from .technologies.grid_connection._abstract_grid_connection import (
+    AbstractGridConnection,
+)
 
 
 class Location(NamedElement):
@@ -104,7 +106,13 @@ class Location(NamedElement):
         for component in self._components:
             yield component
 
-    def graph(self, detail: bool = True, flow_results = None, flow_color:dict=None, colorscheme:dict=None) -> Tuple[Digraph, set]:
+    def graph(
+        self,
+        detail: bool = True,
+        flow_results=None,
+        flow_color: dict = None,
+        colorscheme: dict = None,
+    ) -> Tuple[Digraph, set]:
         """
         Generate graphviz visualization of the MTRESS location.
 
@@ -116,7 +124,9 @@ class Location(NamedElement):
         external_edges = set()
 
         for component in self.components:
-            subgraph, edges = component.graph(detail, flow_results, flow_color, colorscheme)
+            subgraph, edges = component.graph(
+                detail, flow_results, flow_color, colorscheme
+            )
 
             external_edges.update(edges)
             graph.subgraph(subgraph)

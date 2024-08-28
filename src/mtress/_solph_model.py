@@ -52,7 +52,9 @@ class SolphModel:
             case dict() as params:
                 self.timeindex = pd.date_range(**params)
             case _:
-                raise ValueError("Don't know how to process timeindex specification")
+                raise ValueError(
+                    "Don't know how to process timeindex specification"
+                )
 
         self.data = DataHandler(self.timeindex)
 
@@ -78,7 +80,9 @@ class SolphModel:
             component.establish_interconnections()
 
         for connection in self._meta_model.connections:
-            connection.source.connect(connection.carrier, connection.destination)
+            connection.source.connect(
+                connection.carrier, connection.destination
+            )
 
     def build_solph_model(self):
         """Build the `oemof.solph` representation of the model."""

@@ -88,7 +88,9 @@ class AbstractSolphRepresentation(AbstractComponent):
         _full_label = SolphLabel(*self.create_label(label))
 
         if label in self._solph_nodes:
-            raise KeyError(f"Solph component named {_full_label} already exists")
+            raise KeyError(
+                f"Solph component named {_full_label} already exists"
+            )
 
         _node = node_type(label=_full_label, **kwargs)
 
@@ -115,7 +117,9 @@ class AbstractSolphRepresentation(AbstractComponent):
     def add_constraints(self) -> None:
         """Add constraints to the model."""
 
-    def get_flow_color(self, flow_color: dict, colorscheme: dict = None) -> None:
+    def get_flow_color(
+        self, flow_color: dict, colorscheme: dict = None
+    ) -> None:
         def rec(node, color):
             # recursively iterate nodes until all edges covered
             # or node type in [Source, Sink, Converter]
@@ -146,10 +150,13 @@ class AbstractSolphRepresentation(AbstractComponent):
             external_nodes = set(connected_nodes) - set(own_nodes)
             external_nodes = set.intersection(*map(set, external_nodes))
             if external_nodes in [
-                set(x.identifier) for x in self._solph_model._meta_model.components
+                set(x.identifier)
+                for x in self._solph_model._meta_model.components
             ]:
                 color = colorscheme[
-                    set.intersection(set(colorscheme.keys()), external_nodes).pop()
+                    set.intersection(
+                        set(colorscheme.keys()), external_nodes
+                    ).pop()
                 ]
 
         if color != None:  # color nodes
@@ -232,7 +239,9 @@ class AbstractSolphRepresentation(AbstractComponent):
                                     color="grey",
                                 )
                         else:
-                            graph.edge(str(origin.label), str(solph_node.label))
+                            graph.edge(
+                                str(origin.label), str(solph_node.label)
+                            )
                 else:
                     # This is an external edge
                     if detail:
@@ -262,7 +271,12 @@ class AbstractSolphRepresentation(AbstractComponent):
                                 )
                         else:
                             external_edges.add(
-                                (str(origin.label), str(solph_node.label), "", "black")
+                                (
+                                    str(origin.label),
+                                    str(solph_node.label),
+                                    "",
+                                    "black",
+                                )
                             )
                     else:
                         # Add edge from MTRESS component to MTRESS component
@@ -280,7 +294,9 @@ class AbstractSolphRepresentation(AbstractComponent):
     # TODO: Methods for result analysis
 
 
-class ModelicaInterface(AbstractComponent):  # pylint: disable=too-few-public-methods
+class ModelicaInterface(
+    AbstractComponent
+):  # pylint: disable=too-few-public-methods
     """Interface for components which can be represented in open modelica."""
 
     # At the moment, this is just a memory aid

@@ -7,7 +7,14 @@ import os
 from oemof.solph.processing import results
 import pytest
 
-from mtress import carriers, Location, MetaModel, SolphModel, technologies, demands
+from mtress import (
+    carriers,
+    Location,
+    MetaModel,
+    SolphModel,
+    technologies,
+    demands,
+)
 from mtress._helpers import get_flows
 
 

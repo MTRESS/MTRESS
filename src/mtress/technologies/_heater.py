@@ -50,8 +50,8 @@ class AbstractHeater(AbstractTechnology, AbstractSolphRepresentation):
         )
 
         for temp_in, temp_out in zip(in_levels, out_levels):
-            bus_warm, bus_cold, ratio = heat_carrier.get_connection_heat_transfer(
-                temp_out, temp_in
+            bus_warm, bus_cold, ratio = (
+                heat_carrier.get_connection_heat_transfer(temp_out, temp_in)
             )
             self.create_solph_node(
                 label=f"heat_{temp_in:.0f}_{temp_out:.0f}",

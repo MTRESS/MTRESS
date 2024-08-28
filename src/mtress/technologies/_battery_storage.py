@@ -63,7 +63,8 @@ class BatteryStorage(AbstractTechnology, AbstractSolphRepresentation):
             },
             outputs={
                 electricity.distribution: Flow(
-                    nominal_value=self.nominal_capacity * self.discharging_C_Rate
+                    nominal_value=self.nominal_capacity
+                    * self.discharging_C_Rate
                 )
             },
             nominal_storage_capacity=self.nominal_capacity,

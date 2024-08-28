@@ -8,7 +8,9 @@ def get_flows(results):
     :param results: Results from solph optimization
     """
     flows = {
-        (source_node.label, destination_node.label): result["sequences"]["flow"]
+        (source_node.label, destination_node.label): result["sequences"][
+            "flow"
+        ]
         for (source_node, destination_node), result in results.items()
         if destination_node is not None and not source_node == destination_node
     }
@@ -23,7 +25,9 @@ def get_status(results):
     :param results: Results from solph optimization
     """
     flows = {
-        (source_node.label, destination_node.label): result["sequences"]["status"]
+        (source_node.label, destination_node.label): result["sequences"][
+            "status"
+        ]
         for (source_node, destination_node), result in results.items()
         if destination_node is not None
         and "status" in result["sequences"]

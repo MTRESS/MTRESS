@@ -61,20 +61,26 @@ class GasGridConnection(AbstractGridConnection, AbstractSolphRepresentation):
     def build_core(self):
         gas_carrier = self.location.get_carrier(GasCarrier)
 
-        pressure_level_low, pressure_level_high = gas_carrier.get_surrounding_levels(
-            self.gas_type, self.grid_pressure
+        pressure_level_low, pressure_level_high = (
+            gas_carrier.get_surrounding_levels(
+                self.gas_type, self.grid_pressure
+            )
         )
 
         self.b_grid_export = self.create_solph_node(
             label="grid_export",
             node_type=Bus,
-            inputs={gas_carrier.inputs[self.gas_type][pressure_level_high]: Flow()},
+            inputs={
+                gas_carrier.inputs[self.gas_type][pressure_level_high]: Flow()
+            },
         )
 
         self.b_grid_import = self.create_solph_node(
             label="grid_import",
             node_type=Bus,
-            outputs={gas_carrier.inputs[self.gas_type][pressure_level_low]: Flow()},
+            outputs={
+                gas_carrier.inputs[self.gas_type][pressure_level_low]: Flow()
+            },
         )
 
         if self.working_rate is not None:

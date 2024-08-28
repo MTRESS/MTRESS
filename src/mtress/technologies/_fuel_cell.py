@@ -126,7 +126,9 @@ class AbstractFuelCell(AbstractHeater):
         )
 
         # Electrical connection for FC electrical output
-        self.electricity_carrier = self.location.get_carrier(ElectricityCarrier)
+        self.electricity_carrier = self.location.get_carrier(
+            ElectricityCarrier
+        )
 
         # Electrical efficiency with conversion from gas in kg to electricity in W
         self.full_load_electrical_output = (
@@ -372,21 +374,27 @@ class OffsetFuelCell(AbstractFuelCell):
         min_load_electrical_output = (
             self.min_load_electrical_efficiency * self.gas_type.LHV
         )
-        min_load_heat_output = self.min_load_thermal_efficiency * self.gas_type.LHV
-
-        # offset mode
-        slope_el, offset_el = solph.components.slope_offset_from_nonconvex_input(
-            self.maximum_load,
-            self.minimum_load,
-            self.full_load_electrical_output,
-            min_load_electrical_output,
+        min_load_heat_output = (
+            self.min_load_thermal_efficiency * self.gas_type.LHV
         )
 
-        slope_ht, offset_ht = solph.components.slope_offset_from_nonconvex_input(
-            self.maximum_load,
-            self.minimum_load,
-            self.full_load_heat_output,
-            min_load_heat_output,
+        # offset mode
+        slope_el, offset_el = (
+            solph.components.slope_offset_from_nonconvex_input(
+                self.maximum_load,
+                self.minimum_load,
+                self.full_load_electrical_output,
+                min_load_electrical_output,
+            )
+        )
+
+        slope_ht, offset_ht = (
+            solph.components.slope_offset_from_nonconvex_input(
+                self.maximum_load,
+                self.minimum_load,
+                self.full_load_heat_output,
+                min_load_heat_output,
+            )
         )
 
         self.create_solph_node(

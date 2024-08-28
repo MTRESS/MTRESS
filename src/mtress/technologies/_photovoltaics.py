@@ -137,7 +137,9 @@ class Photovoltaics(RenewableElectricitySource):
     def _prepare_weather_data(self):
         if self.weather is None:
             _LOGGER.warning("No weather data provided, taking clearsky data")
-            return self.geo_location.get_clearsky(self._solph_model.data.timeindex)
+            return self.geo_location.get_clearsky(
+                self._solph_model.data.timeindex
+            )
 
         weather = pd.DataFrame()
         for col in ["ghi", "dhi"]:
@@ -151,7 +153,9 @@ class Photovoltaics(RenewableElectricitySource):
         if "dni" not in weather:
             for col in ["temp_air", "temp_dew", "pressure"]:
                 if col not in self.weather:
-                    raise KeyError(f"{col} required if dni is not provided missing")
+                    raise KeyError(
+                        f"{col} required if dni is not provided missing"
+                    )
 
                 weather[col] = self._solph_model.data.get_timeseries(
                     self.weather[col], kind=TimeseriesType.INTERVAL
@@ -178,7 +182,9 @@ class Photovoltaics(RenewableElectricitySource):
         for attr in ["surface_tilt", "surface_azimuth"]:
             if val := getattr(self, attr) is not None:
                 if len(self.pv_system.arrays) > 1:
-                    raise ValueError(f"Can assign {attr} for only one PV array")
+                    raise ValueError(
+                        f"Can assign {attr} for only one PV array"
+                    )
 
                 setattr(self.pv_system.arrays[0].mount, attr, val)
 

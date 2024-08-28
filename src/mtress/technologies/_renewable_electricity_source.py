@@ -20,7 +20,9 @@ from ..carriers import ElectricityCarrier
 from ._abstract_technology import AbstractTechnology
 
 
-class RenewableElectricitySource(AbstractTechnology, AbstractSolphRepresentation):
+class RenewableElectricitySource(
+    AbstractTechnology, AbstractSolphRepresentation
+):
     """A generic electricity source."""
 
     def __init__(

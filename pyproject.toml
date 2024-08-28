@@ -49,3 +49,6 @@ dependencies = [
     "pvlib",
 ]
 license = {text = "MIT"}
+
+[tool.black]
+line-length = 79

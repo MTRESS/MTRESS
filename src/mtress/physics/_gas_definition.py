@@ -4,7 +4,6 @@ parameter values. Various functions for gases are defined
 here.
 """
 
-
 from dataclasses import dataclass
 from ._helper_functions import bar_to_pascal
 from ._constants import IDEAL_GAS_CONSTANT
@@ -59,7 +58,9 @@ def calc_hydrogen_density(pressure, temperature: float = 25) -> float:
     return density
 
 
-def calc_biogas_heating_value(CH4_share=0.75, CO2_share=0.25, heating_value=CH4_LHV):
+def calc_biogas_heating_value(
+    CH4_share=0.75, CO2_share=0.25, heating_value=CH4_LHV
+):
     """
     Calculate the heating value of biogas based on methane proportion.
     Heating value either LHV or HHV are calculated based on per kg

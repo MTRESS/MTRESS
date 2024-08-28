@@ -5,6 +5,7 @@ SPDX-FileCopyrightText: Deutsches Zentrum für Luft und Raumfahrt
 
 SPDX-License-Identifier: MIT
 """
+
 from mtress.physics import HYDROGEN
 from mtress.physics import calc_hydrogen_density
 
@@ -25,7 +26,9 @@ class H2Storage(GasStorage):
         name: str,
         volume: float,
         power_limit: float,
-        multiplexer_implementation: Implementation | str = Implementation.STRICT,
+        multiplexer_implementation: (
+            Implementation | str
+        ) = Implementation.STRICT,
     ):
         """
         Create fully mixed hydrogen storage component.

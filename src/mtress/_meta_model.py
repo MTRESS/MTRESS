@@ -8,7 +8,9 @@ from typing import TYPE_CHECKING, Iterable, List
 
 if TYPE_CHECKING:
     from ._abstract_component import AbstractComponent
-    from mtress.technologies.grid_connection._abstract_grid_connection import AbstractGridConnection
+    from mtress.technologies.grid_connection._abstract_grid_connection import (
+        AbstractGridConnection,
+    )
 
 from ._location import Location
 

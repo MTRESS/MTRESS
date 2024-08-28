@@ -55,13 +55,17 @@ class HeatCarrier(AbstractLayeredCarrier, AbstractSolphRepresentation):
         :param reference_temperature: Reference temperature (in °C)
         """
         if reference_temperature in temperature_levels:
-            raise ValueError("Reference temperature is not a valid temperature level.")
+            raise ValueError(
+                "Reference temperature is not a valid temperature level."
+            )
         super().__init__(
             levels=sorted(temperature_levels),
             reference=reference_temperature,
         )
 
-        self._reference_index = np.searchsorted(self.levels, reference_temperature)
+        self._reference_index = np.searchsorted(
+            self.levels, reference_temperature
+        )
 
         # Properties for solph interfaces
         self.level_nodes = {}
@@ -101,14 +105,18 @@ class HeatCarrier(AbstractLayeredCarrier, AbstractSolphRepresentation):
         self.create_solph_node(
             label="excess_heat",
             node_type=components.Sink,
-            inputs={bus: Flow(variable_costs=1e9) for bus in self.level_nodes.values()},
+            inputs={
+                bus: Flow(variable_costs=1e9)
+                for bus in self.level_nodes.values()
+            },
         )
 
         self.create_solph_node(
             label=f"missing_heat",
             node_type=components.Source,
             outputs={
-                bus: Flow(variable_costs=1e9) for bus in self.level_nodes.values()
+                bus: Flow(variable_costs=1e9)
+                for bus in self.level_nodes.values()
             },
         )
 

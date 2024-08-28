@@ -35,7 +35,11 @@ class AbstractFixedTemperature(AbstractDemand, AbstractSolphRepresentation):
     """
 
     def __init__(
-        self, name: str, flow_temperature: float, return_temperature: float, time_series
+        self,
+        name: str,
+        flow_temperature: float,
+        return_temperature: float,
+        time_series,
     ):
         """
         Initialize space heater.
@@ -58,12 +62,12 @@ class FixedTemperatureHeating(AbstractFixedTemperature):
         min_flow_temperature: float,
         return_temperature: float,
         time_series,
-    ):  
+    ):
         """
         Heating demand with a fixed return temperature.
 
         :param min_flow_temperature: minimum temperature
-            that can be used for heating 
+            that can be used for heating
         :param return_temperature: return temperature
         :param time_series: demand time series (in W)
         """
@@ -145,7 +149,7 @@ class FixedTemperatureCooling(AbstractFixedTemperature):
         Cooling demand with a fixed return temperature.
 
         :param max_flow_temperature: maximum temperature
-            that can be used for cooling 
+            that can be used for cooling
         :param return_temperature: return temperature
         :param time_series: demand time series (in W)
         """
@@ -167,7 +171,9 @@ class FixedTemperatureCooling(AbstractFixedTemperature):
         outputs = {}
         conversion_factors = {}
 
-        _, minimum_t = carrier.get_surrounding_levels(self.max_flow_temperature)
+        _, minimum_t = carrier.get_surrounding_levels(
+            self.max_flow_temperature
+        )
 
         input = self.create_solph_node(
             label="input",

@@ -28,4 +28,3 @@ def test_h2_storage():
     assert storage.calc_density(pressure=pressure) == calc_hydrogen_density(
         pressure=pressure
     )
-

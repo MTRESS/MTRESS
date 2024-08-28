@@ -43,7 +43,9 @@ class GasCompressor(AbstractTechnology, AbstractSolphRepresentation):
             label="electrical_input",
             node_type=Bus,
             inputs={
-                electricity_carrier.distribution: Flow(nominal_value=self.nominal_power)
+                electricity_carrier.distribution: Flow(
+                    nominal_value=self.nominal_power
+                )
             },
         )
 
@@ -55,9 +57,13 @@ class GasCompressor(AbstractTechnology, AbstractSolphRepresentation):
                     node_type=Converter,
                     inputs={
                         electrical_input: Flow(),
-                        gas_carrier.outputs[self.gas_type][pressure_low]: Flow(),
+                        gas_carrier.outputs[self.gas_type][
+                            pressure_low
+                        ]: Flow(),
                     },
-                    outputs={gas_carrier.outputs[self.gas_type][pressure]: Flow()},
+                    outputs={
+                        gas_carrier.outputs[self.gas_type][pressure]: Flow()
+                    },
                     conversion_factors={
                         gas_carrier.outputs[self.gas_type][pressure_low]: 1,
                         gas_carrier.outputs[self.gas_type][pressure]: 1,
@@ -65,7 +71,8 @@ class GasCompressor(AbstractTechnology, AbstractSolphRepresentation):
                             calc_isothermal_compression_energy(
                                 pressure_low,
                                 pressure,
-                                R=IDEAL_GAS_CONSTANT / self.gas_type.molar_mass,
+                                R=IDEAL_GAS_CONSTANT
+                                / self.gas_type.molar_mass,
                             )
                             / self.isothermal_efficiency
                         ),

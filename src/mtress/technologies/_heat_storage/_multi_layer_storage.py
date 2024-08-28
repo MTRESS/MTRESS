@@ -19,7 +19,12 @@ from oemof.thermal import stratified_thermal_storage
 
 from mtress._data_handler import TimeseriesSpecifier, TimeseriesType
 from mtress.carriers import HeatCarrier
-from mtress.physics import H2O_DENSITY, H2O_HEAT_CAPACITY, SECONDS_PER_HOUR, mega_to_one
+from mtress.physics import (
+    H2O_DENSITY,
+    H2O_HEAT_CAPACITY,
+    SECONDS_PER_HOUR,
+    mega_to_one,
+)
 
 from ._abstract_heat_storage import AbstractHeatStorage
 
@@ -93,7 +98,9 @@ class LayeredHeatStorage(AbstractHeatStorage):
                 level_node = heat_carrier.level_nodes[temperature]
 
                 if temperature in self.initial_storage_levels:
-                    initial_storage_level = self.initial_storage_levels[temperature]
+                    initial_storage_level = self.initial_storage_levels[
+                        temperature
+                    ]
                 else:
                     initial_storage_level = None
 
@@ -163,7 +170,9 @@ class LayeredHeatStorage(AbstractHeatStorage):
 
     def add_constraints(self):
         """Add constraints to the model."""
-        reference_temperature = self.location.get_carrier(HeatCarrier).reference
+        reference_temperature = self.location.get_carrier(
+            HeatCarrier
+        ).reference
 
         components, weights = zip(
             *[
@@ -199,7 +208,9 @@ class LayeredHeatStorage(AbstractHeatStorage):
         # When a storage loses energy, in reality it will not direktly go to the lowest
         # temperature. We mimic this by (additional) step-wise downshifting of the
         # remaining heat.
-        for lower_temperature, upper_temperature in zip(temperatures, temperatures[1:]):
+        for lower_temperature, upper_temperature in zip(
+            temperatures, temperatures[1:]
+        ):
             ratio = (lower_temperature - reference_temperature) / (
                 upper_temperature - reference_temperature
             )
@@ -213,7 +224,9 @@ class LayeredHeatStorage(AbstractHeatStorage):
                         ]
                     )
                 ) == model.flow[
-                    self.buses[upper_temperature], self.buses[lower_temperature], t
+                    self.buses[upper_temperature],
+                    self.buses[lower_temperature],
+                    t,
                 ]
 
             setattr(

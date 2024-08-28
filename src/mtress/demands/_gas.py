@@ -49,7 +49,9 @@ class GasDemand(AbstractDemand, AbstractSolphRepresentation):
     def build_core(self):
         """Build core structure of oemof.solph representation."""
         gas_carrier = self.location.get_carrier(GasCarrier)
-        _, pressure = gas_carrier.get_surrounding_levels(self.gas_type, self.pressure)
+        _, pressure = gas_carrier.get_surrounding_levels(
+            self.gas_type, self.pressure
+        )
 
         gas_bus = self.create_solph_node(
             label="input",

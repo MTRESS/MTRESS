@@ -69,7 +69,9 @@ def storage_multiplexer_constraint(
             for interval in intervals
         ]
 
-    interval_indices = po.Set(dimen=2, ordered=True, initialize=init_interval_indices)
+    interval_indices = po.Set(
+        dimen=2, ordered=True, initialize=init_interval_indices
+    )
     setattr(model, f"{name}_interval_indices", interval_indices)
 
     # Binary variable indicating active interval
@@ -92,9 +94,15 @@ def storage_multiplexer_constraint(
 
     # Set for indexing the weight variables
     def init_level_indices(model):
-        return [(level, timestep) for timestep in model.TIMESTEPS for level in levels]
+        return [
+            (level, timestep)
+            for timestep in model.TIMESTEPS
+            for level in levels
+        ]
 
-    level_indices = po.Set(dimen=2, ordered=True, initialize=init_level_indices)
+    level_indices = po.Set(
+        dimen=2, ordered=True, initialize=init_level_indices
+    )
     setattr(model, f"{name}_level_indices", level_indices)
 
     # Weight variable
@@ -135,7 +143,9 @@ def storage_multiplexer_constraint(
         for level in levels:
             expr += weights[level, timestep] * level
 
-        expr -= model.GenericStorageBlock.storage_content[storage_component, timestep]
+        expr -= model.GenericStorageBlock.storage_content[
+            storage_component, timestep
+        ]
         return expr == 0
 
     setattr(
@@ -161,14 +171,18 @@ def storage_multiplexer_constraint(
 
     # Now we can constrain the input and output flows
     # Helper mapping the levels to the input components
-    input_energy = {upp: upp - low for low, upp in zip(levels[:-1], levels[1:])}
+    input_energy = {
+        upp: upp - low for low, upp in zip(levels[:-1], levels[1:])
+    }
 
     # Define constraints on the input flows
     def constrain_input_flows(model, flow_level, timestep):
         expr = 0
 
         # Energy of the interval below the flow level
-        expr -= sum(weights[level, timestep] for level in levels if level < flow_level)
+        expr -= sum(
+            weights[level, timestep] for level in levels if level < flow_level
+        )
         expr *= input_energy.get(flow_level, 0)
 
         # Energy which is extracted in this timestep
@@ -187,14 +201,18 @@ def storage_multiplexer_constraint(
     )
 
     # Helper mapping the levels to the output components
-    output_energy = {low: upp - low for low, upp in zip(levels[:-1], levels[1:])}
+    output_energy = {
+        low: upp - low for low, upp in zip(levels[:-1], levels[1:])
+    }
 
     # Define constraints on the input flows
     def constrain_output_flows(model, flow_level, timestep):
         expr = 0
 
         # Energy of the interval above the flow level
-        expr -= sum(weights[level, timestep] for level in levels if level > flow_level)
+        expr -= sum(
+            weights[level, timestep] for level in levels if level > flow_level
+        )
         expr *= output_energy.get(flow_level, 0)
 
         # Energy which is extracted in this timestep

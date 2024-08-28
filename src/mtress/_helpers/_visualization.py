@@ -61,7 +61,9 @@ def generate_graph(energysystem, label_extractor=None):
     return dot
 
 
-def render_series(plots: list[graphviz.Digraph], path: str, duration: int) -> None:
+def render_series(
+    plots: list[graphviz.Digraph], path: str, duration: int
+) -> None:
     """Generate a gif from a series of graphs."""
     images = []
     for i, plot in enumerate(plots):

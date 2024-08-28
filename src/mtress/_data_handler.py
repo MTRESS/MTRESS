@@ -7,6 +7,7 @@ import pandas as pd
 
 TimeseriesSpecifier = str | pd.Series | list | float
 
+
 class TimeseriesType(IntEnum):
     POINT = 0
     INTERVAL = 1
@@ -21,10 +22,8 @@ class DataHandler:
         self._cache: dict[pd.DataFrame] = {}
 
     def get_timeseries(
-            self,
-            specifier: TimeseriesSpecifier,
-            kind: TimeseriesType
-        ):
+        self, specifier: TimeseriesSpecifier, kind: TimeseriesType
+    ):
         """
         Prepare a time series for the usage in MTRESS.
 
@@ -66,7 +65,9 @@ class DataHandler:
                 return pd.Series(data=value, index=target_index)
 
             case _:
-                raise ValueError(f"Time series specifier {specifier} not supported")
+                raise ValueError(
+                    f"Time series specifier {specifier} not supported"
+                )
 
     def _read_from_file(self, file: str, column: str):
         """Read a column from a file."""
@@ -75,7 +76,9 @@ class DataHandler:
             return self._cache[file][column]
 
         if file.lower().endswith(".csv"):
-            self._cache[file] = data = pd.read_csv(file, index_col=0, parse_dates=True)
+            self._cache[file] = data = pd.read_csv(
+                file, index_col=0, parse_dates=True
+            )
             return data[column]
 
         if file.lower().endswith(".h5"):

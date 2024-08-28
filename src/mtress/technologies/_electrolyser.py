@@ -122,7 +122,9 @@ class AbstractElectrolyser(AbstractHeater):
         """Build core structure of oemof.solph representation."""
         super().build_core()
         # Electrical connection
-        self.electricity_carrier = self.location.get_carrier(ElectricityCarrier)
+        self.electricity_carrier = self.location.get_carrier(
+            ElectricityCarrier
+        )
         self.electrical_bus = self.electricity_carrier.distribution
 
         # Hydrogen connection
@@ -135,7 +137,9 @@ class AbstractElectrolyser(AbstractHeater):
         self.h2_bus = self.gas_carrier.inputs[HYDROGEN][self.pressure]
 
         # H2 output in kg at max load
-        self.full_load_h2_output = self.full_load_hydrogen_efficiency / HYDROGEN.LHV
+        self.full_load_h2_output = (
+            self.full_load_hydrogen_efficiency / HYDROGEN.LHV
+        )
 
 
 class Electrolyser(AbstractElectrolyser):
@@ -312,18 +316,22 @@ class OffsetElectrolyser(AbstractElectrolyser):
 
         min_load_h2_output = self.min_load_hydrogen_efficiency / HYDROGEN.LHV
 
-        slope_h2, offset_h2 = solph.components.slope_offset_from_nonconvex_input(
-            self.maximum_load,
-            self.minimum_load,
-            self.full_load_h2_output,
-            min_load_h2_output,
+        slope_h2, offset_h2 = (
+            solph.components.slope_offset_from_nonconvex_input(
+                self.maximum_load,
+                self.minimum_load,
+                self.full_load_h2_output,
+                min_load_h2_output,
+            )
         )
 
-        slope_th, offset_th = solph.components.slope_offset_from_nonconvex_input(
-            self.maximum_load,
-            self.minimum_load,
-            self.full_load_thermal_efficiency,
-            self.min_load_thermal_efficiency,
+        slope_th, offset_th = (
+            solph.components.slope_offset_from_nonconvex_input(
+                self.maximum_load,
+                self.minimum_load,
+                self.full_load_thermal_efficiency,
+                self.min_load_thermal_efficiency,
+            )
         )
 
         self.create_solph_node(

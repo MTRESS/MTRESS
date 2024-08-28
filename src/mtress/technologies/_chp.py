@@ -190,7 +190,8 @@ class CHP(AbstractHeater):
         # W(i) = Vol. fraction (i) * molar_mass(i)/ ∑(Vol. fraction (i) * molar_mass(i))
         # Calculate the denominator first
         denominator = sum(
-            vol_fraction * gas.molar_mass for gas, vol_fraction in self.gas_type.items()
+            vol_fraction * gas.molar_mass
+            for gas, vol_fraction in self.gas_type.items()
         )
         # Convert volume fractions to mass fractions in the gas_type dictionary
         self.gas_type = {
@@ -225,7 +226,9 @@ class CHP(AbstractHeater):
         )
 
         # Conversion factors for the converter
-        conversion = {gas_bus[gas]: share for gas, share in self.gas_type.items()}
+        conversion = {
+            gas_bus[gas]: share for gas, share in self.gas_type.items()
+        }
         conversion.update(
             {
                 self.heat_bus: heat_output,

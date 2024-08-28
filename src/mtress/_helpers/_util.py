@@ -111,14 +111,18 @@ def enable_templating(template_class):
     """Decorate a function to accept a dataclass as a template."""
 
     def _decorator(func):
-        param_names = [field.name for field in dataclasses.fields(template_class)]
+        param_names = [
+            field.name for field in dataclasses.fields(template_class)
+        ]
         func_signature = inspect.signature(func)
         func_params = func_signature.parameters
 
         def _wrapper(*args, template=None, **kwargs):
             if template is not None:
                 if not isinstance(template, template_class):
-                    raise TypeError(f"template should be of type {template_class}")
+                    raise TypeError(
+                        f"template should be of type {template_class}"
+                    )
 
                 for param in param_names:
                     if param not in kwargs and param in func_params:
