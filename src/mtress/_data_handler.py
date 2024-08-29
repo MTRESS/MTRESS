@@ -47,9 +47,12 @@ class DataHandler:
                 if isinstance(series.index, pd.DatetimeIndex):
                     matching_index = target_index.isin(series.index)
                     if not matching_index.all():
+                        np.array(matching_index)
+                        flipped_array = np.logical_not(matching_index)
+                        flipped_list = flipped_array.tolist()
                         raise KeyError(
                             "Provided series doesn't cover time index: "
-                            + f"{list(self.timeindex[not matching_index])}"
+                            + f"{list(self.timeindex[flipped_list])}"
                         )
                     return series.reindex(target_index)
                 else:
