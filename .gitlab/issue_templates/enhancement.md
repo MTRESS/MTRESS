@@ -20,7 +20,7 @@
 
 ## Example
 
-<!-- Please the new functionality using code or pseudo-code. -->
+<!-- Please describe the new functionality using code or pseudo-code. -->
 
 ```
 # insert your code below this line
