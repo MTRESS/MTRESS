@@ -7,7 +7,14 @@ import os
 import pandas as pd
 from oemof.solph.processing import results
 
-from mtress import Location, MetaModel, SolphModel, carriers, demands, technologies
+from mtress import (
+    Location,
+    MetaModel,
+    SolphModel,
+    carriers,
+    demands,
+    technologies,
+)
 from mtress._helpers import get_flows
 from mtress.physics import HYDROGEN
 from mtress.technologies import PEM_ELECTROLYSER
@@ -20,7 +27,9 @@ house_1 = Location(name="house_1")
 energy_system.add_location(house_1)
 
 house_1.add(carriers.ElectricityCarrier())
-house_1.add(technologies.ElectricityGridConnection(working_rate=None, revenue=0.0001))
+house_1.add(
+    technologies.ElectricityGridConnection(working_rate=None, revenue=0.0001)
+)
 
 weather = {
     "ghi": "FILE:../weather.csv:ghi",
@@ -80,7 +89,9 @@ house_1.add(
 house_2 = Location(name="house_2")
 energy_system.add_location(house_2)
 house_2.add(carriers.ElectricityCarrier())
-house_2.add(technologies.ElectricityGridConnection(working_rate=0.25, revenue=None))
+house_2.add(
+    technologies.ElectricityGridConnection(working_rate=0.25, revenue=None)
+)
 house_2.add(demands.Electricity(name="demand0", time_series=500))
 
 solph_representation = SolphModel(
@@ -94,7 +105,9 @@ solph_representation = SolphModel(
 )
 
 # Far from optimal, but currently only works on the existing solph model
-house_1.connect(connection=technologies.ElectricityGridConnection, destination=house_2)
+house_1.connect(
+    connection=technologies.ElectricityGridConnection, destination=house_2
+)
 
 solph_representation.build_solph_model()
 
@@ -113,4 +126,6 @@ results = pd.DataFrame(flows)
 plot = solph_representation.graph(detail=True, flow_results=flows)
 plot.render(outfile="conn_pv_results.png")
 
-solved_model.write("electricity_pv.lp", io_options={"symbolic_solver_labels": True})
+solved_model.write(
+    "electricity_pv.lp", io_options={"symbolic_solver_labels": True}
+)

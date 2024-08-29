@@ -1,9 +1,16 @@
-import imageio
 import os
+
 import pandas as pd
 from oemof.solph.processing import results
 
-from mtress import Location, MetaModel, SolphModel, carriers, demands, technologies
+from mtress import (
+    Location,
+    MetaModel,
+    SolphModel,
+    carriers,
+    demands,
+    technologies,
+)
 from mtress._helpers import get_flows
 from mtress._helpers._visualization import render_series
 

@@ -3,8 +3,10 @@
 Tests for the MTRESS heat carrier.
 """
 
-import pytest
 import math
+
+import pytest
+
 from mtress.carriers import HeatCarrier
 
 

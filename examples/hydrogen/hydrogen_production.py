@@ -4,7 +4,14 @@ import os
 
 from oemof.solph.processing import results
 
-from mtress import Location, MetaModel, SolphModel, carriers, demands, technologies
+from mtress import (
+    Location,
+    MetaModel,
+    SolphModel,
+    carriers,
+    demands,
+    technologies,
+)
 from mtress._helpers import get_flows
 from mtress.physics import HYDROGEN
 from mtress.technologies import ALKALINE_ELECTROLYSER
@@ -123,7 +130,9 @@ house_1.add(
 )
 
 house_1.add(
-    technologies.GasCompressor(name="H2Compr", nominal_power=5e4, gas_type=HYDROGEN)
+    technologies.GasCompressor(
+        name="H2Compr", nominal_power=5e4, gas_type=HYDROGEN
+    )
 )
 
 solph_representation = SolphModel(
@@ -149,7 +158,9 @@ solved_model = solph_representation.solve(solve_kwargs={"tee": True})
 myresults = results(solved_model)
 flows = get_flows(myresults)
 
-plot = solph_representation.graph(detail=True, flow_results=flows, flow_color=None)
+plot = solph_representation.graph(
+    detail=True, flow_results=flows, flow_color=None
+)
 plot.render(outfile="hydrogen_production_results.png")
 
 solved_model.write(

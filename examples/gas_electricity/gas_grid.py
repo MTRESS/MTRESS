@@ -8,9 +8,16 @@ import os
 
 from oemof.solph.processing import results
 
-from mtress import Location, MetaModel, SolphModel, carriers, demands, technologies
-from mtress.physics import HYDROGEN, NATURAL_GAS
-from mtress.technologies import HYDROGEN_CHP, HYDROGEN_MIXED_CHP
+from mtress import (
+    Location,
+    MetaModel,
+    SolphModel,
+    carriers,
+    demands,
+    technologies,
+)
+from mtress.physics import HYDROGEN
+from mtress.technologies import HYDROGEN_CHP
 
 LOGGER = logging.getLogger(__file__)
 from mtress._helpers import get_flows
@@ -100,7 +107,9 @@ house_2.add(
 )
 
 house_2.add(
-    demands.GasDemand(name="H2_demand", gas_type=HYDROGEN, time_series=1, pressure=30)
+    demands.GasDemand(
+        name="H2_demand", gas_type=HYDROGEN, time_series=1, pressure=30
+    )
 )
 
 solph_representation = SolphModel(

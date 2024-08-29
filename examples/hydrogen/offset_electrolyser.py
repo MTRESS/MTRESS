@@ -6,7 +6,14 @@ import os
 import pandas as pd
 from oemof.solph.processing import results
 
-from mtress import Location, MetaModel, SolphModel, carriers, demands, technologies
+from mtress import (
+    Location,
+    MetaModel,
+    SolphModel,
+    carriers,
+    demands,
+    technologies,
+)
 from mtress.physics import HYDROGEN
 from mtress.technologies import PEM_ELECTROLYSER
 

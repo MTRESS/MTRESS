@@ -8,7 +8,14 @@ import os
 
 from oemof.solph.processing import results
 
-from mtress import Location, MetaModel, SolphModel, carriers, demands, technologies
+from mtress import (
+    Location,
+    MetaModel,
+    SolphModel,
+    carriers,
+    demands,
+    technologies,
+)
 from mtress.physics import HYDROGEN, NATURAL_GAS
 from mtress.technologies import HYDROGEN_MIXED_CHP
 
@@ -116,7 +123,9 @@ logging.info("Optimise the energy system")
 myresults = results(solved_model)
 flows = get_flows(myresults)
 
-plot = solph_representation.graph(detail=True, flow_results=flows, flow_color=None)
+plot = solph_representation.graph(
+    detail=True, flow_results=flows, flow_color=None
+)
 plot.render(outfile="gas_plant_results.png")
 
 solved_model.write("gas_plant.lp", io_options={"symbolic_solver_labels": True})
