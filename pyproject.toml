@@ -56,3 +56,7 @@ target-version = "py310"
 
 # Same as for core python (and oemof.solph)
 line-length = 79
+
+[tool.black]
+# needs to align with ruff
+line-length = 79
