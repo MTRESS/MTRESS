@@ -15,7 +15,9 @@ def test_gas_grid_initialisation():
         working_rate=gas_working_rate,
     )
 
-    assert gas_grid.name == 'GasGridConnection' # TODO: gas_grid.name == gas_grid_name
+    assert (
+        gas_grid.name == "GasGridConnection"
+    )  # TODO: gas_grid.name == gas_grid_name
     assert gas_grid.gas_type == gas_type
     assert gas_grid.grid_pressure == gas_grid_pressure
     assert gas_grid.working_rate == gas_working_rate
