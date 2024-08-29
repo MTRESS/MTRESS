@@ -64,4 +64,3 @@ target-version = "py310"
 
 # Same as Black setting above.
 line-length = 79
-indent-width = 4
