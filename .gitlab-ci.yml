@@ -40,15 +40,15 @@ pytest:
     - pip install pytest pytest-cov
     - python -m pytest --cov=mtress tests
     - coverage report
-    - coverage xml
+    - coverage html
   coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
   artifacts:
     paths:
-      - coverage.xml
+      - coverage.html
     reports:
       coverage_report:
         coverage_format: cobertura
-        path: coverage.xml
+        path: coverage.html
 
   allow_failure: false
 
