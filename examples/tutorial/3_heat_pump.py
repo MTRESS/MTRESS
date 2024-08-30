@@ -1,9 +1,18 @@
 import os
+
 import pandas as pd
 from oemof.solph.processing import results
 
-from mtress import Location, MetaModel, SolphModel, carriers, demands, technologies
+from mtress import (
+    Location,
+    MetaModel,
+    SolphModel,
+    carriers,
+    demands,
+    technologies,
+)
 from mtress._helpers import get_flows
+from mtress._helpers._visualization import render_series
 
 os.chdir(os.path.dirname(__file__))
 
@@ -51,7 +60,7 @@ house_1.add(
         name="Cooling_demand",
         max_flow_temperature=5,
         return_temperature=10,
-        time_series=[50, 50],
+        time_series=[50, 50, 40, 25],
     )
 )
 
@@ -60,7 +69,7 @@ house_1.add(
         name="Heating_demand",
         min_flow_temperature=30,
         return_temperature=20,
-        time_series=[50, 50],
+        time_series=[50, 50, 30, 40],
     )
 )
 
@@ -69,7 +78,7 @@ solph_representation = SolphModel(
     energy_system,
     timeindex={
         "start": "2021-07-10 00:00:00",
-        "end": "2021-07-10 02:00:00",
+        "end": "2021-07-10 04:00:00",
         "freq": "60T",
     },
 )
@@ -99,3 +108,13 @@ plot = solph_representation.graph(
     detail=True, flow_results=flows, flow_color=flow_color
 )
 plot.render(outfile="heat_pump_cooling_results.png")
+
+
+plot_series = solph_representation.graph_series(
+    flow_results=flows,
+    # start=pd.Timestamp("2021-07-10 00:00:00"),
+    # stop=pd.Timestamp("2021-07-10 03:00:00"),
+    step=pd.Timedelta("60min"),
+    flow_color=flow_color,
+)
+render_series(plot_series, "heat_pump_cooling_series", 2500)

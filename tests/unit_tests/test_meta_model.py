@@ -3,13 +3,12 @@
 Tests for the bare MTRESS meta model.
 """
 
-import pytest
-
 from typing import Iterable
 
+import pytest
+
 from mtress import Connection, Location, MetaModel
-from mtress.carriers import ElectricityCarrier
-from mtress.carriers import HeatCarrier
+from mtress.carriers import ElectricityCarrier, HeatCarrier
 
 
 def test_minimal_initialisation():
@@ -56,11 +55,17 @@ def test_adding_connections():
 
     connections = list(meta_model.connections)
     assert len(connections) == 1
-    assert Connection(house_1, house_2, ElectricityCarrier) in meta_model.connections
+    assert (
+        Connection(house_1, house_2, ElectricityCarrier)
+        in meta_model.connections
+    )
 
     meta_model.add(house_3)
     meta_model.add(Connection(house_2, house_3, HeatCarrier))
     connections = list(meta_model.connections)
     assert len(connections) == 2
-    assert Connection(house_1, house_2, ElectricityCarrier) in meta_model.connections
+    assert (
+        Connection(house_1, house_2, ElectricityCarrier)
+        in meta_model.connections
+    )
     assert Connection(house_2, house_3, HeatCarrier) in meta_model.connections

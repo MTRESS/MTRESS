@@ -56,11 +56,6 @@ to perform the actual optimisation. Please refer to the
 [documentation of solph](https://oemof-solph.readthedocs.io/en/stable/readme.html#installing-a-solver)
 to learn how to install a solver.
 
-Install all the other dependencies:
-```bash 
-pip install -r requirements.txt
-``` 
-
 ## Documentation
 
 The auto-generated documentation can be found on the [GitLab pages](https://mtress-ecosystem.pages.gitlab.dlr.de/mtress).
@@ -84,7 +79,8 @@ Ministry of Education and Research (BMBF) of Germany in the project [H2Giga-Syst
 
 ## Contributing
 
-You are welcome to contribute to MTRESS. We use [Black code style](https://black.readthedocs.io/),
+You are welcome to contribute to MTRESS. We use
+[Black code style](https://black.readthedocs.io/) with 79 characters a line,
 and put our code under [MIT license](LICENSE). When contributing, you need to do the same.
 For smaller changes, you can just open a merge request. If you plan something bigger,
 please open an issue first, so that we can discuss beforehand and avoid double work. 

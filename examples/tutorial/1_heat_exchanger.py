@@ -2,7 +2,14 @@ import os
 
 from oemof.solph.processing import results
 
-from mtress import Location, MetaModel, SolphModel, carriers, demands, technologies
+from mtress import (
+    Location,
+    MetaModel,
+    SolphModel,
+    carriers,
+    demands,
+    technologies,
+)
 from mtress._helpers import get_flows
 
 os.chdir(os.path.dirname(__file__))
@@ -15,7 +22,11 @@ energy_system.add_location(house_1)
 # Add carriers
 house_1.add(
     carriers.HeatCarrier(
-        temperature_levels=[10, 20, 30],  # Introduce relevant temperature levels
+        temperature_levels=[
+            10,
+            20,
+            30,
+        ],  # Introduce relevant temperature levels
         reference_temperature=0,  # Energy content is equal to zero
     )
 )

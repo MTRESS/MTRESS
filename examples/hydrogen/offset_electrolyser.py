@@ -6,12 +6,20 @@ import os
 import pandas as pd
 from oemof.solph.processing import results
 
-from mtress import Location, MetaModel, SolphModel, carriers, demands, technologies
+from mtress import (
+    Location,
+    MetaModel,
+    SolphModel,
+    carriers,
+    demands,
+    technologies,
+)
 from mtress.physics import HYDROGEN
 from mtress.technologies import PEM_ELECTROLYSER
 
-LOGGER = logging.getLogger(__file__)
 from mtress._helpers import get_flows
+
+LOGGER = logging.getLogger(__file__)
 
 energy_system = MetaModel()
 
