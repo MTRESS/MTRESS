@@ -6,7 +6,14 @@ import os
 
 from oemof.solph.processing import results
 
-from mtress import Location, MetaModel, SolphModel, carriers, demands, technologies
+from mtress import (
+    Location,
+    MetaModel,
+    SolphModel,
+    carriers,
+    demands,
+    technologies,
+)
 from mtress._helpers import get_flows
 from mtress.physics import NATURAL_GAS
 

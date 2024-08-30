@@ -1,5 +1,5 @@
-from mtress.technologies import H2Storage
 from mtress.physics import HYDROGEN, calc_hydrogen_density
+from mtress.technologies import H2Storage
 from mtress.technologies._abstract_homogenous_storage import Implementation
 
 
@@ -28,4 +28,3 @@ def test_h2_storage():
     assert storage.calc_density(pressure=pressure) == calc_hydrogen_density(
         pressure=pressure
     )
-
