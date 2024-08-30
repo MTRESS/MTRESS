@@ -51,8 +51,6 @@ pytest:
 pages:
   extends: .base_environment
   stage: build
-  dependencies:
-    - test:pytest
   script:
     - pip install pdoc
     - pdoc mtress -o ./public
