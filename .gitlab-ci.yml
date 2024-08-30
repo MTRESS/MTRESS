@@ -45,10 +45,6 @@ pytest:
   artifacts:
     paths:
       - htmlcov/
-    reports:
-      coverage_report:
-        coverage_format: cobertura
-        path: htmlcov/
 
   allow_failure: false
 
