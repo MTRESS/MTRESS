@@ -51,11 +51,14 @@ pytest:
 pages:
   extends: .base_environment
   stage: build
+  dependencies:
+    - test
   script:
     - pip install pdoc
     - pdoc mtress -o ./public
+    - mv htmlcov/ public/
   artifacts:
     paths:
-      - public
+      - public/
 #  rules:
 #    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
