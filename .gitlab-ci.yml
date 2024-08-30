@@ -21,8 +21,8 @@ cache:
 # Make the default stages explicit
 stages:
   - linting
-  - build
   - test
+  - build
   - deploy
 
 ruff:
@@ -51,7 +51,7 @@ pytest:
 pages:
   extends: .base_environment
   stage: build
-  needs: ["test"]
+  needs: ["pytest"]
   script:
     - pip install pdoc
     - pdoc mtress -o ./public
