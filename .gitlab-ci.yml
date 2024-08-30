@@ -44,11 +44,11 @@ pytest:
   coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
   artifacts:
     paths:
-      - coverage.html
+      - htmlcov/
     reports:
       coverage_report:
         coverage_format: cobertura
-        path: coverage.html
+        path: htmlcov/
 
   allow_failure: false
 
