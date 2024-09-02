@@ -12,7 +12,7 @@ from ._meta_model import Connection, MetaModel
 from ._solph_model import SolphModel
 
 """
-.. include:: ../README.md
+.. include:: ../../README.md
 """
 
 __version__ = "3.0.0a2"
