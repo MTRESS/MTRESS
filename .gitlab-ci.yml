@@ -54,8 +54,8 @@ pages:
   needs: ["pytest"]
   script:
     - pip install pdoc
-    - pdoc mtress -o ./public/doc/
-    - mv htmlcov/ public/cov/
+    - pdoc mtress -o ./public/
+    - mv htmlcov/ public/coverage/
   artifacts:
     paths:
       - public/

@@ -59,6 +59,7 @@ to learn how to install a solver.
 ## Documentation
 
 The auto-generated documentation can be found on the [GitLab pages](https://mtress-ecosystem.pages.gitlab.dlr.de/mtress).
+The coverage report can be found on the [GitLab pages](https://mtress-ecosystem.pages.gitlab.dlr.de/mtress/coverage) as well.
 
 ## Usage and Tutorials
 Please refer to the examples folder in this repository to get acquainted with building 

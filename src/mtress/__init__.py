@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+"""
+.. include:: ../README.md
+"""
 
 """
 SPDX-FileCopyrightText: Deutsches Zentrum für Luft und Raumfahrt
