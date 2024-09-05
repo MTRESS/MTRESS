@@ -55,6 +55,7 @@ pages:
   script:
     - pip install pdoc
     - pdoc src/mtress -o ./public/api/
+    - pdoc src/doc -o ./public/
     - mv htmlcov/ public/coverage/
   artifacts:
     paths:
