@@ -1,7 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-.. include:: ../../README.md
-"""
 
 from ._abstract_component import SolphLabel
 from ._location import Location
