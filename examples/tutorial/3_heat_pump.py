@@ -38,7 +38,7 @@ house_1.add(
         name="Air_HE",
         reservoir_temperature=20,
         maximum_working_temperature=40,
-        minimum_working_temperature=10,
+        minimum_working_temperature=5,
         nominal_power=1e4,
     )
 )
@@ -67,8 +67,8 @@ house_1.add(
 house_1.add(
     demands.FixedTemperatureHeating(
         name="Heating_demand",
-        min_flow_temperature=30,
-        return_temperature=20,
+        min_flow_temperature=40,
+        return_temperature=30,
         time_series=[50, 50, 30, 40],
     )
 )
@@ -108,7 +108,6 @@ plot = solph_representation.graph(
     detail=True, flow_results=flows, flow_color=flow_color
 )
 plot.render(outfile="heat_pump_cooling_results.png")
-
 
 plot_series = solph_representation.graph_series(
     flow_results=flows,
