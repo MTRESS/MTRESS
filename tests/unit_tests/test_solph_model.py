@@ -4,7 +4,8 @@ Tests for the MTRESS solph model.
 """
 
 import datetime
-import json
+
+# import json
 
 import pandas as pd
 import pytest
@@ -15,7 +16,7 @@ from mtress import (
     MetaModel,
     SolphModel,
     carriers,
-    demands,
+    # demands,
 )
 from mtress.technologies.grid_connection import ElectricityGridConnection
 
