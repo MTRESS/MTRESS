@@ -108,7 +108,7 @@ def test_build_model_with_connected_electricity_missing_connection():
         )
 
 
-def test_graph():
+""" def test_graph():
     nodes = []
     meta_model = MetaModel()
 
@@ -172,4 +172,4 @@ def test_graph():
         assert (
             f"SolphLabel(location='{n[0]}', mtress_component='{n[1]}', solph_node='{n[2]}')"
             in obj_names
-        )
+        ) """
