@@ -5,7 +5,7 @@ Tests for the MTRESS solph model.
 
 import datetime
 
-# import json
+import json
 
 import pandas as pd
 import pytest
@@ -16,7 +16,7 @@ from mtress import (
     MetaModel,
     SolphModel,
     carriers,
-    # demands,
+    demands,
 )
 from mtress.technologies.grid_connection import ElectricityGridConnection
 
@@ -109,7 +109,7 @@ def test_build_model_with_connected_electricity_missing_connection():
         )
 
 
-""" def test_graph():
+def test_graph():
     nodes = []
     meta_model = MetaModel()
 
@@ -173,4 +173,4 @@ def test_build_model_with_connected_electricity_missing_connection():
         assert (
             f"SolphLabel(location='{n[0]}', mtress_component='{n[1]}', solph_node='{n[2]}')"
             in obj_names
-        ) """
+        )
