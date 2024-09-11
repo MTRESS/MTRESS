@@ -8,6 +8,7 @@ import datetime
 import json
 
 import pandas as pd
+from oemof.solph.processing import results
 import pytest
 
 from mtress import (
@@ -17,8 +18,10 @@ from mtress import (
     SolphModel,
     carriers,
     demands,
+    technologies,
 )
 from mtress.technologies.grid_connection import ElectricityGridConnection
+from mtress._helpers import get_flows
 
 
 def test_minimal_initialisation_with_date_range():
@@ -109,12 +112,71 @@ def test_build_model_with_connected_electricity_missing_connection():
         )
 
 
-def test_graph():
+def test_graph_simple():
     nodes = []
     meta_model = MetaModel()
 
-    name = "house_1"
-    house_1 = Location(name=name)
+    house_1 = Location(name="house_1")
+    meta_model.add_location(house_1)
+
+    carrier0 = carriers.ElectricityCarrier()
+    nodes.append(("house_1", "ElectricityCarrier"))
+
+    carrier1 = carriers.HeatCarrier(
+        temperature_levels=[10, 20, 30],
+        reference_temperature=0,
+    )
+    nodes.append(
+        (
+            "house_1",
+            "HeatCarrier",
+        )
+    )
+
+    demand1 = demands.Electricity(name="demand1", time_series=[0, 1, 2])
+    nodes.append(("house_1", "demand1"))
+
+    demand2 = demands.FixedTemperatureHeating(
+        name="demand2",
+        min_flow_temperature=20,
+        return_temperature=10,
+        time_series=[1, 2, 3],
+    )
+    nodes.append(("house_1", "demand2"))
+
+    house_1.add(carrier0)
+    house_1.add(carrier1)
+    house_1.add(demand1)
+    house_1.add(demand2)
+
+    solph_representation = SolphModel(
+        meta_model,
+        timeindex={
+            "start": "2021-07-10 00:00:00",
+            "end": "2021-07-10 03:00:00",
+            "freq": "60T",
+        },
+    )
+
+    solph_representation.build_solph_model()
+
+    plot = solph_representation.graph(detail=False)
+
+    plot_json_string = plot.pipe("json").decode()
+    plot_json_dict = json.loads(plot_json_string)
+
+    assert plot_json_dict["name"] == "MTRESS model"
+
+    obj_names = [obj["name"] for obj in plot_json_dict["objects"]]
+    for n in nodes:
+        assert f"['{n[0]}', '{n[1]}']" in obj_names
+
+
+def test_graph_detail():
+    nodes = []
+    meta_model = MetaModel()
+
+    house_1 = Location(name="house_1")
     meta_model.add_location(house_1)
 
     carrier0 = carriers.ElectricityCarrier()
@@ -165,6 +227,8 @@ def test_graph():
 
     plot_json_string = plot.pipe("json").decode()
     plot_json_dict = json.loads(plot_json_string)
+
+    print(plot_json_dict)
 
     assert plot_json_dict["name"] == "MTRESS model"
 
