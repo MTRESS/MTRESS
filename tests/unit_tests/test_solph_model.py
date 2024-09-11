@@ -8,7 +8,6 @@ import datetime
 import json
 
 import pandas as pd
-from oemof.solph.processing import results
 import pytest
 
 from mtress import (
@@ -21,7 +20,6 @@ from mtress import (
     technologies,
 )
 from mtress.technologies.grid_connection import ElectricityGridConnection
-from mtress._helpers import get_flows
 
 
 def test_minimal_initialisation_with_date_range():
