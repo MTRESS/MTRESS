@@ -17,7 +17,6 @@ from mtress import (
     SolphModel,
     carriers,
     demands,
-    technologies,
 )
 from mtress.technologies.grid_connection import ElectricityGridConnection
 
