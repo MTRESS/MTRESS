@@ -99,17 +99,23 @@ def lorenz_cop(temp_low, temp_high):
     return temp_high / np.maximum(temp_high - temp_low, 1e-3)
 
 
+# TODO: temperature units should be the same
+
 def calc_cop(
     temp_primary_in,
     temp_secondary_out,
     temp_primary_out=None,
     temp_secondary_in=None,
-    cop_0_35=4.6,
+    ref_cop=4.6,
+    ref_temp_source_high=0,
+    ref_temp_source_low=-5,
+    ref_temp_sink_high=35,
+    ref_temp_sink_low=30
 ):
     """
     :param temp_input: Higher Temperature of the source (in K)
     :param temp_highput: Flow Temperature of the heating system (in K)
-    :param cop_0_35: COP for B0/W35
+    :param ref_cop: COP for B0/W35
     :return: Scaled COP for the given temperatures
     """
     if temp_primary_out is None or temp_primary_out == temp_primary_in:
@@ -126,15 +132,16 @@ def calc_cop(
             temp_high=temp_secondary_out, temp_low=temp_secondary_in
         )
 
-    cpf = cop_0_35 / lorenz_cop(
+    # intermediate step: cop_design/lorenz_design
+    cpf = ref_cop / lorenz_cop(
         temp_low=logarithmic_mean_temperature(
-            temp_high=celsius_to_kelvin(0), temp_low=celsius_to_kelvin(-5)
+            temp_high=celsius_to_kelvin(ref_temp_source_high), temp_low=celsius_to_kelvin(ref_temp_source_low)
         ),
         temp_high=logarithmic_mean_temperature(
-            temp_high=celsius_to_kelvin(35), temp_low=celsius_to_kelvin(30)
+            temp_high=celsius_to_kelvin(ref_temp_sink_high), temp_low=celsius_to_kelvin(ref_temp_sink_low)
         ),
     )
-
+    # cop = cop_design * (lorenz_real/lorenz_design)
     cop = cpf * lorenz_cop(temp_low=temp_low, temp_high=temp_high)
 
     return cop
