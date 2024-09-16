@@ -3,6 +3,7 @@
 Tests for coefficient of performance calculations.
 """
 import math
+import pytest
 from src.mtress.physics._helper_functions import lorenz_cop
 from src.mtress.physics._helper_functions import logarithmic_mean_temperature
 from src.mtress.physics._helper_functions import calc_cop
@@ -71,11 +72,33 @@ class TestCOP:
             lmt_high = logarithmic_mean_temperature(temp_high=t_sink_high, temp_low=t_sink_low)
             cop_lorenz = lorenz_cop(temp_high=lmt_high, temp_low=lmt_low)
             assert math.isclose(cop_lorenz, cop_lorenz_true, abs_tol=5e-3)
-            
-        
-    # TODO: test the near zero value
     
-    # TODO: test negative temperatures in Kelvin
+    def test_log_mean_temperature_negative_inputs(self):
+        
+        # negative low temperature
+        with pytest.raises(ValueError):
+            _ = logarithmic_mean_temperature(273.15+90, -1)
+                
+        # negative high temperature
+        with pytest.raises(ValueError):
+            _ = logarithmic_mean_temperature(-1, 273.15+60)
+        
+    def test_theoretical_cop_negative_inputs(self):
+        
+        # negative low temperature
+        with pytest.raises(ValueError):
+            _ = lorenz_cop(30, -1)
+                
+        # negative high temperature
+        with pytest.raises(ValueError):
+            _ = lorenz_cop(-1, 30)
+            
+    
+    def test_lorenz_cop_division_by_zero(self):
+        
+        cop_lorenz = lorenz_cop(5, 5)     
+        cop_lorenz_true = 5/1e-3
+        assert math.isclose(cop_lorenz, cop_lorenz_true, abs_tol=5e-3)
         
     def test_theoretical_cop_pinch(self):
         
@@ -130,54 +153,54 @@ class TestCOP:
         
         # source: 40 to 15 ºC
         # sink: 60 to 90 ºC
-        t_source_low = 15
-        t_source_high = 40
-        t_sink_low = 60
-        t_sink_high = 90
+        t_source_low = 15+273.15
+        t_source_high = 40+273.15
+        t_sink_low = 60+273.15
+        t_sink_high = 90+273.15
         cop = 5
         
         # test same cop
         new_cop = calc_cop(
-            temp_primary_in=t_source_low+273.15, 
-            temp_secondary_out=t_sink_high+273.15,
-            temp_primary_out=t_source_high+273.15,
-            temp_secondary_in=t_sink_low+273.15,
+            temp_primary_in=t_source_low, 
+            temp_secondary_out=t_sink_high,
+            temp_primary_out=t_source_high,
+            temp_secondary_in=t_sink_low,
             ref_cop=cop,
-            ref_temp_sink_high=t_sink_high,
-            ref_temp_sink_low=t_sink_low,
-            ref_temp_source_high=t_source_high,
-            ref_temp_source_low=t_source_low
+            ref_temp_primary_in=t_source_low, 
+            ref_temp_secondary_out=t_sink_high,
+            ref_temp_primary_out=t_source_high,
+            ref_temp_secondary_in=t_sink_low,
             )
         assert math.isclose(new_cop, cop, abs_tol=1e-3)
         
         # test higher lift
         additional_lift = 10
         new_cop = calc_cop(
-            temp_primary_in=t_source_low+273.15, 
-            temp_secondary_out=t_sink_high+273.15+additional_lift,
-            temp_primary_out=t_source_high+273.15,
-            temp_secondary_in=t_sink_low+273.15,
+            temp_primary_in=t_source_low, 
+            temp_secondary_out=t_sink_high+additional_lift,
+            temp_primary_out=t_source_high,
+            temp_secondary_in=t_sink_low,
             ref_cop=cop,
-            ref_temp_sink_high=t_sink_high,
-            ref_temp_sink_low=t_sink_low,
-            ref_temp_source_high=t_source_high,
-            ref_temp_source_low=t_source_low
+            ref_temp_primary_in=t_source_low, 
+            ref_temp_secondary_out=t_sink_high,
+            ref_temp_primary_out=t_source_high,
+            ref_temp_secondary_in=t_sink_low,
             )
         true_cop = 4.6
         assert math.isclose(new_cop, true_cop, abs_tol=1e-3)
         
         # test lower lift
-        additional_lift =- 10
+        additional_lift = -10
         new_cop = calc_cop(
-            temp_primary_in=t_source_low+273.15, 
-            temp_secondary_out=t_sink_high+273.15+additional_lift,
-            temp_primary_out=t_source_high+273.15,
-            temp_secondary_in=t_sink_low+273.15,
+            temp_primary_in=t_source_low, 
+            temp_secondary_out=t_sink_high+additional_lift,
+            temp_primary_out=t_source_high,
+            temp_secondary_in=t_sink_low,
             ref_cop=cop,
-            ref_temp_sink_high=t_sink_high,
-            ref_temp_sink_low=t_sink_low,
-            ref_temp_source_high=t_source_high,
-            ref_temp_source_low=t_source_low
+            ref_temp_primary_in=t_source_low, 
+            ref_temp_secondary_out=t_sink_high,
+            ref_temp_primary_out=t_source_high,
+            ref_temp_secondary_in=t_sink_low,
             )
         true_cop = 5.495
         assert math.isclose(new_cop, true_cop, abs_tol=1e-3)

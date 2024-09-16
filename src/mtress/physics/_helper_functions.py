@@ -81,6 +81,8 @@ def logarithmic_mean_temperature(temp_high, temp_low):
     :param t_low: Low Temperature (in K)
     :return: Logarithmic Mean Temperature Difference (in K)
     """
+    if temp_high < 0 or temp_low < 0:
+        raise ValueError('Temperatures in Kelvin cannot be negative.')
     return (temp_low - temp_high) / np.log(temp_low / temp_high)
 
 
@@ -92,14 +94,13 @@ def lorenz_cop(temp_low, temp_high):
     (Lorenz, H, 1895. Die Ermittlung der Grenzwerte der
     thermodynamischen Energieumwandlung. Zeitschrift für
     die gesammte Kälte-Industrie, 2(1-3, 6-12).)
-    :param temp_low: Inlet Temperature (in K?)
-    :param temp_high: Outlet Temperature (in K?)
+    :param temp_low: Inlet Temperature (in K)
+    :param temp_high: Outlet Temperature (in K)
     :return: Ideal COP
     """
+    if temp_high < 0 or temp_low < 0:
+        raise ValueError('Temperatures in Kelvin cannot be negative.')
     return temp_high / np.maximum(temp_high - temp_low, 1e-3)
-
-
-# TODO: temperature units should be the same
 
 def calc_cop(
     temp_primary_in,
@@ -107,15 +108,21 @@ def calc_cop(
     temp_primary_out=None,
     temp_secondary_in=None,
     ref_cop=4.6,
-    ref_temp_source_high=0,
-    ref_temp_source_low=-5,
-    ref_temp_sink_high=35,
-    ref_temp_sink_low=30
+    ref_temp_primary_in=0+273.15,
+    ref_temp_primary_out=-5+273.15,
+    ref_temp_secondary_out=35+273.15,
+    ref_temp_secondary_in=30+273.15
 ):
     """
-    :param temp_input: Higher Temperature of the source (in K)
-    :param temp_highput: Flow Temperature of the heating system (in K)
-    :param ref_cop: COP for B0/W35
+    :param temp_primary_in: Inlet temperature in the primary side (in K)
+    :param temp_secondary_out: Outlet temperature in the secondary side (in K)
+    :param temp_primary_out: Outlet temperature in the primary side (in K)
+    :param temp_secondary_in: Inlet temperature in the secondary side (in K)
+    :param ref_cop: COP for reference conditions    
+    :param ref_temp_primary_in: Reference inlet temperature in the primary side (in K)
+    :param ref_temp_primary_out: Reference outlet temperature in the primary side (in K)
+    :param ref_temp_secondary_out: Reference outlet temperature in the secondary side (in K)
+    :param ref_temp_secondary_in: Reference inlet temperature in the secondary side (in K)
     :return: Scaled COP for the given temperatures
     """
     if temp_primary_out is None or temp_primary_out == temp_primary_in:
@@ -135,10 +142,10 @@ def calc_cop(
     # intermediate step: cop_design/lorenz_design
     cpf = ref_cop / lorenz_cop(
         temp_low=logarithmic_mean_temperature(
-            temp_high=celsius_to_kelvin(ref_temp_source_high), temp_low=celsius_to_kelvin(ref_temp_source_low)
+            temp_high=ref_temp_primary_in, temp_low=ref_temp_primary_out
         ),
         temp_high=logarithmic_mean_temperature(
-            temp_high=celsius_to_kelvin(ref_temp_sink_high), temp_low=celsius_to_kelvin(ref_temp_sink_low)
+            temp_high=ref_temp_secondary_out, temp_low=ref_temp_secondary_in
         ),
     )
     # cop = cop_design * (lorenz_real/lorenz_design)
