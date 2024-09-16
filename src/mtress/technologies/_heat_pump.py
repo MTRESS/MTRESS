@@ -42,10 +42,10 @@ class HeatPump(AbstractTechnology, AbstractSolphRepresentation):
         electrical_power_limit: float = None,
         thermal_power_limit: float = None,
         ref_cop: float = 4.6,
-        ref_temp_source_high: float = 0,
-        ref_temp_source_low: float = -5,
-        ref_temp_sink_high: float = 35,
-        ref_temp_sink_low: float = 30,
+        ref_temp_primary_in: float = 0,
+        ref_temp_primary_out: float = -5,
+        ref_temp_secondary_out: float = 35,
+        ref_temp_secondary_in: float = 30,
         max_temp_primary: float = None,
         min_temp_primary: float = None,
         min_delta_temp_primary: float = 5.0,
@@ -58,6 +58,10 @@ class HeatPump(AbstractTechnology, AbstractSolphRepresentation):
 
         :param thermal_power_limit: Thermal power limit on all temperature ranges
         :param ref_cop: the reference COP
+        :param ref_temp_primary_in: Reference inlet temperature (°C) at the primary side.
+        :param ref_temp_primary_out: Reference outlet temperature (°C) at the primary side.
+        :param ref_temp_secondary_out: Reference outlet temperature (°C) at the secondary side.
+        :param ref_temp_secondary_in: Reference inlet temperature (°C) at the secondary side.
         :param max_temp_primary: Maximum inlet temperature (°C) at the cold side.
         :param min_temp_primary: Minimum outlet temperature (°C) at the cold side.
         :param min_delta_temp_primary: Minumum delta (°C) at the cold side.
@@ -66,14 +70,14 @@ class HeatPump(AbstractTechnology, AbstractSolphRepresentation):
         :param min_delta_temp_secondary: Minumum delta (°C) at the warm side.
         """
         super().__init__(name=name)
-
+        
         self.electrical_power_limit = electrical_power_limit
         self.thermal_power_limit = thermal_power_limit
         self.ref_cop = ref_cop        
-        self.ref_temp_source_high = ref_temp_source_high
-        self.ref_temp_source_low = ref_temp_source_low
-        self.ref_temp_sink_high = ref_temp_sink_high
-        self.ref_temp_sink_low = ref_temp_sink_low
+        self.ref_temp_primary_in = celsius_to_kelvin(ref_temp_primary_in)
+        self.ref_temp_primary_out = celsius_to_kelvin(ref_temp_primary_out)
+        self.ref_temp_secondary_out = celsius_to_kelvin(ref_temp_secondary_out)
+        self.ref_temp_secondary_in = celsius_to_kelvin(ref_temp_secondary_in)
         
         self.max_temp_primary = max_temp_primary
         self.min_temp_primary = min_temp_primary
@@ -191,10 +195,10 @@ class HeatPump(AbstractTechnology, AbstractSolphRepresentation):
             temp_secondary_in=celsius_to_kelvin(temp_secondary_in),
             temp_secondary_out=celsius_to_kelvin(temp_secondary_out),
             ref_cop=self.ref_cop,
-            ref_temp_sink_high=self.ref_temp_sink_high,
-            ref_temp_sink_low=self.ref_temp_sink_low,
-            ref_temp_source_high=self.ref_temp_source_high,
-            ref_temp_source_low=self.ref_temp_source_low            
+            ref_temp_secondary_out=self.ref_temp_secondary_out,
+            ref_temp_secondary_in=self.ref_temp_secondary_in,
+            ref_temp_primary_in=self.ref_temp_primary_in,
+            ref_temp_primary_out=self.ref_temp_primary_out            
         )
 
         self.create_solph_node(
