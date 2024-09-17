@@ -21,8 +21,8 @@ cache:
 # Make the default stages explicit
 stages:
   - linting
-  - build
   - test
+  - build
   - deploy
 
 ruff:
@@ -37,29 +37,33 @@ pytest:
   extends: .base_environment
   stage: test
   script:
+    # install the dependencies necessary to run the tests
     - pip install pytest pytest-cov
-    - python -m pytest --cov=mtress tests
-    - coverage report
-    - coverage xml
+    # runs the tests from source and produces an html report which covers the tests and the source code and specifies the test gaps
+    - python -m pytest --doctest-modules --cov-report=term-missing --cov-report=html --cov=src/ --cov=tests/
   coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
   artifacts:
     paths:
-      - coverage.xml
-    reports:
-      coverage_report:
-        coverage_format: cobertura
-        path: coverage.xml
+      # the report is placed in this folder by default, can be changed by adding ':DEST' after 'html' where DEST is the target folder
+      - htmlcov/
 
   allow_failure: false
 
 pages:
   extends: .base_environment
   stage: build
+  needs: ["pytest"]
   script:
+    # pdoc is used to generate the documentation
     - pip install pdoc
-    - pdoc mtress -o ./public
+    # generates the API documentation
+    - pdoc src/mtress -o ./public/api/
+    # generates the landing page
+    - pdoc src/doc -o ./public/
+    # moves the coverage report to the pages' folder structure
+    - mv htmlcov/ public/coverage/
   artifacts:
     paths:
-      - public
-#  rules:
-#    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      - public/
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
