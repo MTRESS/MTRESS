@@ -10,6 +10,7 @@ SPDX-FileCopyrightText: Lucas Schmeling
 
 SPDX-License-Identifier: MIT
 """
+from dataclasses import dataclass
 
 import numpy as np
 
@@ -82,7 +83,7 @@ def logarithmic_mean_temperature(temp_high, temp_low):
     :return: Logarithmic Mean Temperature Difference (in K)
     """
     if temp_high < 0 or temp_low < 0:
-        raise ValueError('Temperatures in Kelvin cannot be negative.')
+        raise ValueError("Temperatures in Kelvin cannot be negative.")
     return (temp_low - temp_high) / np.log(temp_low / temp_high)
 
 
@@ -99,26 +100,32 @@ def lorenz_cop(temp_low, temp_high):
     :return: Ideal COP
     """
     if temp_high < 0 or temp_low < 0:
-        raise ValueError('Temperatures in Kelvin cannot be negative.')
+        raise ValueError("Temperatures in Kelvin cannot be negative.")
     return temp_high / np.maximum(temp_high - temp_low, 1e-3)
+
+
+@dataclass
+class COPReference:
+    cop: float = 4.6
+    cold_side_in: float = celsius_to_kelvin(0.0)
+    cold_side_out: float = celsius_to_kelvin(-5.0)
+    warm_side_out: float = celsius_to_kelvin(35.0)
+    warm_side_in: float = celsius_to_kelvin(30.0)
+
 
 def calc_cop(
     temp_primary_in,
     temp_secondary_out,
     temp_primary_out=None,
     temp_secondary_in=None,
-    ref_cop=4.6,
-    ref_temp_primary_in=0+273.15,
-    ref_temp_primary_out=-5+273.15,
-    ref_temp_secondary_out=35+273.15,
-    ref_temp_secondary_in=30+273.15
+    ref_cop=COPReference(4.6, 0, -5, 35, 30),
 ):
     """
     :param temp_primary_in: Inlet temperature in the primary side (in K)
     :param temp_secondary_out: Outlet temperature in the secondary side (in K)
     :param temp_primary_out: Outlet temperature in the primary side (in K)
     :param temp_secondary_in: Inlet temperature in the secondary side (in K)
-    :param ref_cop: COP for reference conditions    
+    :param ref_cop: COP for reference conditions
     :param ref_temp_primary_in: Reference inlet temperature in the primary side (in K)
     :param ref_temp_primary_out: Reference outlet temperature in the primary side (in K)
     :param ref_temp_secondary_out: Reference outlet temperature in the secondary side (in K)
@@ -140,12 +147,12 @@ def calc_cop(
         )
 
     # intermediate step: cop_design/lorenz_design
-    cpf = ref_cop / lorenz_cop(
+    cpf = ref_cop.cop / lorenz_cop(
         temp_low=logarithmic_mean_temperature(
-            temp_high=ref_temp_primary_in, temp_low=ref_temp_primary_out
+            temp_high=ref_cop.cold_side_in, temp_low=ref_cop.cold_side_out
         ),
         temp_high=logarithmic_mean_temperature(
-            temp_high=ref_temp_secondary_out, temp_low=ref_temp_secondary_in
+            temp_high=ref_cop.warm_side_out, temp_low=ref_cop.warm_side_in
         ),
     )
     # cop = cop_design * (lorenz_real/lorenz_design)

@@ -5,6 +5,7 @@ Tests for coefficient of performance calculations.
 import math
 import pytest
 from mtress.physics import celsius_to_kelvin
+from mtress.physics import COPReference
 from mtress.physics import lorenz_cop
 from mtress.physics import logarithmic_mean_temperature
 from mtress.physics import calc_cop
@@ -181,7 +182,13 @@ class TestCOP:
         t_source_high = celsius_to_kelvin(40)
         t_sink_low = celsius_to_kelvin(60)
         t_sink_high = celsius_to_kelvin(90)
-        cop = 5
+        cop_ref = COPReference(
+            cop=5,
+            cold_side_in=t_source_high,
+            cold_side_out=t_source_low,
+            warm_side_in=t_sink_low,
+            warm_side_out=t_sink_high,
+        )
 
         # test same cop
         new_cop = calc_cop(
@@ -189,13 +196,9 @@ class TestCOP:
             temp_secondary_out=t_sink_high,
             temp_primary_out=t_source_high,
             temp_secondary_in=t_sink_low,
-            ref_cop=cop,
-            ref_temp_primary_in=t_source_low,
-            ref_temp_secondary_out=t_sink_high,
-            ref_temp_primary_out=t_source_high,
-            ref_temp_secondary_in=t_sink_low,
+            ref_cop=cop_ref,
         )
-        assert math.isclose(new_cop, cop, abs_tol=1e-3)
+        assert math.isclose(new_cop, cop_ref.cop, abs_tol=1e-3)
 
         # test higher lift
         additional_lift = 10
@@ -204,11 +207,7 @@ class TestCOP:
             temp_secondary_out=t_sink_high + additional_lift,
             temp_primary_out=t_source_high,
             temp_secondary_in=t_sink_low,
-            ref_cop=cop,
-            ref_temp_primary_in=t_source_low,
-            ref_temp_secondary_out=t_sink_high,
-            ref_temp_primary_out=t_source_high,
-            ref_temp_secondary_in=t_sink_low,
+            ref_cop=cop_ref,
         )
         true_cop = 4.6
         assert math.isclose(new_cop, true_cop, abs_tol=1e-3)
@@ -220,11 +219,7 @@ class TestCOP:
             temp_secondary_out=t_sink_high + additional_lift,
             temp_primary_out=t_source_high,
             temp_secondary_in=t_sink_low,
-            ref_cop=cop,
-            ref_temp_primary_in=t_source_low,
-            ref_temp_secondary_out=t_sink_high,
-            ref_temp_primary_out=t_source_high,
-            ref_temp_secondary_in=t_sink_low,
+            ref_cop=cop_ref,
         )
         true_cop = 5.495
         assert math.isclose(new_cop, true_cop, abs_tol=1e-3)
