@@ -4,37 +4,42 @@ Tests for coefficient of performance calculations.
 """
 import math
 import pytest
-from src.mtress.physics._helper_functions import lorenz_cop
-from src.mtress.physics._helper_functions import logarithmic_mean_temperature
-from src.mtress.physics._helper_functions import calc_cop
+from mtress.physics._helper_functions import celsius_to_kelvin
+from mtress.physics._helper_functions import lorenz_cop
+from mtress.physics._helper_functions import logarithmic_mean_temperature
+from mtress.physics._helper_functions import calc_cop
+
 
 class TestCOP:
-    
+
     def test_theoretical_cop(self):
-        
+
         # source: 10.18462/iir.gl.2018.1380
-        
+
         # source: 40 to 15 ºC
         # sink: 60 to 90 ºC
-        t_source_low = 15+273.15
-        t_source_high = 40+273.15
-        t_sink_low = 60+273.15
-        t_sink_high = 90+273.15
-        
+        t_source_low = celsius_to_kelvin(15)
+        t_source_high = celsius_to_kelvin(40)
+        t_sink_low = celsius_to_kelvin(60)
+        t_sink_high = celsius_to_kelvin(90)
+
         cop_carnot_true = 4.84
         cop_lorenz_true = 7.33
-        
+
         # test carnot cop
-        cop_carnot = t_sink_high/(t_sink_high-t_source_low)
+        cop_carnot = t_sink_high / (t_sink_high - t_source_low)
         assert math.isclose(cop_carnot, cop_carnot_true, abs_tol=3e-3)
-        
+
         # test lorenz cop
-        lmt_low = logarithmic_mean_temperature(temp_high=t_source_high, temp_low=t_source_low)
-        lmt_high = logarithmic_mean_temperature(temp_high=t_sink_high, temp_low=t_sink_low)
+        lmt_low = logarithmic_mean_temperature(
+            temp_high=t_source_high, temp_low=t_source_low
+        )
+        lmt_high = logarithmic_mean_temperature(
+            temp_high=t_sink_high, temp_low=t_sink_low
+        )
         cop_lorenz = lorenz_cop(temp_high=lmt_high, temp_low=lmt_low)
         assert math.isclose(cop_lorenz, cop_lorenz_true, abs_tol=2e-3)
-        
-        
+
         # bulk test
         test_data = [
             (43, 15, 50, 90, 4.84, 8.40),
@@ -53,58 +58,67 @@ class TestCOP:
             (17, 13, 35, 75, 5.62, 8.28),
             (12, 7, 30, 35, 11.01, 13.29),
             (20, 4, 20, 65, 5.54, 10.49),
-            ]
-        
-        for tsoh, tsol, tsil, tsih, cop_carnot_true, cop_lorenz_true in test_data:
-            
+        ]
+
+        for (
+            tsoh,
+            tsol,
+            tsil,
+            tsih,
+            cop_carnot_true,
+            cop_lorenz_true,
+        ) in test_data:
+
             # convert to kelvin
-            t_source_low = tsol+273.15
-            t_source_high = tsoh+273.15
-            t_sink_low = tsil+273.15
-            t_sink_high = tsih+273.15
-            
+            t_source_low = celsius_to_kelvin(tsol)
+            t_source_high = celsius_to_kelvin(tsoh)
+            t_sink_low = celsius_to_kelvin(tsil)
+            t_sink_high = celsius_to_kelvin(tsih)
+
             # test carnot cop
-            cop_carnot = t_sink_high/(t_sink_high-t_source_low)
+            cop_carnot = t_sink_high / (t_sink_high - t_source_low)
             assert math.isclose(cop_carnot, cop_carnot_true, abs_tol=5e-3)
-            
+
             # test lorenz cop
-            lmt_low = logarithmic_mean_temperature(temp_high=t_source_high, temp_low=t_source_low)
-            lmt_high = logarithmic_mean_temperature(temp_high=t_sink_high, temp_low=t_sink_low)
+            lmt_low = logarithmic_mean_temperature(
+                temp_high=t_source_high, temp_low=t_source_low
+            )
+            lmt_high = logarithmic_mean_temperature(
+                temp_high=t_sink_high, temp_low=t_sink_low
+            )
             cop_lorenz = lorenz_cop(temp_high=lmt_high, temp_low=lmt_low)
             assert math.isclose(cop_lorenz, cop_lorenz_true, abs_tol=5e-3)
-    
+
     def test_log_mean_temperature_negative_inputs(self):
-        
+
         # negative low temperature
         with pytest.raises(ValueError):
-            _ = logarithmic_mean_temperature(273.15+90, -1)
-                
+            _ = logarithmic_mean_temperature(90, -1)
+
         # negative high temperature
         with pytest.raises(ValueError):
-            _ = logarithmic_mean_temperature(-1, 273.15+60)
-        
+            _ = logarithmic_mean_temperature(-1, 60)
+
     def test_theoretical_cop_negative_inputs(self):
-        
+
         # negative low temperature
         with pytest.raises(ValueError):
             _ = lorenz_cop(30, -1)
-                
+
         # negative high temperature
         with pytest.raises(ValueError):
             _ = lorenz_cop(-1, 30)
-            
-    
+
     def test_lorenz_cop_division_by_zero(self):
-        
-        cop_lorenz = lorenz_cop(5, 5)     
-        cop_lorenz_true = 5/1e-3
+
+        cop_lorenz = lorenz_cop(5, 5)
+        cop_lorenz_true = 5 / 1e-3
         assert math.isclose(cop_lorenz, cop_lorenz_true, abs_tol=5e-3)
-        
+
     def test_theoretical_cop_pinch(self):
-        
+
         # source: 10.18462/iir.gl.2018.1380
-        
-        pass
+
         test_data = [
             (43, 15, 50, 90, 4.52, 7.38),
             (43, 15, 50, 80, 5.02, 8.12),
@@ -122,85 +136,95 @@ class TestCOP:
             (17, 13, 35, 75, 5.16, 7.25),
             (12, 7, 30, 35, 9.15, 10.64),
             (20, 4, 20, 65, 5.09, 8.83),
-            (30, 25, 40, 80, 5.84, 8.81)
-            ]
-        
+            (30, 25, 40, 80, 5.84, 8.81),
+        ]
+
         dt_pinch_source = 3
         dt_pinch_sink = 3
-        
-        for tsoh, tsol, tsil, tsih, cop_carnot_true, cop_lorenz_true in test_data:
-            
+
+        for (
+            tsoh,
+            tsol,
+            tsil,
+            tsih,
+            cop_carnot_true,
+            cop_lorenz_true,
+        ) in test_data:
+
             # convert to kelvin
-            t_source_low = tsol+273.15-dt_pinch_source
-            t_source_high = tsoh+273.15-dt_pinch_source
-            t_sink_low = tsil+273.15+dt_pinch_sink
-            t_sink_high = tsih+273.15+dt_pinch_sink
-            
+            t_source_low = celsius_to_kelvin(tsol) - dt_pinch_source
+            t_source_high = celsius_to_kelvin(tsoh) - dt_pinch_source
+            t_sink_low = celsius_to_kelvin(tsil) + dt_pinch_sink
+            t_sink_high = celsius_to_kelvin(tsih) + dt_pinch_sink
+
             # test carnot cop
-            cop_carnot = t_sink_high/(t_sink_high-t_source_low)
+            cop_carnot = t_sink_high / (t_sink_high - t_source_low)
             assert math.isclose(cop_carnot, cop_carnot_true, abs_tol=5e-3)
-            
+
             # test lorenz cop
-            lmt_low = logarithmic_mean_temperature(temp_high=t_source_high, temp_low=t_source_low)
-            lmt_high = logarithmic_mean_temperature(temp_high=t_sink_high, temp_low=t_sink_low)
+            lmt_low = logarithmic_mean_temperature(
+                temp_high=t_source_high, temp_low=t_source_low
+            )
+            lmt_high = logarithmic_mean_temperature(
+                temp_high=t_sink_high, temp_low=t_sink_low
+            )
             cop_lorenz = lorenz_cop(temp_high=lmt_high, temp_low=lmt_low)
             assert math.isclose(cop_lorenz, cop_lorenz_true, abs_tol=5e-3)
-            
-            
+
     def test_different_cop_conditions(self):
-        
+
         # TODO: find published/peer-reviewed source
-        
+
         # source: 40 to 15 ºC
         # sink: 60 to 90 ºC
-        t_source_low = 15+273.15
-        t_source_high = 40+273.15
-        t_sink_low = 60+273.15
-        t_sink_high = 90+273.15
+        t_source_low = celsius_to_kelvin(15)
+        t_source_high = celsius_to_kelvin(40)
+        t_sink_low = celsius_to_kelvin(60)
+        t_sink_high = celsius_to_kelvin(90)
         cop = 5
-        
+
         # test same cop
         new_cop = calc_cop(
-            temp_primary_in=t_source_low, 
+            temp_primary_in=t_source_low,
             temp_secondary_out=t_sink_high,
             temp_primary_out=t_source_high,
             temp_secondary_in=t_sink_low,
             ref_cop=cop,
-            ref_temp_primary_in=t_source_low, 
+            ref_temp_primary_in=t_source_low,
             ref_temp_secondary_out=t_sink_high,
             ref_temp_primary_out=t_source_high,
             ref_temp_secondary_in=t_sink_low,
-            )
+        )
         assert math.isclose(new_cop, cop, abs_tol=1e-3)
-        
+
         # test higher lift
         additional_lift = 10
         new_cop = calc_cop(
-            temp_primary_in=t_source_low, 
-            temp_secondary_out=t_sink_high+additional_lift,
+            temp_primary_in=t_source_low,
+            temp_secondary_out=t_sink_high + additional_lift,
             temp_primary_out=t_source_high,
             temp_secondary_in=t_sink_low,
             ref_cop=cop,
-            ref_temp_primary_in=t_source_low, 
+            ref_temp_primary_in=t_source_low,
             ref_temp_secondary_out=t_sink_high,
             ref_temp_primary_out=t_source_high,
             ref_temp_secondary_in=t_sink_low,
-            )
+        )
         true_cop = 4.6
         assert math.isclose(new_cop, true_cop, abs_tol=1e-3)
-        
+
         # test lower lift
         additional_lift = -10
         new_cop = calc_cop(
-            temp_primary_in=t_source_low, 
-            temp_secondary_out=t_sink_high+additional_lift,
+            temp_primary_in=t_source_low,
+            temp_secondary_out=t_sink_high + additional_lift,
             temp_primary_out=t_source_high,
             temp_secondary_in=t_sink_low,
             ref_cop=cop,
-            ref_temp_primary_in=t_source_low, 
+            ref_temp_primary_in=t_source_low,
             ref_temp_secondary_out=t_sink_high,
             ref_temp_primary_out=t_source_high,
             ref_temp_secondary_in=t_sink_low,
-            )
+        )
         true_cop = 5.495
         assert math.isclose(new_cop, true_cop, abs_tol=1e-3)
