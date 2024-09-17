@@ -14,7 +14,7 @@ from oemof.solph.components import Converter, Source
 
 from .._abstract_component import AbstractSolphRepresentation
 from ..carriers import ElectricityCarrier, HeatCarrier
-from ..physics import calc_cop, celsius_to_kelvin
+from ..physics import calc_cop, celsius_to_kelvin, COPReference
 from ._abstract_technology import AbstractTechnology
 
 
@@ -42,10 +42,6 @@ class HeatPump(AbstractTechnology, AbstractSolphRepresentation):
         electrical_power_limit: float = None,
         thermal_power_limit: float = None,
         ref_cop: float = 4.6,
-        ref_temp_primary_in: float = 0,
-        ref_temp_primary_out: float = -5,
-        ref_temp_secondary_out: float = 35,
-        ref_temp_secondary_in: float = 30,
         max_temp_primary: float = None,
         min_temp_primary: float = None,
         min_delta_temp_primary: float = 5.0,
@@ -70,15 +66,11 @@ class HeatPump(AbstractTechnology, AbstractSolphRepresentation):
         :param min_delta_temp_secondary: Minumum delta (°C) at the warm side.
         """
         super().__init__(name=name)
-        
+
         self.electrical_power_limit = electrical_power_limit
         self.thermal_power_limit = thermal_power_limit
-        self.ref_cop = ref_cop        
-        self.ref_temp_primary_in = celsius_to_kelvin(ref_temp_primary_in)
-        self.ref_temp_primary_out = celsius_to_kelvin(ref_temp_primary_out)
-        self.ref_temp_secondary_out = celsius_to_kelvin(ref_temp_secondary_out)
-        self.ref_temp_secondary_in = celsius_to_kelvin(ref_temp_secondary_in)
-        
+        self.ref_cop = ref_cop
+
         self.max_temp_primary = max_temp_primary
         self.min_temp_primary = min_temp_primary
         self.min_delta_temp_primary = min_delta_temp_primary
@@ -195,10 +187,6 @@ class HeatPump(AbstractTechnology, AbstractSolphRepresentation):
             temp_secondary_in=celsius_to_kelvin(temp_secondary_in),
             temp_secondary_out=celsius_to_kelvin(temp_secondary_out),
             ref_cop=self.ref_cop,
-            ref_temp_secondary_out=self.ref_temp_secondary_out,
-            ref_temp_secondary_in=self.ref_temp_secondary_in,
-            ref_temp_primary_in=self.ref_temp_primary_in,
-            ref_temp_primary_out=self.ref_temp_primary_out            
         )
 
         self.create_solph_node(
