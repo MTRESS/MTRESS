@@ -16,12 +16,7 @@ from pyomo import environ as po
 
 from mtress._data_handler import TimeseriesSpecifier, TimeseriesType
 from mtress.carriers import HeatCarrier
-from mtress.physics import (
-    H2O_DENSITY,
-    H2O_HEAT_CAPACITY,
-    SECONDS_PER_HOUR,
-    mega_to_one,
-)
+from mtress.physics import H2O_DENSITY, H2O_HEAT_CAPACITY, SECONDS_PER_HOUR, mega_to_one
 
 from ._abstract_heat_storage import AbstractHeatStorage
 

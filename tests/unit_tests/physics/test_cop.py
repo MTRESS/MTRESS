@@ -3,12 +3,16 @@
 Tests for coefficient of performance calculations.
 """
 import math
+
 import pytest
-from mtress.physics import celsius_to_kelvin
-from mtress.physics import COPReference
-from mtress.physics import lorenz_cop
-from mtress.physics import logarithmic_mean_temperature
-from mtress.physics import calc_cop
+
+from mtress.physics import (
+    COPReference,
+    calc_cop,
+    celsius_to_kelvin,
+    logarithmic_mean_temperature,
+    lorenz_cop,
+)
 
 
 class TestCOP:

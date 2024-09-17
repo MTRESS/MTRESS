@@ -5,11 +5,7 @@ from oemof.solph.components import Converter
 
 from .._abstract_component import AbstractSolphRepresentation
 from ..carriers import ElectricityCarrier, GasCarrier
-from ..physics import (
-    IDEAL_GAS_CONSTANT,
-    Gas,
-    calc_isothermal_compression_energy,
-)
+from ..physics import IDEAL_GAS_CONSTANT, Gas, calc_isothermal_compression_energy
 from ._abstract_technology import AbstractTechnology
 
 

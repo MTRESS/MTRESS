@@ -34,11 +34,11 @@ from ._gas_definition import (
     calc_natural_gas_molar_mass,
 )
 from ._helper_functions import (
+    COPReference,
     bar_to_pascal,
     calc_cop,
     calc_isothermal_compression_energy,
     celsius_to_kelvin,
-    COPReference,
     kelvin_to_celsius,
     kilo_to_mega,
     kJ_to_MWh,

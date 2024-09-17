@@ -13,10 +13,7 @@ from typing import Callable
 from mtress.carriers import GasCarrier
 
 from ...physics import Gas
-from .._abstract_homogenous_storage import (
-    AbstractHomogenousStorage,
-    Implementation,
-)
+from .._abstract_homogenous_storage import AbstractHomogenousStorage, Implementation
 from .._abstract_technology import AbstractTechnology
 
 
