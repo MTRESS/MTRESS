@@ -4,10 +4,10 @@ Tests for coefficient of performance calculations.
 """
 import math
 import pytest
-from mtress.physics._helper_functions import celsius_to_kelvin
-from mtress.physics._helper_functions import lorenz_cop
-from mtress.physics._helper_functions import logarithmic_mean_temperature
-from mtress.physics._helper_functions import calc_cop
+from mtress.physics import celsius_to_kelvin
+from mtress.physics import lorenz_cop
+from mtress.physics import logarithmic_mean_temperature
+from mtress.physics import calc_cop
 
 
 class TestCOP:
