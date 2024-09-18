@@ -14,7 +14,6 @@ from mtress import (
     SolphModel,
     carriers,
     demands,
-    technologies,
 )
 from mtress._helpers import get_flows
 
