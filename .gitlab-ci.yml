@@ -39,8 +39,8 @@ pytest:
   script:
     # install the dependencies necessary to run the tests
     - pip install pytest pytest-cov
-    # runs the tests from source and produces an html report which covers the tests and the source code and specifies the test gaps
-    - python -m pytest --doctest-modules --cov-report=term-missing --cov-report=html --cov=src/ --cov=tests/ --cov=examples/
+    # runs the tests from the installed package and produces an html report specifying the test gaps
+    - python -m pytest --doctest-modules --cov-report=term-missing --cov-report=html --cov=mtress
   coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
   artifacts:
     paths:
