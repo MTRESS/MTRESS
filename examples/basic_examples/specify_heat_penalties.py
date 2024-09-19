@@ -62,5 +62,6 @@ plot.render(outfile="specify_penalties.png")
 
 mr = meta_results(solved_model)
 
-# This line shows the total cost of the operation (?)
+# Print the objective value.
+# Here it contains the cost of the operation including penalties.
 print(mr["objective"])
