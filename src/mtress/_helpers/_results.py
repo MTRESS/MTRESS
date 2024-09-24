@@ -17,6 +17,20 @@ def get_flows(results):
 
     return flows
 
+def get_storage_content(results):
+    """
+    Extract storage content from results dictionary.
+
+    :param results: Results from solph optimization
+    """
+    storage_content = {
+        source_node.label: result["sequences"]["storage_content"]
+        for (source_node, destination_node), result in results.items()
+        if "storage_content" in result["sequences"]
+    }
+
+    return storage_content
+
 
 def get_status(results):
     """
