@@ -7,7 +7,13 @@ from typing import TYPE_CHECKING, Callable, NamedTuple, Tuple
 
 from graphviz import Digraph
 from oemof.solph import Bus
-from oemof.solph.components import Converter, GenericStorage, Sink, Source
+from oemof.solph.components import (
+    Converter,
+    GenericStorage,
+    Sink,
+    Source,
+    OffsetConverter,
+)
 
 from ._interfaces import NamedElement
 from ._solph_model import SolphModel
@@ -20,6 +26,7 @@ SOLPH_SHAPES = {
     Sink: "invtrapezium",
     Bus: "ellipse",
     Converter: "octagon",
+    OffsetConverter: "octagon",
     GenericStorage: "cylinder",
 }
 
@@ -123,7 +130,7 @@ class AbstractSolphRepresentation(AbstractComponent):
         def rec(node, color):
             # recursively iterate nodes until all edges covered
             # or node type in [Source, Sink, Converter]
-            if type(node) in [Source, Sink, Converter]:
+            if type(node) in [Source, Sink, Converter, OffsetConverter]:
                 return
             node_id = tuple(node.label)
             for origin in node.inputs:
