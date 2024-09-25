@@ -9,12 +9,14 @@ SPDX-FileCopyrightText: Lucas Schmeling
 SPDX-License-Identifier: MIT
 """
 
+from dataclasses import is_dataclass
+
 from oemof.solph import Bus, Flow
 from oemof.solph.components import Converter, Source
 
 from .._abstract_component import AbstractSolphRepresentation
 from ..carriers import ElectricityCarrier, HeatCarrier
-from ..physics import calc_cop, celsius_to_kelvin
+from ..physics import calc_cop, celsius_to_kelvin, COPReference
 from ._abstract_technology import AbstractTechnology
 
 
@@ -67,9 +69,19 @@ class HeatPump(AbstractTechnology, AbstractSolphRepresentation):
         """
         super().__init__(name=name)
 
+        if not is_dataclass(ref_cop) and ref_cop != 4.6:
+            raise KeyError(
+                "You COP is other than the default value 4.6. "
+                "To change COP import COPReference from _helper_functions"
+            )
+
+        if ref_cop == 4.6:
+            self.ref_cop = COPReference(ref_cop)
+        else:
+            self.ref_cop = ref_cop
+
         self.electrical_power_limit = electrical_power_limit
         self.thermal_power_limit = thermal_power_limit
-        self.ref_cop = ref_cop
 
         self.max_temp_primary = max_temp_primary
         self.min_temp_primary = min_temp_primary
@@ -182,11 +194,11 @@ class HeatPump(AbstractTechnology, AbstractSolphRepresentation):
             temp_secondary_out, temp_secondary_in
         )
         cop = calc_cop(
+            ref_cop=self.ref_cop,
             temp_primary_in=celsius_to_kelvin(temp_primary_in),
             temp_primary_out=celsius_to_kelvin(temp_primary_out),
             temp_secondary_in=celsius_to_kelvin(temp_secondary_in),
             temp_secondary_out=celsius_to_kelvin(temp_secondary_out),
-            ref_cop=self.ref_cop,
         )
 
         self.create_solph_node(
