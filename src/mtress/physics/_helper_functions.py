@@ -112,13 +112,23 @@ class COPReference:
     warm_side_out: float = celsius_to_kelvin(35.0)
     warm_side_in: float = celsius_to_kelvin(30.0)
 
+    def __post_init__(self):
+        self.cold_side_in = self._celsius_to_kelvin(self.cold_side_in)
+        self.cold_side_out = self._celsius_to_kelvin(self.cold_side_out)
+        self.warm_side_out = self._celsius_to_kelvin(self.warm_side_out)
+        self.warm_side_in = self._celsius_to_kelvin(self.warm_side_in)
+
+    @staticmethod
+    def _celsius_to_kelvin(celsius: float) -> float:
+        return celsius_to_kelvin(celsius)
+
 
 def calc_cop(
+    ref_cop,
     temp_primary_in,
     temp_secondary_out,
     temp_primary_out=None,
     temp_secondary_in=None,
-    ref_cop=COPReference(4.6, 0, -5, 35, 30),
 ):
     """
     :param temp_primary_in: Inlet temperature in the primary side (in K)
@@ -132,6 +142,7 @@ def calc_cop(
     :param ref_temp_secondary_in: Reference inlet temperature in the secondary side (in K)
     :return: Scaled COP for the given temperatures
     """
+
     if temp_primary_out is None or temp_primary_out == temp_primary_in:
         temp_low = temp_primary_in
     else:
