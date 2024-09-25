@@ -71,7 +71,7 @@ class HeatPump(AbstractTechnology, AbstractSolphRepresentation):
 
         if not is_dataclass(ref_cop) and ref_cop != 4.6:
             raise KeyError(
-                "You COP is other than the default value 4.6. "
+                "Your COP is different from the default value 4.6. "
                 "To change COP import COPReference from _helper_functions"
             )
 
