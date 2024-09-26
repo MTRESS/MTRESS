@@ -195,10 +195,10 @@ class HeatPump(AbstractTechnology, AbstractSolphRepresentation):
         )
         cop = calc_cop(
             ref_cop=self.ref_cop,
-            temp_primary_in=celsius_to_kelvin(temp_primary_in),
-            temp_primary_out=celsius_to_kelvin(temp_primary_out),
-            temp_secondary_in=celsius_to_kelvin(temp_secondary_in),
-            temp_secondary_out=celsius_to_kelvin(temp_secondary_out),
+            temp_primary_in=temp_primary_in,
+            temp_primary_out=temp_primary_out,
+            temp_secondary_in=temp_secondary_in,
+            temp_secondary_out=temp_secondary_out,
         )
 
         self.create_solph_node(
