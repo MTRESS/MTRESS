@@ -182,10 +182,10 @@ class TestCOP:
 
         # source: 40 to 15 ºC
         # sink: 60 to 90 ºC
-        t_source_low = celsius_to_kelvin(15)
-        t_source_high = celsius_to_kelvin(40)
-        t_sink_low = celsius_to_kelvin(60)
-        t_sink_high = celsius_to_kelvin(90)
+        t_source_low = 15
+        t_source_high = 0
+        t_sink_low = 60
+        t_sink_high = 90
         cop_ref = COPReference(
             cop=5,
             cold_side_in=t_source_high,
