@@ -46,12 +46,16 @@ class HeatCarrier(AbstractLayeredCarrier, AbstractSolphRepresentation):
         self,
         temperature_levels: list[float],
         reference_temperature: float = 0,
+        missing_heat_penalty: float = 1e9,
+        excess_heat_penalty: float = 1e9,
     ):
         """
         Initialize heat energy carrier and add components.
 
         :param temperature_levels: list of temperatures (in °C)
         :param reference_temperature: Reference temperature (in °C)
+        :param missing_heat_penalty: assigns a cost for each unit of missing heat produced (in any currency)
+        :param excess_heat_penalty: assigns a cost for each unit of excess heat produced (in any currency)
         """
         if reference_temperature in temperature_levels:
             raise ValueError(
@@ -61,6 +65,8 @@ class HeatCarrier(AbstractLayeredCarrier, AbstractSolphRepresentation):
             levels=sorted(temperature_levels),
             reference=reference_temperature,
         )
+        self.missing_heat_penalty = missing_heat_penalty
+        self.excess_heat_penalty = excess_heat_penalty
 
         self._reference_index = np.searchsorted(
             self.levels, reference_temperature
@@ -105,7 +111,7 @@ class HeatCarrier(AbstractLayeredCarrier, AbstractSolphRepresentation):
             label="excess_heat",
             node_type=components.Sink,
             inputs={
-                bus: Flow(variable_costs=1e9)
+                bus: Flow(variable_costs=self.excess_heat_penalty)
                 for bus in self.level_nodes.values()
             },
         )
@@ -114,7 +120,7 @@ class HeatCarrier(AbstractLayeredCarrier, AbstractSolphRepresentation):
             label="missing_heat",
             node_type=components.Source,
             outputs={
-                bus: Flow(variable_costs=1e9)
+                bus: Flow(variable_costs=self.missing_heat_penalty)
                 for bus in self.level_nodes.values()
             },
         )
