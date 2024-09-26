@@ -38,13 +38,14 @@ pytest:
   extends: .base_environment
   stage: test
   script:
+    # install the dependencies necessary to run the tests
     - pip install pytest pytest-cov
-    - python -m pytest --cov=mtress tests
-    - coverage report
-    - coverage html
+    # runs the tests from the installed package and produces an html report specifying the test gaps
+    - python -m pytest --cov-report=term-missing --cov-report=html --cov=mtress
   coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
   artifacts:
     paths:
+      # the report is placed in this folder by default, can be changed by adding ':DEST' after 'html' where DEST is the target folder
       - htmlcov/
 
   allow_failure: false
@@ -54,12 +55,16 @@ pages:
   stage: build
   needs: ["pytest"]
   script:
+    # pdoc is used to generate the documentation
     - pip install pdoc
+    # generates the API documentation
     - pdoc src/mtress -o ./public/api/
+    # generates the landing page
     - pdoc src/doc -o ./public/
+    # moves the coverage report to the pages' folder structure
     - mv htmlcov/ public/coverage/
   artifacts:
     paths:
       - public/
-#  rules:
-#    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
