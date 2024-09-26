@@ -219,7 +219,7 @@ class LayeredHeatStorage(AbstractHeatStorage):
                             self.storage_components[upper_temperature], t
                         ]
                     )
-                ) == model.flow[
+                ) <= model.flow[
                     self.buses[upper_temperature],
                     self.buses[lower_temperature],
                     t,
