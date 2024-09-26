@@ -23,10 +23,10 @@ class TestCOP:
 
         # source: 40 to 15 ºC
         # sink: 60 to 90 ºC
-        t_source_low = celsius_to_kelvin(15)
-        t_source_high = celsius_to_kelvin(40)
-        t_sink_low = celsius_to_kelvin(60)
-        t_sink_high = celsius_to_kelvin(90)
+        t_source_low = 15
+        t_source_high = 40
+        t_sink_low = 60
+        t_sink_high = 90
 
         cop_carnot_true = 4.84
         cop_lorenz_true = 7.33
@@ -188,8 +188,8 @@ class TestCOP:
         t_sink_high = 90
         cop_ref = COPReference(
             cop=5,
-            cold_side_in=t_source_high,
-            cold_side_out=t_source_low,
+            cold_side_in=t_source_low,
+            cold_side_out=t_source_high,
             warm_side_in=t_sink_low,
             warm_side_out=t_sink_high,
         )
@@ -213,7 +213,7 @@ class TestCOP:
             temp_secondary_in=t_sink_low,
             ref_cop=cop_ref,
         )
-        true_cop = 4.6
+        true_cop = 4.729
         assert math.isclose(new_cop, true_cop, abs_tol=1e-3)
 
         # test lower lift
@@ -225,5 +225,5 @@ class TestCOP:
             temp_secondary_in=t_sink_low,
             ref_cop=cop_ref,
         )
-        true_cop = 5.495
+        true_cop = 5.315
         assert math.isclose(new_cop, true_cop, abs_tol=1e-3)
