@@ -107,20 +107,10 @@ def lorenz_cop(temp_low, temp_high):
 @dataclass
 class COPReference:
     cop: float = 4.6
-    cold_side_in: float = celsius_to_kelvin(0.0)
-    cold_side_out: float = celsius_to_kelvin(-5.0)
-    warm_side_out: float = celsius_to_kelvin(35.0)
-    warm_side_in: float = celsius_to_kelvin(30.0)
-
-    def __post_init__(self):
-        self.cold_side_in = self._celsius_to_kelvin(self.cold_side_in)
-        self.cold_side_out = self._celsius_to_kelvin(self.cold_side_out)
-        self.warm_side_out = self._celsius_to_kelvin(self.warm_side_out)
-        self.warm_side_in = self._celsius_to_kelvin(self.warm_side_in)
-
-    @staticmethod
-    def _celsius_to_kelvin(celsius: float) -> float:
-        return celsius_to_kelvin(celsius)
+    cold_side_in: float = 0.0
+    cold_side_out: float = -5.0
+    warm_side_out: float = 35.0
+    warm_side_in: float = 30.0
 
 
 def calc_cop(
@@ -143,9 +133,13 @@ def calc_cop(
     :return: Scaled COP for the given temperatures
     """
 
+    temp_primary_in = celsius_to_kelvin(temp_primary_in)
+    temp_secondary_out = celsius_to_kelvin(temp_secondary_out)
+
     if temp_primary_out is None or temp_primary_out == temp_primary_in:
         temp_low = temp_primary_in
     else:
+        temp_primary_out = celsius_to_kelvin(temp_primary_out)
         temp_low = logarithmic_mean_temperature(
             temp_high=temp_primary_in, temp_low=temp_primary_out
         )
@@ -153,6 +147,7 @@ def calc_cop(
     if temp_secondary_in is None or temp_secondary_out == temp_secondary_in:
         temp_high = temp_secondary_out
     else:
+        temp_secondary_in = celsius_to_kelvin(temp_secondary_in)
         temp_high = logarithmic_mean_temperature(
             temp_high=temp_secondary_out, temp_low=temp_secondary_in
         )
@@ -160,10 +155,12 @@ def calc_cop(
     # intermediate step: cop_design/lorenz_design
     cpf = ref_cop.cop / lorenz_cop(
         temp_low=logarithmic_mean_temperature(
-            temp_high=ref_cop.cold_side_in, temp_low=ref_cop.cold_side_out
+            temp_high=celsius_to_kelvin(ref_cop.cold_side_in),
+            temp_low=celsius_to_kelvin(ref_cop.cold_side_out),
         ),
         temp_high=logarithmic_mean_temperature(
-            temp_high=ref_cop.warm_side_out, temp_low=ref_cop.warm_side_in
+            temp_high=celsius_to_kelvin(ref_cop.warm_side_out),
+            temp_low=celsius_to_kelvin(ref_cop.warm_side_in),
         ),
     )
     # cop = cop_design * (lorenz_real/lorenz_design)
