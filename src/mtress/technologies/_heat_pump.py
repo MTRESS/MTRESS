@@ -16,7 +16,7 @@ from oemof.solph.components import Converter, Source
 
 from .._abstract_component import AbstractSolphRepresentation
 from ..carriers import ElectricityCarrier, HeatCarrier
-from ..physics import calc_cop, celsius_to_kelvin, COPReference
+from ..physics import calc_cop, COPReference
 from ._abstract_technology import AbstractTechnology
 
 
