@@ -13,10 +13,9 @@ from mtress import (
     demands,
     technologies,
 )
+from mtress._helpers import get_flows
 from mtress.physics import HYDROGEN
 from mtress.technologies import AFC, PEM_ELECTROLYSER
-
-from mtress._helpers import get_flows
 
 LOGGER = logging.getLogger(__file__)
 
@@ -30,12 +29,14 @@ energy_system.add_location(house_1)
 
 
 house_1.add(carriers.ElectricityCarrier())
-house_1.add(technologies.ElectricityGridConnection(working_rate=0.70))
+house_1.add(
+    technologies.ElectricityGridConnection(working_rate=70e-3, revenue=0)
+)
 
 house_1.add(
     carriers.GasCarrier(
         gases={
-            HYDROGEN: [20, 30, 60, 350],
+            HYDROGEN: [5, 30, 40, 70],
         }
     )
 )
@@ -52,7 +53,7 @@ house_1.add(
     technologies.Photovoltaics(
         "pv0",
         (52.729, 8.181),
-        nominal_power=8e6,
+        nominal_power=2000e3,
         weather=weather,
         surface_azimuth=180,
         surface_tilt=35,
@@ -72,7 +73,7 @@ house_1.add(
         name="H2_demand",
         gas_type=HYDROGEN,
         time_series="FILE:../input_file.csv:h2_demand",
-        pressure=60,
+        pressure=40,
     )
 )
 
@@ -80,7 +81,7 @@ house_1.add(
 house_1.add(
     technologies.H2Storage(
         name="H2_Storage",
-        volume=15,
+        volume=5,
         power_limit=10,
     )
 )
@@ -88,40 +89,43 @@ house_1.add(
 house_1.add(
     carriers.HeatCarrier(
         temperature_levels=[20, 40],
-        reference_temperature=10,
-    )
-)
-
-house_1.add(
-    demands.FixedTemperatureHeating(
-        name="hot water",
-        min_flow_temperature=40,
-        return_temperature=20,
-        time_series="FILE:../input_file.csv:heat",
+        reference_temperature=0,
     )
 )
 
 house_1.add(
     technologies.Electrolyser(
-        name="PEM_Ely", nominal_power=10e5, template=PEM_ELECTROLYSER
+        name="PEM_Ely",
+        nominal_power=1500e3,
+        template=PEM_ELECTROLYSER,
     )
 )
 house_1.add(
     technologies.FuelCell(
-        name="AFC", nominal_power=5e5, gas_input_pressure=20, template=AFC
+        name="AFC", nominal_power=10e3, gas_input_pressure=5, template=AFC
+    )
+)
+
+house_1.add(
+    technologies.HeatSink(
+        name="Heat_Sink",
+        reservoir_temperature=20,
+        minimum_working_temperature=20,
+        maximum_working_temperature=40,
+        nominal_power=200e5,
     )
 )
 house_1.add(
     technologies.GasCompressor(
-        name="H2Compr", nominal_power=1e5, gas_type=HYDROGEN
+        name="H2Compr", nominal_power=50e3, gas_type=HYDROGEN
     )
 )
 
 solph_representation = SolphModel(
     energy_system,
     timeindex={
-        "start": "2022-06-01 08:00:00",
-        "end": "2022-06-01 18:00:00",
+        "start": "2022-07-01 08:00:00",
+        "end": "2022-07-02 19:00:00",
         "freq": "15T",
         "tz": "Europe/Berlin",
     },
