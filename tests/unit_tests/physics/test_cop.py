@@ -7,12 +7,12 @@ import math
 import pytest
 
 from mtress.physics import (
-    COPReference,
     calc_cop,
     celsius_to_kelvin,
     logarithmic_mean_temperature,
     lorenz_cop,
 )
+from mtress.technologies import COPReference
 
 
 class TestCOP:

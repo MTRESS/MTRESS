@@ -1,5 +1,4 @@
-from mtress.physics import COPReference
-from mtress.technologies import HeatPump
+from mtress.technologies import HeatPump, COPReference
 
 from oemof.solph.processing import results, meta_results
 import math
