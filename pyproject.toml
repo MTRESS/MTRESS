@@ -51,11 +51,12 @@ dependencies = [
 license = {text = "MIT"}
 
 [tool.ruff]
-
 target-version = "py310"
-
 # Same as for core python (and oemof.solph)
 line-length = 79
+
+[tool.ruff.lint]
+select = ["E501"]
 
 [tool.black]
 # needs to align with ruff
