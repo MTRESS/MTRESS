@@ -104,13 +104,13 @@ def lorenz_cop(temp_low, temp_high):
 
 def calc_cop(
     ref_cop,
-    temp_primary_in,
-    temp_secondary_out,
-    temp_primary_out=None,
-    temp_secondary_in=None,
+    temp_primary_in: float = None,
+    temp_secondary_out: float = None,
+    temp_primary_out: float = None,
+    temp_secondary_in: float = None,
 ):
     """
-    :param ref_cop: COP for reference conditions
+    :param ref_cop: Data class representing the reference COP
     :param temp_primary_in: Inlet temperature in the primary side (in °C)
     :param temp_secondary_out: Outlet temperature in the secondary side (in °C)
     :param temp_primary_out: Outlet temperature in the primary side (in °C)
