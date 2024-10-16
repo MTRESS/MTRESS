@@ -10,14 +10,40 @@ SPDX-License-Identifier: MIT
 """
 
 from dataclasses import is_dataclass
+from dataclasses import dataclass
 
 from oemof.solph import Bus, Flow
 from oemof.solph.components import Converter, Source
 
 from .._abstract_component import AbstractSolphRepresentation
 from ..carriers import ElectricityCarrier, HeatCarrier
-from ..physics import calc_cop, COPReference
+from ..physics import calc_cop
 from ._abstract_technology import AbstractTechnology
+
+
+@dataclass
+class COPReference:
+    """
+    :param ref_temp_primary_in: Reference inlet temperature (°C) at the primary side.
+    :param ref_temp_primary_out: Reference outlet temperature (°C) at the primary side.
+    :param ref_temp_secondary_out: Reference outlet temperature (°C) at the secondary side.
+    :param ref_temp_secondary_in: Reference inlet temperature (°C) at the secondary side.
+    """
+
+    cop: float = 4.6
+    cold_side_in: float = 0.0
+    cold_side_out: float = -5.0
+    warm_side_out: float = 35.0
+    warm_side_in: float = 30.0
+
+
+REFERENCE_COP = COPReference(
+    cop=4.6,
+    cold_side_in=0.0,
+    cold_side_out=-5.0,
+    warm_side_out=35.0,
+    warm_side_in=30.0,
+)
 
 
 class HeatPump(AbstractTechnology, AbstractSolphRepresentation):
@@ -41,9 +67,9 @@ class HeatPump(AbstractTechnology, AbstractSolphRepresentation):
     def __init__(
         self,
         name: str,
-        electrical_power_limit: float = None,
+        ref_cop: COPReference = REFERENCE_COP,
         thermal_power_limit: float = None,
-        ref_cop: float = 4.6,
+        electrical_power_limit: float = None,
         max_temp_primary: float = None,
         min_temp_primary: float = None,
         min_delta_temp_primary: float = 5.0,
@@ -54,12 +80,8 @@ class HeatPump(AbstractTechnology, AbstractSolphRepresentation):
         """
         Initialize heat pump component.
 
+        :param ref_cop: dataclass representing the reference COP
         :param thermal_power_limit: Thermal power limit on all temperature ranges
-        :param ref_cop: the reference COP
-        :param ref_temp_primary_in: Reference inlet temperature (°C) at the primary side.
-        :param ref_temp_primary_out: Reference outlet temperature (°C) at the primary side.
-        :param ref_temp_secondary_out: Reference outlet temperature (°C) at the secondary side.
-        :param ref_temp_secondary_in: Reference inlet temperature (°C) at the secondary side.
         :param max_temp_primary: Maximum inlet temperature (°C) at the cold side.
         :param min_temp_primary: Minimum outlet temperature (°C) at the cold side.
         :param min_delta_temp_primary: Minumum delta (°C) at the cold side.
@@ -69,17 +91,10 @@ class HeatPump(AbstractTechnology, AbstractSolphRepresentation):
         """
         super().__init__(name=name)
 
-        if not is_dataclass(ref_cop) and ref_cop != 4.6:
-            raise KeyError(
-                "Your COP is different from the default value 4.6. "
-                "To change COP import COPReference from _helper_functions"
-            )
+        if not is_dataclass(ref_cop):
+            raise KeyError("A COPReference dataclass needs to be provided")
 
-        if ref_cop == 4.6:
-            self.ref_cop = COPReference(ref_cop)
-        else:
-            self.ref_cop = ref_cop
-
+        self.ref_cop = ref_cop
         self.electrical_power_limit = electrical_power_limit
         self.thermal_power_limit = thermal_power_limit
 
