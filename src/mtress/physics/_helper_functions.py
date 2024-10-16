@@ -10,8 +10,6 @@ SPDX-FileCopyrightText: Lucas Schmeling
 
 SPDX-License-Identifier: MIT
 """
-from dataclasses import dataclass
-
 import numpy as np
 
 from ._constants import SECONDS_PER_HOUR, ZERO_CELSIUS
@@ -104,15 +102,6 @@ def lorenz_cop(temp_low, temp_high):
     return temp_high / np.maximum(temp_high - temp_low, 1e-3)
 
 
-@dataclass
-class COPReference:
-    cop: float = 4.6
-    cold_side_in: float = 0.0
-    cold_side_out: float = -5.0
-    warm_side_out: float = 35.0
-    warm_side_in: float = 30.0
-
-
 def calc_cop(
     ref_cop,
     temp_primary_in,
@@ -121,15 +110,11 @@ def calc_cop(
     temp_secondary_in=None,
 ):
     """
-    :param temp_primary_in: Inlet temperature in the primary side (in K)
-    :param temp_secondary_out: Outlet temperature in the secondary side (in K)
-    :param temp_primary_out: Outlet temperature in the primary side (in K)
-    :param temp_secondary_in: Inlet temperature in the secondary side (in K)
     :param ref_cop: COP for reference conditions
-    :param ref_temp_primary_in: Reference inlet temperature in the primary side (in K)
-    :param ref_temp_primary_out: Reference outlet temperature in the primary side (in K)
-    :param ref_temp_secondary_out: Reference outlet temperature in the secondary side (in K)
-    :param ref_temp_secondary_in: Reference inlet temperature in the secondary side (in K)
+    :param temp_primary_in: Inlet temperature in the primary side (in °C)
+    :param temp_secondary_out: Outlet temperature in the secondary side (in °C)
+    :param temp_primary_out: Outlet temperature in the primary side (in °C)
+    :param temp_secondary_in: Inlet temperature in the secondary side (in °C)
     :return: Scaled COP for the given temperatures
     """
 

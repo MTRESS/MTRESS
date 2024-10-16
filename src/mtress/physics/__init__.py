@@ -34,7 +34,6 @@ from ._gas_definition import (
     calc_natural_gas_molar_mass,
 )
 from ._helper_functions import (
-    COPReference,
     bar_to_pascal,
     calc_cop,
     calc_isothermal_compression_energy,
@@ -53,7 +52,6 @@ __all__ = [
     "calc_biogas_molar_mass",
     "calc_natural_gas_molar_mass",
     "celsius_to_kelvin",
-    "COPReference",
     "kelvin_to_celsius",
     "kJ_to_MWh",
     "bar_to_pascal",
