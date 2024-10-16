@@ -1,6 +1,6 @@
 from mtress.technologies import HeatPump, COPReference
 
-from oemof.solph.processing import results, meta_results
+from oemof.solph.processing import meta_results
 import math
 
 from mtress import (
@@ -11,7 +11,6 @@ from mtress import (
     demands,
     technologies,
 )
-from mtress._helpers import get_flows
 
 
 def test_heat_pump_initialisation():
