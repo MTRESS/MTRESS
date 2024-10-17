@@ -12,7 +12,10 @@ from mtress._data_handler import TimeseriesSpecifier
 from mtress.carriers import HeatCarrier
 from mtress.physics import H2O_DENSITY, H2O_HEAT_CAPACITY, SECONDS_PER_HOUR
 
-from .._abstract_homogenous_storage import AbstractHomogenousStorage, Implementation
+from .._abstract_homogenous_storage import (
+    AbstractHomogenousStorage,
+    Implementation,
+)
 from ._abstract_heat_storage import AbstractHeatStorage
 
 
