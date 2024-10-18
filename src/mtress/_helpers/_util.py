@@ -23,7 +23,8 @@ def update_in_dict(
     `d['foo']['bar']['baz'] = 3.1415`.
 
     :param dictionary: Dictionary which should be updated
-    :param keys: List of keys or dot separated string locating the value in question
+    :param keys: List of keys or dot separated string locating the value
+        in question
     :param value: New value
     :param sep: Level separator, defaults to .
     :param ignore_missing: Ignore missing keys
@@ -126,8 +127,8 @@ def enable_templating(template_class):
 
                 for param in param_names:
                     if param not in kwargs and param in func_params:
-                        # Take the value from the template if it is not provided as keyword
-                        # argument
+                        # Take the value from the template if it is not
+                        # provided as keyword argument
                         kwargs[param] = getattr(template, param)
 
             return func(*args, **kwargs)

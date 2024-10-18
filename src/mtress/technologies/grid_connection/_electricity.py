@@ -87,5 +87,6 @@ class ElectricityGridConnection(
         self,
         other: ElectricityGridConnection,
     ):
-        # TODO create the actual flows between the location in establish interconnections
+        # TODO create the actual flows between the location in
+        # establish interconnections
         self.grid_export.outputs[other.grid_import] = Flow()

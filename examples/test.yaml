@@ -65,7 +65,7 @@ locations:
       hp0:
         technology: HeatPump
         parameters:
-          cop_0_35: 2.
+          ref_cop: 2.
           thermal_power_limit: 0.1 # MW
 
       heater:

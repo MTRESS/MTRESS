@@ -16,8 +16,8 @@ class H2Storage(GasStorage):
     """
     Fully mixed hydrogen storage.
 
-    Fully mixed hydrogen storage that ensures access only when suitable pressure levels
-    are reached.
+    Fully mixed hydrogen storage that ensures access only when suitable
+    pressure levels are reached.
     """
 
     def __init__(

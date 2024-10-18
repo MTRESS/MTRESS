@@ -23,7 +23,8 @@ class AbstractHeater(AbstractTechnology, AbstractSolphRepresentation):
         """
         :param name: Set the name of the component.
         :parma maximum_temperature: Temperature (in °C) of the heat output.
-        :parma minimum_temperature: Lowest possible temperature (in °C) of the inlet.
+        :parma minimum_temperature: Lowest possible temperature (in °C)
+            of the inlet.
         """
         super().__init__(name=name)
 
@@ -88,8 +89,10 @@ class ResistiveHeater(AbstractHeater):
 
         :param name: Set the name of the component.
         :param maximum_temperature: Temperature (in °C) of the heat output.
-        :param minimum_temperature: Lowest possible temperature (in °C) of the inlet.
-        :param heating_power: Nominal heating capacity of the heating rod (in W).
+        :param minimum_temperature: Lowest possible temperature (in °C)
+            of the inlet.
+        :param heating_power: Nominal heating capacity of the heating rod
+            (in W).
         :param efficiency: Thermal conversion efficiency.
         """
         super().__init__(
@@ -144,7 +147,8 @@ class GasBoiler(AbstractHeater):
         :param gas_type: (Gas) type of gas from gas carrier and its share in
                          vol %
         :parma maximum_temperature: Temperature (in °C) of the heat output
-        :parma minimum_temperature: Lowest possible temperature (in °C) of the inlet.
+        :parma minimum_temperature: Lowest possible temperature (in °C)
+            of the inlet.
         :param heating_power: Nominal heat output capacity (in Watts).
         :param input_pressure: Input pressure of gas or gases (in bar).
         :param efficiency: Thermal conversion efficiency (LHV).

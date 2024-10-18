@@ -9,18 +9,41 @@ SPDX-FileCopyrightText: Lucas Schmeling
 SPDX-License-Identifier: MIT
 """
 
+from dataclasses import dataclass
+
 from oemof.solph import Bus, Flow
 from oemof.solph.components import Converter, Source
 
 from .._abstract_component import AbstractSolphRepresentation
 from ..carriers import ElectricityCarrier, HeatCarrier
-from ..physics import calc_cop, celsius_to_kelvin
+from ..physics import calc_cop
 from ._abstract_technology import AbstractTechnology
+
+
+@dataclass
+class COPReference:
+    """
+    :param cold_side_in: Reference inlet temperature (°C) at cold side 
+        of the HP, e.g., evaporator.
+    :param cold_side_out: Reference outlet temperature (°C) at cold side
+        of the HP, e.g., evaporator.
+    :param warm_side_out: Reference outlet temperature (°C) at warm side
+        of the HP, e.g., condenser.
+    :param warm_side_in: Reference inlet temperature (°C) at warm side
+        of the HP, e.g., condenser.
+    """
+
+    cop: float = 4.6
+    cold_side_in: float = 0.0
+    cold_side_out: float = -5.0
+    warm_side_out: float = 35.0
+    warm_side_in: float = 30.0
 
 
 class HeatPump(AbstractTechnology, AbstractSolphRepresentation):
     """
-    Clustered heat pump for modeling power flows with variable temperature levels.
+    Clustered heat pump for modeling power flows with variable
+    temperature levels.
 
     Connects any input to any output using Converter
     with shared resources, see https://arxiv.org/abs/2012.12664
@@ -39,9 +62,9 @@ class HeatPump(AbstractTechnology, AbstractSolphRepresentation):
     def __init__(
         self,
         name: str,
-        electrical_power_limit: float = None,
+        ref_cop: COPReference = None,
         thermal_power_limit: float = None,
-        cop_0_35: float = 4.6,
+        electrical_power_limit: float = None,
         max_temp_primary: float = None,
         min_temp_primary: float = None,
         min_delta_temp_primary: float = 5.0,
@@ -52,20 +75,29 @@ class HeatPump(AbstractTechnology, AbstractSolphRepresentation):
         """
         Initialize heat pump component.
 
-        :param thermal_power_limit: Thermal power limit on all temperature ranges
+        :param thermal_power_limit: Thermal power limit on all
+            temperature ranges
         :param cop_0_35: COP for the temperature rise 0°C to 35°C
-        :param max_temp_primary: Maximum inlet temperature (°C) at the cold side.
-        :param min_temp_primary: Minimum outlet temperature (°C) at the cold side.
+        :param max_temp_primary: Maximum inlet temperature (°C)
+            at the cold side.
+        :param min_temp_primary: Minimum outlet temperature (°C) 
+            at the cold side.
         :param min_delta_temp_primary: Minumum delta (°C) at the cold side.
-        :param max_temp_secondary: Maximum outlet temperature (°C) at the warm side.
-        :param min_temp_secondary: Minimum inlet temperature (°C) at the warm side.
+        :param max_temp_secondary: Maximum outlet temperature (°C)
+            at the warm side.
+        :param min_temp_secondary: Minimum inlet temperature (°C)
+            at the warm side.
         :param min_delta_temp_secondary: Minumum delta (°C) at the warm side.
         """
         super().__init__(name=name)
 
+        if ref_cop is None:
+            ref_cop = COPReference()
+
+        self.ref_cop = ref_cop
         self.electrical_power_limit = electrical_power_limit
         self.thermal_power_limit = thermal_power_limit
-        self.cop_0_35 = cop_0_35
+
         self.max_temp_primary = max_temp_primary
         self.min_temp_primary = min_temp_primary
         self.min_delta_temp_primary = min_delta_temp_primary
@@ -177,11 +209,11 @@ class HeatPump(AbstractTechnology, AbstractSolphRepresentation):
             temp_secondary_out, temp_secondary_in
         )
         cop = calc_cop(
-            temp_primary_in=celsius_to_kelvin(temp_primary_in),
-            temp_primary_out=celsius_to_kelvin(temp_primary_out),
-            temp_secondary_in=celsius_to_kelvin(temp_secondary_in),
-            temp_secondary_out=celsius_to_kelvin(temp_secondary_out),
-            cop_0_35=self.cop_0_35,
+            ref_cop=self.ref_cop,
+            temp_primary_in=temp_primary_in,
+            temp_primary_out=temp_primary_out,
+            temp_secondary_in=temp_secondary_in,
+            temp_secondary_out=temp_secondary_out,
         )
 
         self.create_solph_node(

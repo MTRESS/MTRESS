@@ -22,20 +22,21 @@ class HeatCarrier(AbstractLayeredCarrier, AbstractSolphRepresentation):
     Connector class for modelling power flows with variable temperature levels.
 
     This class models is a heat bus system with configurable temperature levels
-    (original concept at https://arxiv.org/abs/2012.12664). The temperature levels
-    can represent flow and return of a room heating system or various tapping
-    temperatures.
+    (original concept at https://arxiv.org/abs/2012.12664). The temperature
+    levels can represent flow and return of a room heating system or various
+    tapping temperatures.
 
     (T3) -> (T2) -> (T1) -> (T0)
 
-    Functionality: Heat connections at a location. This class represents a local
-        heat distribution system (typically hydraulic).
+    Functionality: Heat connections at a location. This class represents a
+        local heat distribution system (typically hydraulic).
         The energy carrier heat allows to optimise both, temperature and heat,
-        as the temperature has a significant impact on the performance of renewable
-        energy supply systems. This is done by defining several discrete temperature
-        levels.
-        Besides the temperature levels, a reference temperature is defined, that
-        is used to calculate the values of heat flows from, to an inside the carrier.
+        as the temperature has a significant impact on the performance of
+        renewable energy supply systems. This is done by defining several
+        discrete temperature levels.
+        Besides the temperature levels, a reference temperature is defined,
+        that is used to calculate the values of heat flows from, to an inside
+        the carrier.
 
         Other components and demands might be added to the energy_system by
         their respective classes / functions and are automatically connected
@@ -54,8 +55,10 @@ class HeatCarrier(AbstractLayeredCarrier, AbstractSolphRepresentation):
 
         :param temperature_levels: list of temperatures (in °C)
         :param reference_temperature: Reference temperature (in °C)
-        :param missing_heat_penalty: assigns a cost for each unit of missing heat produced (in any currency)
-        :param excess_heat_penalty: assigns a cost for each unit of excess heat produced (in any currency)
+        :param missing_heat_penalty: assigns a cost for each unit of missing
+            heat produced (in any currency)
+        :param excess_heat_penalty: assigns a cost for each unit of excess
+            heat produced (in any currency)
         """
         if reference_temperature in temperature_levels:
             raise ValueError(
@@ -131,11 +134,13 @@ class HeatCarrier(AbstractLayeredCarrier, AbstractSolphRepresentation):
 
         if cold_level_heating not in self.levels:
             raise ValueError(
-                f"No suitable temperature level available for {cold_level_heating}."
+                f"""No suitable temperature level available 
+                for {cold_level_heating}."""
             )
         if warm_level_heating not in self.levels:
             raise ValueError(
-                f"No suitable temperature level available for {warm_level_heating}."
+                f"""No suitable temperature level available 
+                for {warm_level_heating}."""
             )
 
         ratio = (cold_level_heating - self.reference) / (

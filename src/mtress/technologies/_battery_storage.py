@@ -35,7 +35,8 @@ class BatteryStorage(AbstractTechnology, AbstractSolphRepresentation):
         :param discharging_efficiency: Efficiency during battery discharging,
                                        default to 0.95.
         :param loss_rate: Loss rate of a battery storage, default to 0.
-        :param initial_soc: Initial state of charge of a battery, default to 0.5.
+        :param initial_soc: Initial state of charge of a battery,
+            default to 0.5.
         :param min_soc: Minimum state of charge of a battery, default to 0.1.
         """
 

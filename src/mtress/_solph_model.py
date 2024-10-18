@@ -133,7 +133,9 @@ class SolphModel:
         flow_color: dict = None,
         colorscheme: dict = None,
     ) -> list[Digraph]:
-        """Wrapper for graph function to generate multiple graphs as a series."""
+        """
+        Wrapper for graph function to generate multiple graphs as a series.
+        """
         if start is None:
             # use first entry of time series
             temp_flow = list(flow_results.items())[0][1]
