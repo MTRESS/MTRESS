@@ -33,16 +33,17 @@ def storage_multiplexer_constraint(
     name : string
         Name of the multiplexer.
     storage_bus : oemof.solph.components.GenericStorage
-        Storage component whose content should mandate the possible inputs and outputs.
+        Storage component whose content should mandate the possible inputs
+        and outputs.
     multiplexer_bus : oemof.solph.Bus
         Bus which connects the input and output levels to the storage.
     input_levels : dict[oemof.network.network.Node, float]
-        Mapping of storage content levels to the corresponding input node, e.g. for a
-        given value in this list, the corresponding input can be
+        Mapping of storage content levels to the corresponding input node,
+        e.g. for a given value in this list, the corresponding input can be
         active if the storage content is lower than this value.
     output_levels : dict[oemof.network.network.Node, float]
-        Mapping of storage content levels to the corresponding output node, e.g. for a
-        given value in this list, the corresponding output can be
+        Mapping of storage content levels to the corresponding output node,
+        e.g. for a given value in this list, the corresponding output can be
         active if the storage content is higher than this value.
     """
     # TODO: Add example.
@@ -59,7 +60,8 @@ def storage_multiplexer_constraint(
         for i, (left, right) in enumerate(zip(levels[:-1], levels[1:]))
     }
 
-    # Set for indexing the intervals (each interval is represented by its lower bound)
+    # Set for indexing the intervals
+    # (each interval is represented by its lower bound)
     def init_interval_indices(model):
         return [
             (interval, timestep)
@@ -107,8 +109,8 @@ def storage_multiplexer_constraint(
     weights = po.Var(level_indices, bounds=(0, 1))
     setattr(model, f"{name}_weights", weights)
 
-    # Constrain weight variables to be non-zero only when the corresponding levels
-    # sourround the active interval
+    # Constrain weight variables to be non-zero only when the corresponding
+    # levels sourround the active interval
     def init_weight_constraint(_, level, timestep):
         expr = 0
         expr += weights[level, timestep]
