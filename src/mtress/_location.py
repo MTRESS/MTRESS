@@ -52,7 +52,8 @@ class Location(NamedElement):
 
     @property
     def identifier(self) -> list[str]:
-        """As Location is at the highest level, it's name directly identifies it.
+        """
+        As Location is at the highest level, it's name directly identifies it.
         The list is created for consistency.
         """
         return [self.name]

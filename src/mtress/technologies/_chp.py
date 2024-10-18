@@ -51,12 +51,12 @@ class CHPTemplate:
     10. https://www.energy.gov/eere/amo/articles/gas-turbines-doe-chp-technology-fact-sheet-series-fact-sheet-2016
     11. https://assets.publishing.service.gov.uk/government/uploads/system/uploads
         /attachment_data/file/961492/Part_2_CHP_Technologies_BEIS_v03.pdf
-    12. "Hydrogen-based combined heat and power systems: A review of technologies
-        and challenges" by Sen Yu et. al.
+    12. "Hydrogen-based combined heat and power systems: A review of
+        technologies and challenges" by Sen Yu et. al.
     13. https://www.ge.com/content/dam/gepower-new/global/en_US/downloads/gas-new-site/
         future-of-energy/hydrogen-for-power-gen-gea34805.pdf
-    14. "Comparison of District Heating Supply Options for Different CHP Configurations"
-        by Pavel et. al.
+    14. "Comparison of District Heating Supply Options for Different
+        CHP Configurations" by Pavel et. al.
     15. https://gentec.cz/wp-content/uploads/2021/09/Technical-datasheet_KE-MNG-500-BE_28.08.2023_rev1.pdf
 
     """
@@ -133,13 +133,14 @@ class CHP(AbstractHeater):
     industrial processes, etc.
 
     Note: User can select one of the default CHP technology template
-    (NATURALGAS_CHP, BIOGAS_CHP, BIOMETHANE_CHP, HYDROGEN_CHP, HYDROGEN_MIXED_CHP).
-    These CHPs are distinguished with gas input fuel with shares in vol %, thermal
-    temperature, electrical efficiency, and thermal efficiency. User can either
-    change these parameters for any specific technology type or can create user-
-    -defined technology if needed. Moreover, by default, HYDROGEN_MIXED_CHP type
-    takes fuel input of natural gas (80 vol%) and  hydrogen (20 vol%).
-
+    (NATURALGAS_CHP, BIOGAS_CHP, BIOMETHANE_CHP, HYDROGEN_CHP,
+    HYDROGEN_MIXED_CHP).
+    These CHPs are distinguished with gas input fuel with shares in vol %,
+    thermal temperature, electrical efficiency, and thermal efficiency.
+    User can either change these parameters for any specific technology type or
+    can create user-defined technology if needed. Moreover, by default,
+    HYDROGEN_MIXED_CHP type takes fuel input of natural gas (80 vol%) and
+    hydrogen (20 vol%).
     """
 
     @enable_templating(CHPTemplate)
@@ -160,13 +161,16 @@ class CHP(AbstractHeater):
         :param name: Set the name of the component
         :param gas_type: (Dict) type of gas from gas carrier and its share in
                          vol %
-        :parma maximum_temperature: Maximum temperature level (in °C) of the heat output
-                                    from CHP that is recoverable.
+        :parma maximum_temperature: Maximum temperature level (in °C) of the
+            heat output from CHP that is recoverable.
         :param minimum_temperature: Minimum return temperature level (in °C)
-        :param nominal_power: Nominal electric output capacity of the CHP (in Watts)
+        :param nominal_power: Nominal electric output capacity of the CHP
+            (in Watts)
         :param input_pressure: Input pressure of gas or gases (in bar).
-        :param electric_efficiency: Electric conversion efficiency (LHV) of the CHP
-        :param thermal_efficiency: Thermal conversion efficiency (LHV) of the CHP
+        :param electric_efficiency: Electric conversion efficiency
+            (LHV) of the CHP
+        :param thermal_efficiency: Thermal conversion efficiency
+            (LHV) of the CHP
 
         """
         super().__init__(
@@ -185,9 +189,10 @@ class CHP(AbstractHeater):
         """Build core structure of oemof.solph representation."""
         super().build_core()
 
-        # Convert volume (vol% )fraction into mass fraction (%) as unit of gases
-        # in MTRESS are considered in mass (kg).
-        # W(i) = Vol. fraction (i) * molar_mass(i)/ ∑(Vol. fraction (i) * molar_mass(i))
+        # Convert volume (vol% )fraction into mass fraction (%) as unit
+        # of gases in MTRESS are considered in mass (kg).
+        # W(i) =
+        # Vol. fraction(i) * molar_mass(i)/ ∑(Vol. fraction(i) * molar_mass(i))
         # Calculate the denominator first
         denominator = sum(
             vol_fraction * gas.molar_mass
@@ -217,10 +222,11 @@ class CHP(AbstractHeater):
         # Add electrical connection
         electricity_carrier = self.location.get_carrier(ElectricityCarrier)
         electrical_bus = electricity_carrier.distribution
-        # convert gas in kg to electricity in Wh with thermal efficiency conversion
+        # convert gas in kg to electricity in Wh with thermal
+        # efficiency conversion
         electrical_output = self.electric_efficiency * gas_LHV
-        # convert nominal electrical capacity in watts to nominal gas consumption
-        # in kg
+        # convert nominal electrical capacity in watts to nominal
+        # gas consumption in kg
         nominal_gas_consumption = self.nominal_power / (
             self.electric_efficiency * gas_LHV
         )

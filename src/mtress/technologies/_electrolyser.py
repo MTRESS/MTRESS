@@ -28,9 +28,9 @@ class ElectrolyserTemplate:
     Important references on technologies:
     1. https://en.wikipedia.org/wiki/Polymer_electrolyte_membrane_electrolysis
     2. https://www.h-tec.com/produkte/detail/h-tec-pem-elektrolyseur-me450/me450/
-    3. "Assessment of the Future Waste Heat Potential from Electrolysers and its
-    Utilisation in District Heating" by Stefan REUTER, Ralf-Roman SCHMIDT
-    4. "A study on the potential of excess heat from medium­ to large­scale PEM
+    3. "Assessment of the Future Waste Heat Potential from Electrolysers and
+    its Utilisation in District Heating" by Stefan REUTER, Ralf-Roman SCHMIDT
+    4. "A study on the potential of excess heat from medium to large scale PEM
     electrolysis and the performance analysis of a dedicated cooling system"
     by W.J. Tiktak
     5. https://handbook.enapter.com/electrolyser/aem-flex120
@@ -52,10 +52,10 @@ class ElectrolyserTemplate:
     hydrogen_output_pressure: float
 
 
-#  Efficiency for each of the technology are based on Lower Heating Value (LHV).
-#  The efficiency (hydrogen and thermal) assumed here are based on the Beginning
-#  of Life (BoL). In Practice, both the efficiency values of electrolyser changes
-#  as it gets older.
+# Efficiency for each of the technology are based on Lower Heating Value (LHV).
+# The efficiency (hydrogen and thermal) assumed here are based on the Beginning
+# of Life (BoL). In Practice, both the efficiency values of electrolyser
+# changes as it gets older.
 
 PEM_ELECTROLYSER = ElectrolyserTemplate(
     full_load_hydrogen_efficiency=0.63,
@@ -144,18 +144,20 @@ class AbstractElectrolyser(AbstractHeater):
 
 class Electrolyser(AbstractElectrolyser):
     """
-    Electrolyser split water into hydrogen and oxygen with the electricity as input
-    source of energy.Hydrogen can be used as an energy carrier for various applications.
-    Excess heat from electrolyser (PEM, Alk, AEM) can also be utilised for space heating
-    and hot water in: offices, commercial building, residential applications, either
-    directly or via a district heating network. Heat requirement for Anaerobic Digestion
-    (AD) Plant or some industrial processes can also be provided via Electrolysers.
-    Waste heat utilisation can increase the system efficiency of up to 91 %. Oxygen
-    produced in the electrolysis process is not considered in MTRESS.
+    Electrolyser split water into hydrogen and oxygen with the electricity as
+    input source of energy.Hydrogen can be used as an energy carrier for
+    various applications. Excess heat from electrolyser (PEM, Alk, AEM) can
+    also be utilised for space heating and hot water in: offices,
+    commercial building, residential applications, either directly or via a
+    district heating network. Heat requirement for Anaerobic Digestion (AD)
+    Plant or some industrial processes can also be provided via Electrolysers.
+    Waste heat utilisation can increase the system efficiency of up to 91 %.
+    Oxygen produced in the electrolysis process is not considered in MTRESS.
 
-    There are various types of electrolyser : PEM, Alkaline, AEM, etc. The SOEC is not
-    considered in MTRESS. This class module can use electrolyser template for PEM,
-    Alkaline, and AEM, with their default parameters as follows:
+    There are various types of electrolyser : PEM, Alkaline, AEM, etc.
+    The SOEC is not considered in MTRESS. This class module can use
+    electrolyser template for PEM, Alkaline, and AEM, with their default
+    parameters as follows:
 
     from mtress.technologies import PEM_ELECTROLYSER
 
@@ -167,13 +169,13 @@ class Electrolyser(AbstractElectrolyser):
         )
     )
 
-    but user can also overite the default parameters as per the requirements or user can
-    ignore using the template and define all parameters manually.
+    but user can also overite the default parameters as per the requirements or
+    user can ignore using the template and define all parameters manually.
 
-    Note: This Electrolyser class do not consider the offset and partload operation of
-    the electrolyser i.e., electrolyser operates at full load range with fixed
-    efficiency and do not consider the part load operation. To consider partload
-    operation please use OffsetElectrolyser class.
+    Note: This Electrolyser class do not consider the offset and partload
+    operation of the electrolyser i.e., electrolyser operates at full load
+    range with fixed efficiency and do not consider the part load operation.
+    To consider partload operation please use OffsetElectrolyser class.
     """
 
     @enable_templating(ElectrolyserTemplate)
@@ -192,11 +194,13 @@ class Electrolyser(AbstractElectrolyser):
 
         :param name: Name of the component
         :param nominal_power: Nominal electrical power (in W) of the component
-        :param max_load_hydrogen_efficiency: Hydrogen production efficiency at nominal
-            load, i.e., the ratio of hydrogen output and electrical input
-        :param max_load_thermal_efficiency: Thermal efficiency at the nominal load
-            i.e., ratio of thermal output and electrical input
-        :param maximum_temperature: Maximum waste heat temperature level (in °C).
+        :param max_load_hydrogen_efficiency: Hydrogen production efficiency at
+            nominal load, i.e., the ratio of hydrogen output and
+            electrical input
+        :param max_load_thermal_efficiency: Thermal efficiency at the nominal
+            load i.e., ratio of thermal output and electrical input
+        :param maximum_temperature: Maximum waste heat temperature level
+            (in °C).
         :param minimum_temperature: Minimum return temperature level (in °C)
         """
         super().__init__(
@@ -232,18 +236,20 @@ class Electrolyser(AbstractElectrolyser):
 
 class OffsetElectrolyser(AbstractElectrolyser):
     """
-    Electrolyser split water into hydrogen and oxygen with the electricity as input
-    source of energy.Hydrogen can be used as an energy carrier for various applications.
-    Excess heat from electrolyser (PEM, Alk, AEM) can also be utilised for space heating
-    and hot water in: offices, commercial building, residential applications, either
-    directly or via a district heating network. Heat requirement for Anaerobic Digestion
-    (AD) Plant or some industrial processes can also be provided via Electrolysers.
-    Waste heat utilisation can increase the system efficiency of up to 91 %. Oxygen
-    produced in the electrolysis process is not considered in MTRESS.
+    Electrolyser split water into hydrogen and oxygen with the electricity as
+    input source of energy.Hydrogen can be used as an energy carrier for
+    various applications. Excess heat from electrolyser (PEM, Alk, AEM) can
+    also be utilised for space heating and hot water in: offices, commercial
+    building, residential applications, either directly or via a district
+    heating network. Heat requirement for Anaerobic Digestion (AD) Plant or
+    some industrial processes can also be provided via Electrolysers.
+    Waste heat utilisation can increase the system efficiency of up to 91 %.
+    Oxygen produced in the electrolysis process is not considered in MTRESS.
 
-    There are various types of electrolyser : PEM, Alkaline, AEM, etc. The SOEC is not
-    considered in MTRESS. This class module can use electrolyser template for PEM,
-    Alkaline, and AEM, with their default parameters as follows:
+    There are various types of electrolyser : PEM, Alkaline, AEM, etc.
+    The SOEC is not considered in MTRESS. This class module can use
+    electrolyser template for PEM, Alkaline, and AEM, with their default
+    parameters as follows:
 
     from mtress.technologies import PEM_ELECTROLYSER
 
@@ -255,11 +261,11 @@ class OffsetElectrolyser(AbstractElectrolyser):
         )
     )
 
-    but user can also overite the default parameters as per the requirements or user can
-    ignore using the template and define all parameters manually.
+    but user can also overite the default parameters as per the requirements or
+    user can ignore using the template and define all parameters manually.
 
-    Note: This Electrolyser class consider the offsets and partload operation of
-    the electrolyser.
+    Note: This Electrolyser class consider the offsets and partload operation
+    of the electrolyser.
     """
 
     @enable_templating(ElectrolyserTemplate)
@@ -282,17 +288,20 @@ class OffsetElectrolyser(AbstractElectrolyser):
 
         :param name: Name of the component
         :param nominal_power: Nominal electrical power (in W) of the component
-        :param max_load_hydrogen_efficiency: Hydrogen production efficiency at nominal
-            load, i.e., the ratio of hydrogen output and electrical input
-        :param max_load_thermal_efficiency: Thermal efficiency at the nominal load
-            i.e., ratio of thermal output and electrical input
-        :param maximum_temperature: Maximum waste heat temperature level (in °C).
+        :param max_load_hydrogen_efficiency: Hydrogen production efficiency at
+            nominal load, i.e., the ratio of hydrogen output and
+            electrical input
+        :param max_load_thermal_efficiency: Thermal efficiency at the nominal
+            load i.e., ratio of thermal output and electrical input
+        :param maximum_temperature: Maximum waste heat temperature level
+            (in °C).
         :param minimum_temperature: Minimum return temperature level (in °C)
         :param hydrogen_output_pressure: Hydrogen output pressure (in bar)
-        :param min_load_hydrogen_efficiency: Hydrogen production efficiency at minimum
-           load.
+        :param min_load_hydrogen_efficiency: Hydrogen production efficiency
+            at minimum load.
         :param min_load_thermal_efficiency: Thermal efficiency at minimum load
-        :param minimum_load: Minimum load level (fraction of the nominal/maximum load)
+        :param minimum_load: Minimum load level
+            (fraction of the nominal/maximum load)
         :param maximum_load: Maximum load level, default is 1
         """
         super().__init__(
