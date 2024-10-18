@@ -23,10 +23,14 @@ from ._abstract_technology import AbstractTechnology
 @dataclass
 class COPReference:
     """
-    :param cold_side_in: Reference inlet temperature (°C) at cold side of the HP, e.g., evaporator.
-    :param cold_side_out: Reference outlet temperature (°C) at cold side of the HP, e.g., evaporator.
-    :param warm_side_out: Reference outlet temperature (°C) at warm side of the HP, e.g., condenser.
-    :param warm_side_in: Reference inlet temperature (°C) at warm side of the HP, e.g., condenser.
+    :param cold_side_in: Reference inlet temperature (°C) at cold side 
+        of the HP, e.g., evaporator.
+    :param cold_side_out: Reference outlet temperature (°C) at cold side
+        of the HP, e.g., evaporator.
+    :param warm_side_out: Reference outlet temperature (°C) at warm side
+        of the HP, e.g., condenser.
+    :param warm_side_in: Reference inlet temperature (°C) at warm side
+        of the HP, e.g., condenser.
     """
 
     cop: float = 4.6
