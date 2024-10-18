@@ -224,7 +224,8 @@ class AbstractSolphRepresentation(AbstractComponent):
                     tuple(solph_node.label), "black"
                 )
                 if origin in self._solph_nodes:
-                    # This is an internal edge and thus only added if detail is True
+                    # This is an internal edge and thus only added
+                    # if detail is True
                     if detail:
                         flow = 0
                         if flow_results is not None:
