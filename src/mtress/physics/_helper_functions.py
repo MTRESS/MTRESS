@@ -25,7 +25,8 @@ def one_to_mega(arg):
 
 def mega_to_one(arg):
     """
-    use to make explicit unit conversions instead of just multiplying by 1000000
+    use to make explicit unit conversions instead of just
+    multiplying by 1000000
     """
     return arg * 1000000
 
@@ -142,11 +143,12 @@ def calc_cop(
 
 def calc_isothermal_compression_energy(p_in, p_out, T=20, R=4124.2):
     r"""
-    Calculate the energy demand to compress an ideal gas at constant temperature.
+    Calculate the energy demand to compress an ideal gas at
+    constant temperature.
 
     This function calculates the energy demand for an isothermal compression
-    of 1 kg of an ideal gas with gas constant R from input_pressure p_in to input_pressure
-    p_out.
+    of 1 kg of an ideal gas with gas constant R from input_pressure p_in to
+    input_pressure p_out.
 
     The work required for isothermal compression from input_pressure level
     :math:`p_\mathrm{in}` to :math:`p_\mathrm{out}` at the temperature
