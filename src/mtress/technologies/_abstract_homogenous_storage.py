@@ -24,7 +24,8 @@ class Implementation(Enum):
     """
     Possible multiplexer implementations.
 
-    STRICT: Allow flows to be active only if storage content permits until the end of the time step.
+    STRICT: Allow flows to be active only if storage content permits until the 
+        end of the time step.
     FLEXIBLE: Allow flows to be active if storage content permits at any time.
     """
 
@@ -62,14 +63,15 @@ class AbstractHomogenousStorage(AbstractSolphRepresentation):
 
         :param carrier: Carrier to connect to.
         :param power_limit: Power limit of the storage.
-        :param capacity_at_level: Function to calculate the storage content for a given
-            level, e.g. energy content at a given pressure level. If no function is
-            given, linear relation between carrier quality and storage level is assumed.
-        :param empty_level: Level which corresponds to an empty storage, e.g. the
-            reference temperature of the heat carrier. This argument is only used in
-            conjunction with capacity_per_unit.
-        :param solph_storage_arguments: Additional arguments to be passed to the
-            storage constructor, e.g. loss rates
+        :param capacity_at_level: Function to calculate the storage content for 
+            a given level, e.g. energy content at a given pressure level. If no 
+            function is given, linear relation between carrier quality and 
+            storage level is assumed.
+        :param empty_level: Level which corresponds to an empty storage, e.g. 
+            the reference temperature of the heat carrier. This argument is 
+            only used in conjunction with capacity_per_unit.
+        :param solph_storage_arguments: Additional arguments to be passed to 
+            the storage constructor, e.g. loss rates
         """
 
         self.storage_multiplexer_inputs = {}
@@ -79,7 +81,8 @@ class AbstractHomogenousStorage(AbstractSolphRepresentation):
 
         for level in levels:
             if capacity_at_level is not None:
-                # Use user defined function calculating the storage content at level
+                # Use user defined function calculating the storage content 
+                # at level
                 storage_level = capacity_at_level(level) / capacity_at_level(
                     max_level
                 )
@@ -151,5 +154,6 @@ class AbstractHomogenousStorage(AbstractSolphRepresentation):
             return
 
         raise NotImplementedError(
-            f"Storage constraint implementation {self.implementation} not implement"
+            f"Storage constraint implementation {self.implementation} 
+            not implement"
         )

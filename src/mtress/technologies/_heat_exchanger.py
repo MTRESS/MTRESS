@@ -14,7 +14,8 @@ class AbstactHeatExchanger(AbstractTechnology, AbstractSolphRepresentation):
     Heat exchanger
 
     Functionality: Holds a time series of both the temperature and the
-        power limit that can be drawn from the source and/or expelled to the sink.
+        power limit that can be drawn from the source and/or expelled
+        to the sink.
 
     Procedure: Define the type of HE:
         1. Source:
@@ -44,7 +45,8 @@ class AbstactHeatExchanger(AbstractTechnology, AbstractSolphRepresentation):
         Initialize heat exchanger to draw or expel energy from a source
 
         :param name: Name of the component.
-        :param nominal_power: Nominal power of the heat exchanger (in W), default to None.
+        :param nominal_power: Nominal power of the heat exchanger (in W),
+            default to None.
         :param reservoir_temperature: Reference to air temperature time series
         """
         super().__init__(name=name)

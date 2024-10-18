@@ -20,7 +20,8 @@ from ._abstract_technology import AbstractTechnology
 
 class HeatPump(AbstractTechnology, AbstractSolphRepresentation):
     """
-    Clustered heat pump for modeling power flows with variable temperature levels.
+    Clustered heat pump for modeling power flows with variable
+    temperature levels.
 
     Connects any input to any output using Converter
     with shared resources, see https://arxiv.org/abs/2012.12664
@@ -52,13 +53,18 @@ class HeatPump(AbstractTechnology, AbstractSolphRepresentation):
         """
         Initialize heat pump component.
 
-        :param thermal_power_limit: Thermal power limit on all temperature ranges
+        :param thermal_power_limit: Thermal power limit on all
+            temperature ranges
         :param cop_0_35: COP for the temperature rise 0°C to 35°C
-        :param max_temp_primary: Maximum inlet temperature (°C) at the cold side.
-        :param min_temp_primary: Minimum outlet temperature (°C) at the cold side.
+        :param max_temp_primary: Maximum inlet temperature (°C)
+            at the cold side.
+        :param min_temp_primary: Minimum outlet temperature (°C)
+            at the cold side.
         :param min_delta_temp_primary: Minumum delta (°C) at the cold side.
-        :param max_temp_secondary: Maximum outlet temperature (°C) at the warm side.
-        :param min_temp_secondary: Minimum inlet temperature (°C) at the warm side.
+        :param max_temp_secondary: Maximum outlet temperature (°C)
+            at the warm side.
+        :param min_temp_secondary: Minimum inlet temperature (°C)
+            at the warm side.
         :param min_delta_temp_secondary: Minumum delta (°C) at the warm side.
         """
         super().__init__(name=name)

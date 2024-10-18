@@ -130,7 +130,8 @@ class AbstractFuelCell(AbstractHeater):
             ElectricityCarrier
         )
 
-        # Electrical efficiency with conversion from gas in kg to electricity in W
+        # Electrical efficiency with conversion from gas in kg
+        # to electricity in W
         self.full_load_electrical_output = (
             self.full_load_electrical_efficiency * self.gas_type.LHV
         )
@@ -146,37 +147,43 @@ class AbstractFuelCell(AbstractHeater):
 
 class FuelCell(AbstractFuelCell):
     """
-    Class for modeling a Fuel Cell (FC) technology. It inherits from AbstractFuelCell.
+    Class for modeling a Fuel Cell (FC) technology.
+    It inherits from AbstractFuelCell.
 
     Fuel cells converts chemical energy (hydrogen) to electricity, and
-    potentially produces useful heat and water as byproducts. Fuel Cell could be
-    used for various application to produce heat and power with hydrogen as fuel input.
-    Hence, it enables better sector coupling between electricity and heating sector.
-    They find widespread application in various sectors, especially stationary type fuel
-    cell, such as backup power, distributed power generation, and co-generation, in the
-    context of the MTRESS energy system.
+    potentially produces useful heat and water as byproducts. Fuel Cell could
+    be used for various application to produce heat and power with hydrogen as
+    fuel input. Hence, it enables better sector coupling between electricity
+    and heating sector. They find widespread application in various sectors,
+    especially stationary type fuel cell, such as backup power, distributed
+    power generation, and co-generation, in the context of the
+    MTRESS energy system.
 
-    PEMFC are usually rated with electrical efficiency (@ LHV) of 35-39% and thermal
-    efficiency (@ LHV) of ~20-55%. So, technically overall efficiency of 85-94% could be
-    reached, if excess heat could be recovered. The excess heat could be recovered to
-    increase the overall efficiency of the device.
-    Operating temperature of low-temperature FC could range between 50-100 °C, making
-    them suitable for space heating and boiling water for residential, commercial building,
-    and/or industrial processes, etc. For instance, the H2home project demonstrated the use
-    of PEMFC-based combined heat and power (CHP) systems for residential buildings. Ongoing
-    research aims to push the operating temperature beyond 100 °C, with high-temperature
-    PEMFCs (HT-PEMFCs) even capable of reaching up to 200 °C. Alternatively,
-    high-temperature fuel cells like Solid Oxide Fuel Cells (SOFCs) operate at even
-    higher temperatures, typically in the range of 500-1000 °C.  SOFCs are not
-    considered in MTRESS yet.  Fuel Cell CHP uses heat exchanger or heat recovery unit
-    to harness heat energy to useful energy. Heat exchangers that circulates cooling
-    liquid is used to extract heat for PEMFC, AFC, AEM and cathode air flow for SOFC.
+    PEMFC are usually rated with electrical efficiency (@ LHV) of 35-39% and
+    thermal efficiency (@ LHV) of ~20-55%. So, technically overall efficiency
+    of 85-94% could be reached, if excess heat could be recovered. The excess
+    heat could be recovered to increase the overall efficiency of the device.
+    Operating temperature of low-temperature FC could range between 50-100 °C,
+    making them suitable for space heating and boiling water for residential,
+    commercial building, and/or industrial processes, etc. For instance, the
+    H2home project demonstrated the use of PEMFC-based combined heat and power
+    (CHP) systems for residential buildings. Ongoing research aims to push the
+    operating temperature beyond 100 °C, with high-temperature PEMFCs
+    (HT-PEMFCs) even capable of reaching up to 200 °C. Alternatively,
+    high-temperature fuel cells like Solid Oxide Fuel Cells (SOFCs) operate at
+    even higher temperatures, typically in the range of 500-1000 °C.  SOFCs are
+    not considered in MTRESS yet. Fuel Cell CHP uses heat exchanger or heat
+    recovery unit to harness heat energy to useful energy. Heat exchangers that
+    circulates cooling liquid is used to extract heat for PEMFC, AFC, AEM
+    and cathode air flow for SOFC.
 
-    Overall, FC can offer promising solutions to our renewable-based energy system.
+    Overall, FC can offer promising solutions to our renewable-based
+    energy system.
 
-    There are various types of fuel cell (FC) technology : PEM, Alkaline, AEM, etc.
-    This class module can use FC template (PEM, Alkaline, and AEM) with their default
-    parameters as follows:
+    There are various types of fuel cell (FC) technology : PEM, Alkaline,
+    AEM, etc.
+    This class module can use FC template (PEM, Alkaline, and AEM) with their
+    default parameters as follows:
 
     from mtress.technologies import PEMFC
 
@@ -188,15 +195,15 @@ class FuelCell(AbstractFuelCell):
         )
     )
 
-    but user can also overite the default parameters as per the requirements or user can
-    ignore using the template and define all parameters manually. Moreover its possible
-    to change the input gas from Hydrogen to Methane or Biogas. By default the
-    input gas is Hydrogen.
+    but user can also overite the default parameters as per the requirements or
+    user can ignore using the template and define all parameters manually.
+    Moreover its possible to change the input gas from Hydrogen to Methane or
+    Biogas. By default the input gas is Hydrogen.
 
     Note: This FC class do not consider the offset and partload operation of
     the electrolyser i.e., electrolyser operates at full load range with fixed
-    efficiency and do not consider the part load operation. To consider partload
-    operation please use OffsetElectrolyser class.
+    efficiency and do not consider the part load operation. To consider
+    partload operation please use OffsetElectrolyser class.
     """
 
     @enable_templating(FuelCellTemplate)
@@ -217,12 +224,12 @@ class FuelCell(AbstractFuelCell):
         :param name: Name of the component
         :param nominal_power: Nominal electrical power output of Fuel Cell (FC)
             (in W)
-        :param full_load_electrical_efficiency: Electrical efficiency at max/nom load,
-            i.e. ratio of electrical output and gas input
-        :param full_load_thermal_efficiency: Thermal efficiency at the max/nom load,
-            i.e. ratio of thermal output and gas input
-        :param maximum_temperature: Maximum temperature (in °C) at which heat could
-            be extracted from FC.
+        :param full_load_electrical_efficiency: Electrical efficiency at
+            max/nom load, i.e. ratio of electrical output and gas input
+        :param full_load_thermal_efficiency: Thermal efficiency at the max/nom
+            load, i.e. ratio of thermal output and gas input
+        :param maximum_temperature: Maximum temperature (in °C) at which heat
+            could be extracted from FC.
         :param minimum_temperature: Minimum return temperature level (in °C)
         :param gas_input_pressure: Pressure at which gas is injected to FC.
         :param gas_type: Input gas to FC, by default Hydrogen gas is used.
@@ -261,37 +268,43 @@ class FuelCell(AbstractFuelCell):
 
 class OffsetFuelCell(AbstractFuelCell):
     """
-    Class for modeling a Fuel Cell (FC) technology. It inherits from AbstractFuelCell.
+    Class for modeling a Fuel Cell (FC) technology.
+    It inherits from AbstractFuelCell.
 
     Fuel cells converts chemical energy (hydrogen) to electricity, and
-    potentially produces useful heat and water as byproducts. Fuel Cell could be
-    used for various application to produce heat and power with hydrogen as fuel input.
-    Hence, it enables better sector coupling between electricity and heating sector.
-    They find widespread application in various sectors, especially stationary type fuel
-    cell, such as backup power, distributed power generation, and co-generation, in the
-    context of the MTRESS energy system.
+    potentially produces useful heat and water as byproducts. Fuel Cell could
+    be used for various application to produce heat and power with hydrogen as
+    fuel input. Hence, it enables better sector coupling between electricity
+    and heating sector. They find widespread application in various sectors,
+    especially stationary type fuel cell, such as backup power, distributed
+    power generation, and co-generation, in the context of the
+    MTRESS energy system.
 
-    PEMFC are usually rated with electrical efficiency (@ LHV) of 35-39% and thermal
-    efficiency (@ LHV) of ~20-55%. So, technically overall efficiency of 85-94% could be
-    reached, if excess heat could be recovered. The excess heat could be recovered to
-    increase the overall efficiency of the device.
-    Operating temperature of low-temperature FC could range between 50-100 °C, making
-    them suitable for space heating and boiling water for residential, commercial building,
-    and/or industrial processes, etc. For instance, the H2home project demonstrated the use
-    of PEMFC-based combined heat and power (CHP) systems for residential buildings. Ongoing
-    research aims to push the operating temperature beyond 100 °C, with high-temperature
-    PEMFCs (HT-PEMFCs) even capable of reaching up to 200 °C. Alternatively,
-    high-temperature fuel cells like Solid Oxide Fuel Cells (SOFCs) operate at even
-    higher temperatures, typically in the range of 500-1000 °C.  SOFCs are not
-    considered in MTRESS yet.  Fuel Cell CHP uses heat exchanger or heat recovery unit
-    to harness heat energy to useful energy. Heat exchangers that circulates cooling
-    liquid is used to extract heat for PEMFC, AFC, AEM and cathode air flow for SOFC.
+    PEMFC are usually rated with electrical efficiency (@ LHV) of 35-39% and
+    thermal efficiency (@ LHV) of ~20-55%. So, technically overall efficiency
+    of 85-94% could be reached, if excess heat could be recovered. The excess
+    heat could be recovered to increase the overall efficiency of the device.
+    Operating temperature of low-temperature FC could range between 50-100 °C,
+    making them suitable for space heating and boiling water for residential,
+    commercial building, and/or industrial processes, etc. For instance, the
+    H2home project demonstrated the usen of PEMFC-based combined heat and power
+    (CHP) systems for residential buildings. Ongoing research aims to push the
+    operating temperature beyond 100 °C, with high-temperature PEMFCs
+    (HT-PEMFCs) even capable of reaching up to 200 °C. Alternatively,
+    high-temperature fuel cells like Solid Oxide Fuel Cells (SOFCs) operate at
+    even higher temperatures, typically in the range of 500-1000 °C.  SOFCs are
+    not considered in MTRESS yet. Fuel Cell CHP uses heat exchanger or heat
+    recovery unit to harness heat energy to useful energy. Heat exchangers that
+    circulates cooling liquid is used to extract heat for PEMFC, AFC, AEM and
+    cathode air flow for SOFC.
 
-    Overall, FC can offer promising solutions to our renewable-based energy system.
+    Overall, FC can offer promising solutions to our renewable-based
+    energy system.
 
-    There are various types of fuel cell (FC) technology : PEM, Alkaline, AEM, etc.
-    This class module can use FC template (PEM, Alkaline, and AEM) with their default
-    parameters as follows:
+    There are various types of fuel cell (FC) technology : PEM, Alkaline,
+    AEM, etc.
+    This class module can use FC template (PEM, Alkaline, and AEM) with their
+    default parameters as follows:
 
     from mtress.technologies import PEMFC
 
@@ -303,10 +316,10 @@ class OffsetFuelCell(AbstractFuelCell):
         )
     )
 
-    but user can also overite the default parameters as per the requirements or user can
-    ignore using the template and define all parameters manually. Moreover its possible
-    to change the input gas from Hydrogen to Methane or Biogas. By default the
-    input gas is Hydrogen.
+    but user can also overite the default parameters as per the requirements or
+    user can ignore using the template and define all parameters manually.
+    Moreover its possible to change the input gas from Hydrogen to Methane or
+    Biogas. By default the input gas is Hydrogen.
 
     Note: This Fuel Cell class consider the offsets and partload operation.
 
@@ -334,20 +347,23 @@ class OffsetFuelCell(AbstractFuelCell):
         :param name: Name of the component
         :param nominal_power: Nominal electrical power output of Fuel Cell (FC)
             (in W)
-        :param full_load_electrical_efficiency: Electrical efficiency at max/nom load,
-            i.e. ratio of electrical output and gas input
-        :param min_load_electrical_efficiency: Electrical efficiency at minimum load,
-        :param full_load_thermal_efficiency: Thermal efficiency at the max/nom load,
-            i.e. ratio of thermal output and gas input
-        :param min_load_thermal_efficiency: Thermal efficiency at the minimum load,
-        :param maximum_temperature: Maximum temperature (in °C) at which heat could
-            be extracted from FC.
+        :param full_load_electrical_efficiency: Electrical efficiency at
+            max/nom load, i.e. ratio of electrical output and gas input
+        :param min_load_electrical_efficiency: Electrical efficiency at
+            minimum load
+        :param full_load_thermal_efficiency: Thermal efficiency at the max/nom
+            load, i.e. ratio of thermal output and gas input
+        :param min_load_thermal_efficiency: Thermal efficiency at the
+            minimum load
+        :param maximum_temperature: Maximum temperature (in °C) at which heat
+            could be extracted from FC.
         :param minimum_temperature: Minimum return temperature level (in °C)
         :param gas_input_pressure: Pressure at which gas is injected to FC.
         :param gas_type: Input gas to FC, by default Hydrogen gas is used.
 
         :param min_load_thermal_efficiency: Thermal efficiency at minimum load
-        :param minimum_load: Minimum load level (fraction of the nominal/maximum load)
+        :param minimum_load: Minimum load level
+            (fraction of the nominal/maximum load)
         :param maximum_load: Maximum load level, default is 1
         """
         super().__init__(

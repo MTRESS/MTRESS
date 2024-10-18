@@ -30,7 +30,8 @@ class LayeredHeatStorage(AbstractHeatStorage):
     """
     Layered heat storage.
 
-    Matrjoschka storage, i.e. one storage per temperature level with shared resources.
+    Matrjoschka storage, i.e. one storage per temperature level
+    with shared resources.
     See https://arxiv.org/abs/2012.12664
     """
 
@@ -201,9 +202,9 @@ class LayeredHeatStorage(AbstractHeatStorage):
 
         temperatures = list(self.storage_components.keys())
 
-        # When a storage loses energy, in reality it will not direktly go to the lowest
-        # temperature. We mimic this by (additional) step-wise downshifting of the
-        # remaining heat.
+        # When a storage loses energy, in reality it will not direktly go
+        # to the lowest temperature. We mimic this by (additional) step-wise
+        # downshifting of the remaining heat.
         for lower_temperature, upper_temperature in zip(
             temperatures, temperatures[1:]
         ):
