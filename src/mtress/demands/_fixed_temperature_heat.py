@@ -13,8 +13,8 @@ class AbstractFixedTemperature(AbstractDemand, AbstractSolphRepresentation):
     """
     Superclass for heating or coolig with a fixed return temperature.
 
-    Takes energy from the flow temperature level and returns energy at the return
-    temperature level.
+    Takes energy from the flow temperature level and returns energy at the
+    return temperature level.
 
     Functionality: Demands contain time series of energy that is needed.
         The heat demand automatically connects to its corresponding
