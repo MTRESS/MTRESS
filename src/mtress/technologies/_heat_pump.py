@@ -58,7 +58,7 @@ class HeatPump(AbstractTechnology, AbstractSolphRepresentation):
         :param cop_0_35: COP for the temperature rise 0°C to 35°C
         :param max_temp_primary: Maximum inlet temperature (°C)
             at the cold side.
-        :param min_temp_primary: Minimum outlet temperature (°C)
+        :param min_temp_primary: Minimum outlet temperature (°C) 
             at the cold side.
         :param min_delta_temp_primary: Minumum delta (°C) at the cold side.
         :param max_temp_secondary: Maximum outlet temperature (°C)
