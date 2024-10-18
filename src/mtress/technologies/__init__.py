@@ -26,7 +26,7 @@ from ._electrolyser import (
 )
 from ._fuel_cell import AEMFC, AFC, PEMFC, FuelCell, OffsetFuelCell
 from ._heat_exchanger import HeatExchanger, HeatSink, HeatSource
-from ._heat_pump import HeatPump
+from ._heat_pump import HeatPump, COPReference
 from ._heat_storage import FullyMixedHeatStorage, LayeredHeatStorage
 from ._heater import GasBoiler, ResistiveHeater
 from ._photovoltaics import Photovoltaics
@@ -53,6 +53,7 @@ __all__ = [
     "AFC",
     "BatteryStorage",
     "HeatPump",
+    "COPReference",
     "CHP",
     "ResistiveHeater",
     "GasBoiler",
