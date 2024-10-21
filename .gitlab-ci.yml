@@ -15,7 +15,7 @@ cache:
 .base_environment:
   before_script:
     - apt-get update -qy
-    - apt-get install -y coinor-cbc git graphviz
+    - apt-get install -y coinor-cbc git
     - pip install .
 
 # Make the default stages explicit
