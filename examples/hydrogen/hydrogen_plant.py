@@ -125,7 +125,7 @@ solph_representation = SolphModel(
     energy_system,
     timeindex={
         "start": "2022-07-01 08:00:00",
-        "end": "2022-07-02 19:00:00",
+        "end": "2022-07-01 09:00:00",
         "freq": "15T",
         "tz": "Europe/Berlin",
     },
