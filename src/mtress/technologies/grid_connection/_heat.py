@@ -2,7 +2,8 @@
 
 from typing import Optional
 
-from oemof.solph import Bus, Flow, Source
+from oemof.solph import Bus, Flow
+from oemof.solph.components import Source
 
 from mtress._abstract_component import AbstractSolphRepresentation
 from mtress.carriers import HeatCarrier

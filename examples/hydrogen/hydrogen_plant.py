@@ -125,7 +125,7 @@ solph_representation = SolphModel(
     energy_system,
     timeindex={
         "start": "2022-07-01 08:00:00",
-        "end": "2022-07-02 19:00:00",
+        "end": "2022-07-01 09:00:00",
         "freq": "15T",
         "tz": "Europe/Berlin",
     },
@@ -148,7 +148,7 @@ flows = get_flows(myresults)
 plot = solph_representation.graph(
     detail=True, flow_results=flows, flow_color=None
 )
-plot.render(outfile="hydrogen_plant_results.png")
+# plot.render(outfile="hydrogen_plant_results.png")
 
 solved_model.write(
     "hydrogen_plant.lp", io_options={"symbolic_solver_labels": True}
