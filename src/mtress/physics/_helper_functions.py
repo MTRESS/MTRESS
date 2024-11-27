@@ -10,7 +10,6 @@ SPDX-FileCopyrightText: Lucas Schmeling
 
 SPDX-License-Identifier: MIT
 """
-
 import numpy as np
 
 from ._constants import SECONDS_PER_HOUR, ZERO_CELSIUS
@@ -25,7 +24,8 @@ def one_to_mega(arg):
 
 def mega_to_one(arg):
     """
-    use to make explicit unit conversions instead of just multiplying by 1000000
+    use to make explicit unit conversions instead of just
+    multiplying by 1000000
     """
     return arg * 1000000
 
@@ -81,6 +81,8 @@ def logarithmic_mean_temperature(temp_high, temp_low):
     :param t_low: Low Temperature (in K)
     :return: Logarithmic Mean Temperature Difference (in K)
     """
+    if temp_high < 0 or temp_low < 0:
+        raise ValueError("Temperatures in Kelvin cannot be negative.")
     return (temp_low - temp_high) / np.log(temp_low / temp_high)
 
 
@@ -92,29 +94,38 @@ def lorenz_cop(temp_low, temp_high):
     (Lorenz, H, 1895. Die Ermittlung der Grenzwerte der
     thermodynamischen Energieumwandlung. Zeitschrift für
     die gesammte Kälte-Industrie, 2(1-3, 6-12).)
-    :param temp_low: Inlet Temperature (in K?)
-    :param temp_high: Outlet Temperature (in K?)
+    :param temp_low: Inlet Temperature (in K)
+    :param temp_high: Outlet Temperature (in K)
     :return: Ideal COP
     """
+    if temp_high < 0 or temp_low < 0:
+        raise ValueError("Temperatures in Kelvin cannot be negative.")
     return temp_high / np.maximum(temp_high - temp_low, 1e-3)
 
 
 def calc_cop(
-    temp_primary_in,
-    temp_secondary_out,
-    temp_primary_out=None,
-    temp_secondary_in=None,
-    cop_0_35=4.6,
+    ref_cop,
+    temp_primary_in: float = None,
+    temp_secondary_out: float = None,
+    temp_primary_out: float = None,
+    temp_secondary_in: float = None,
 ):
     """
-    :param temp_input: Higher Temperature of the source (in K)
-    :param temp_highput: Flow Temperature of the heating system (in K)
-    :param cop_0_35: COP for B0/W35
+    :param ref_cop: Data class representing the reference COP
+    :param temp_primary_in: Inlet temperature in the primary side (in °C)
+    :param temp_secondary_out: Outlet temperature in the secondary side (in °C)
+    :param temp_primary_out: Outlet temperature in the primary side (in °C)
+    :param temp_secondary_in: Inlet temperature in the secondary side (in °C)
     :return: Scaled COP for the given temperatures
     """
+
+    temp_primary_in = celsius_to_kelvin(temp_primary_in)
+    temp_secondary_out = celsius_to_kelvin(temp_secondary_out)
+
     if temp_primary_out is None or temp_primary_out == temp_primary_in:
         temp_low = temp_primary_in
     else:
+        temp_primary_out = celsius_to_kelvin(temp_primary_out)
         temp_low = logarithmic_mean_temperature(
             temp_high=temp_primary_in, temp_low=temp_primary_out
         )
@@ -122,19 +133,23 @@ def calc_cop(
     if temp_secondary_in is None or temp_secondary_out == temp_secondary_in:
         temp_high = temp_secondary_out
     else:
+        temp_secondary_in = celsius_to_kelvin(temp_secondary_in)
         temp_high = logarithmic_mean_temperature(
             temp_high=temp_secondary_out, temp_low=temp_secondary_in
         )
 
-    cpf = cop_0_35 / lorenz_cop(
+    # intermediate step: cop_design/lorenz_design
+    cpf = ref_cop.cop / lorenz_cop(
         temp_low=logarithmic_mean_temperature(
-            temp_high=celsius_to_kelvin(0), temp_low=celsius_to_kelvin(-5)
+            temp_high=celsius_to_kelvin(ref_cop.cold_side_in),
+            temp_low=celsius_to_kelvin(ref_cop.cold_side_out),
         ),
         temp_high=logarithmic_mean_temperature(
-            temp_high=celsius_to_kelvin(35), temp_low=celsius_to_kelvin(30)
+            temp_high=celsius_to_kelvin(ref_cop.warm_side_out),
+            temp_low=celsius_to_kelvin(ref_cop.warm_side_in),
         ),
     )
-
+    # cop = cop_design * (lorenz_real/lorenz_design)
     cop = cpf * lorenz_cop(temp_low=temp_low, temp_high=temp_high)
 
     return cop
@@ -142,11 +157,12 @@ def calc_cop(
 
 def calc_isothermal_compression_energy(p_in, p_out, T=20, R=4124.2):
     r"""
-    Calculate the energy demand to compress an ideal gas at constant temperature.
+    Calculate the energy demand to compress an ideal gas at
+    constant temperature.
 
     This function calculates the energy demand for an isothermal compression
-    of 1 kg of an ideal gas with gas constant R from input_pressure p_in to input_pressure
-    p_out.
+    of 1 kg of an ideal gas with gas constant R from input_pressure p_in to
+    input_pressure p_out.
 
     The work required for isothermal compression from input_pressure level
     :math:`p_\mathrm{in}` to :math:`p_\mathrm{out}` at the temperature

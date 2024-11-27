@@ -27,7 +27,8 @@ class AbstractTechnology(AbstractComponent):
         super().__init__(**kwargs)
         self._flows = {flow_type: set() for flow_type in FlowType}
 
-    # TODO: The flow categorization logic should probably move to a solph specific class
+    # TODO: The flow categorization logic should probably move to a solph
+    # specific class
     def categorise_flow(self, flow, flow_types):
         """Categorise given flow under the named flow_types."""
         for flow_type in flow_types | {FlowType.ALL}:

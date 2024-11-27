@@ -26,8 +26,8 @@ class GasGridConnection(AbstractGridConnection, AbstractSolphRepresentation):
 
     Note: Working_rate must be defined to enable gas import for your
           energy system.
-          Revenue must be defined to enable the gas export to gas grid connection of
-          the same location.
+          Revenue must be defined to enable the gas export to gas grid
+          connection of the same location.
     """
 
     def __init__(
@@ -115,12 +115,16 @@ class GasGridConnection(AbstractGridConnection, AbstractSolphRepresentation):
         self,
         other: GasGridConnection,
     ):
-        # TODO create the actual flows between the location in establish interconnections
+        # TODO create the actual flows between the location
+        # in establish interconnections
         self.b_grid_export.outputs[other.b_grid_import] = Flow()
         if self.grid_pressure < other.grid_pressure:
             raise ValueError(
-                "Pressure level of the exporting GasGridConnection should be higher "
-                "than or equal to importing GasGridConnection at another location "
-                "(destination). Alternative is to use compressor to raise the pressure "
-                " level, which is not yet implemented."
+                """
+                Pressure level of the exporting GasGridConnection should 
+                be higher than or equal to importing GasGridConnection at 
+                another location (destination). Alternative is to use
+                compressor to raise the pressure level, which is not yet 
+                implemented.
+                """
             )

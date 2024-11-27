@@ -17,6 +17,20 @@ def get_flows(results):
 
     return flows
 
+def get_storage_content(results):
+    """
+    Extract storage content from results dictionary.
+
+    :param results: Results from solph optimization
+    """
+    storage_content = {
+        source_node.label: result["sequences"]["storage_content"]
+        for (source_node, destination_node), result in results.items()
+        if "storage_content" in result["sequences"]
+    }
+
+    return storage_content
+
 
 def get_status(results):
     """
@@ -40,14 +54,13 @@ def get_status(results):
 def get_variables(results):
     """
     Extract variables from results dictionary.
-
-    To access the data you might want to use the xs function, i.e.
-    >>> flows = get_flows(results)
-    >>> flows.xs('component0', axis=1, level='component')
-    >>> flows.xs('variable0', axis=1, level='variable_name')
-
+    
     :param results: Results from oemof optimization
     """
+    # To access the data you might want to use the xs function, i.e.
+    # >>> flows = get_flows(results)
+    # >>> flows.xs('component0', axis=1, level='component')
+    # >>> flows.xs('variable0', axis=1, level='variable_name')
     variables = {
         source_node.label: result["sequences"]
         for (source_node, destination_node), result in results.items()

@@ -94,8 +94,8 @@ class FullyMixedHeatStorage(AbstractHeatStorage, AbstractHomogenousStorage):
 
         self.build_multiplexer_structure(
             levels=carrier.levels_above_reference,
-            inputs=carrier.levels,
-            outputs=carrier.levels,
+            inputs=carrier.level_nodes,
+            outputs=carrier.level_nodes,
             power_limit=self.power_limit,
             empty_level=empty_level,
             solph_storage_arguments=solph_storage_arguments,

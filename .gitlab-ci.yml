@@ -15,8 +15,7 @@ cache:
 .base_environment:
   before_script:
     - apt-get update -qy
-    - apt-get install -y coinor-cbc git
-    - apt-get -yq install graphviz
+    - apt-get install -y coinor-cbc git graphviz
     - pip install .
 
 # Make the default stages explicit
@@ -40,8 +39,10 @@ pytest:
   script:
     # install the dependencies necessary to run the tests
     - pip install pytest pytest-cov
-    # runs the tests from the installed package and produces an html report specifying the test gaps
+    # runs tests on the installed package and produces an html report specifying the test gaps
     - python -m pytest --cov-report=term-missing --cov-report=html --cov=mtress
+    # runs tests on the documentation
+    - python -m pytest --doctest-modules --doctest-ignore-import-errors --cov-report=term-missing --cov=examples/ --cov=src/
   coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
   artifacts:
     paths:
