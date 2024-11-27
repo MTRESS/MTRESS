@@ -236,7 +236,9 @@ def test_graph_detail():
     obj_names = [obj["name"] for obj in plot_json_dict["objects"]]
     for n in nodes:
         assert (
-            f"SolphLabel(location='{n[0]}', mtress_component='{n[1]}', solph_node='{n[2]}')"
+            f"SolphLabel(location='{n[0]}',"
+            + f" mtress_component='{n[1]}', "
+            + f"solph_node='{n[2]}')"
             in obj_names
         )
 
@@ -315,7 +317,9 @@ def test_graph_flow():
     obj_names = [obj["name"] for obj in plot_json_dict["objects"]]
     for n in nodes:
         assert (
-            f"SolphLabel(location='{n[0]}', mtress_component='{n[1]}', solph_node='{n[2]}')"
+            f"SolphLabel(location='{n[0]}', "
+            + f"mtress_component='{n[1]}', "
+            + f"solph_node='{n[2]}')"
             in obj_names
         )
 
@@ -374,6 +378,8 @@ def test_graph_series():
         obj_names = [obj["name"] for obj in plot_json_dict["objects"]]
         for n in nodes:
             assert (
-                f"SolphLabel(location='{n[0]}', mtress_component='{n[1]}', solph_node='{n[2]}')"
+                f"SolphLabel(location='{n[0]}',"
+                + f" mtress_component='{n[1]}',"
+                + f" solph_node='{n[2]}')"
                 in obj_names
             )
